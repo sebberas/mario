@@ -7,6 +7,7 @@ use sdl2::event::*;
 mod renderer;
 
 use sdl2::keyboard::*;
+use sdl2::messagebox::*;
 use serde::{Deserialize, Serialize};
 use serde_json as json;
 
@@ -14,6 +15,7 @@ use image::*;
 
 use self::scene::*;
 
+mod audio;
 mod scene;
 
 fn main() {
@@ -51,28 +53,36 @@ fn main() {
         }
 
         canvas.present();
+
+        game.update(&mut scene);
     }
+
+    game.on_destroy(&mut scene);
 }
 
 #[derive(Serialize, Deserialize, Debug, Default)]
-struct Game {}
+struct Game {
+    completed: Vec<SceneId>,
+}
 
 impl Game {
-    pub fn new(scene: &mut Scene) -> Self {
-        // std::fs::write(
-        //     "./assets/scenes/scene.json",
-        //     json::to_string(&scene).unwrap(),
-        // );
+    const SAVE: &str = "./assets/save.json";
 
+    pub fn new(scene: &mut Scene) -> Self {
         let file = File::open("./assets/save.json").ok();
 
-        file.map(json::from_reader)
-            .transpose()
-            .unwrap()
-            .unwrap_or_default()
+        let game = file.map(|file| json::from_reader(file).unwrap());
+        game.unwrap_or_default()
     }
 
     pub fn update(&mut self, scene: &mut Scene) {}
 
-    pub fn on_destroy(&mut self, scene: &mut Scene) {}
+    pub fn on_destroy(&mut self, scene: &mut Scene) {
+        let contents = json::to_string_pretty(self).unwrap();
+
+        if write(Self::SAVE, contents).is_err() {
+            let msg = "Due to un unexpected error, the game could not be saved and your progress will be lost.";
+            let _ = show_simple_message_box(MessageBoxFlag::ERROR, "Saving Game", msg, None);
+        }
+    }
 }
