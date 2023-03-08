@@ -3,9 +3,14 @@ use std::path::{Path, PathBuf};
 
 use glam::*;
 use sdl2::event::*;
+
+mod renderer;
+
 use sdl2::keyboard::*;
 use serde::{Deserialize, Serialize};
 use serde_json as json;
+
+use image::*;
 
 use self::scene::*;
 
@@ -28,6 +33,8 @@ fn main() {
         tiles: Vec::default(),
         background: vec4(1.0, 1.0, 1.0, 1.0),
     };
+
+    let renderer: Renderer = Renderer::new();
 
     let game = Game::new(&mut scene);
 
