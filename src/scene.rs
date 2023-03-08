@@ -55,4 +55,7 @@ pub struct Scene {
 }
 
 #[derive(Debug, Deserialize, Serialize)]
+pub struct SceneId(usize);
+
+#[derive(Debug, Deserialize, Serialize)]
 pub struct SpriteId(usize);
