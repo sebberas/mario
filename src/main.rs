@@ -2,20 +2,18 @@ use std::fs::*;
 use std::path::{Path, PathBuf};
 
 use glam::*;
+use renderer::Renderer;
 use sdl2::event::*;
-
-mod renderer;
 
 use sdl2::keyboard::*;
 use sdl2::messagebox::*;
 use serde::{Deserialize, Serialize};
 use serde_json as json;
 
-use image::*;
-
 use self::scene::*;
 
 mod audio;
+mod renderer;
 mod scene;
 
 fn main() {
@@ -36,9 +34,9 @@ fn main() {
         background: vec4(1.0, 1.0, 1.0, 1.0),
     };
 
-    let renderer: Renderer = Renderer::new();
+    let mut renderer = Renderer::new(&mut canvas);
 
-    let game = Game::new(&mut scene);
+    let mut game = Game::new(&mut scene);
 
     'running: loop {
         for event in event_pump.poll_iter() {
@@ -51,9 +49,7 @@ fn main() {
                 _ => {}
             }
         }
-
-        canvas.present();
-
+        renderer.render_image(Vec2::from((0.0, 0.0)), 20);
         game.update(&mut scene);
     }
 

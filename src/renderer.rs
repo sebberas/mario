@@ -1,17 +1,42 @@
-use sdl2::image::LoadTexture;
-use sdl2::render::{Texture, WindowCanvas};
+use glam::Vec2;
+use sdl2::pixels::Color;
+use sdl2::rect::Rect;
+use sdl2::render::WindowCanvas;
+
+use image::io::Reader as ImageReader;
+use image::{GenericImage, GenericImageView, ImageBuffer, RgbImage};
 
 pub struct Renderer<'a> {
-    canvas: &'a mut WindowCanvas,
+    pub canvas: &'a mut WindowCanvas,
 }
 
 impl Renderer<'_> {
-    fn new(&mut self, canvas: &mut WindowCanvas) -> Self {
-        Self { canvas }
+    pub fn new(canvas: &'_ mut WindowCanvas) -> Renderer {
+        Renderer { canvas }
     }
 
-    fn render_image(&mut self) {
-        let texture_creator = self.canvas.texture_creator();
-        let texture = texture_creator.load_texture("texture_test.png");
+    pub fn render_image(&mut self, position: Vec2, size: u32) {
+        let sprite = image::open("assets/sprites/texture_test.png")
+            .unwrap()
+            .to_rgb8();
+
+        for (x, y, color) in sprite.enumerate_pixels() {
+            let color: Color = sdl2::pixels::Color {
+                r: color.0[0],
+                g: color.0[1],
+                b: color.0[2],
+                a: 255,
+            };
+            self.canvas.set_draw_color(color);
+            self.canvas
+                .fill_rect(Rect::new(
+                    (position.x as u32 + x * size) as _,
+                    (position.y as u32 + y * size) as _,
+                    position.x as u32 + x * size + size,
+                    position.y as u32 + x * size + size,
+                ))
+                .unwrap();
+            self.canvas.present();
+        }
     }
 }
