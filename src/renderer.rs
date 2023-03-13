@@ -16,7 +16,7 @@ impl Renderer<'_> {
     }
 
     pub fn render_image(&mut self, position: Vec2, size: u32) {
-        let sprite = image::open("assets/sprites/texture_test.png")
+        let sprite = image::open("assets/audio/sprites/micePng.png")
             .unwrap()
             .to_rgb8();
 
