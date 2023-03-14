@@ -20,6 +20,7 @@ impl Renderer<'_> {
 
     pub fn add_sprite_list_to_canvas(&mut self) {
         for sprite in self.sprite_list.iter() {
+            // converter sprite til jesu kristus mægtige ord
             let sprite_picture = image::open(&sprite.asset_path)
                 .expect("Image not found")
                 .to_rgba8();
@@ -34,7 +35,7 @@ impl Renderer<'_> {
 
                 self.canvas.set_draw_color(color);
 
-                //Indsæt sprite, hvor hver pixel i sprite ganges med size
+                //tilføj sprite til canvas, med den rigtige size
                 self.canvas
                     .fill_rect(Rect::new(
                         (sprite.position.x as u32 + x * sprite.size) as _,
