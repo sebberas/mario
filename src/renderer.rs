@@ -3,40 +3,47 @@ use sdl2::pixels::Color;
 use sdl2::rect::Rect;
 use sdl2::render::WindowCanvas;
 
-use image::io::Reader as ImageReader;
-use image::{GenericImage, GenericImageView, ImageBuffer, RgbImage};
+use crate::Sprite;
 
 pub struct Renderer<'a> {
     pub canvas: &'a mut WindowCanvas,
+    pub sprite_list: &'a mut Vec<Sprite>,
 }
 
 impl Renderer<'_> {
-    pub fn new(canvas: &'_ mut WindowCanvas) -> Renderer {
-        Renderer { canvas }
+    pub fn new<'a>(canvas: &'a mut WindowCanvas, sprite_list: &'a mut Vec<Sprite>) -> Renderer<'a> {
+        Renderer {
+            canvas,
+            sprite_list,
+        }
     }
 
-    pub fn render_image(&mut self, position: Vec2, size: u32) {
-        let sprite = image::open("assets/audio/sprites/micePng.png")
-            .unwrap()
-            .to_rgb8();
+    pub fn add_sprite_list_to_canvas(&mut self) {
+        for sprite in self.sprite_list.iter() {
+            let sprite_picture = image::open(&sprite.asset_path)
+                .expect("Image not found")
+                .to_rgba8();
 
-        for (x, y, color) in sprite.enumerate_pixels() {
-            let color: Color = sdl2::pixels::Color {
-                r: color.0[0],
-                g: color.0[1],
-                b: color.0[2],
-                a: 255,
-            };
-            self.canvas.set_draw_color(color);
-            self.canvas
-                .fill_rect(Rect::new(
-                    (position.x as u32 + x * size) as _,
-                    (position.y as u32 + y * size) as _,
-                    position.x as u32 + x * size + size,
-                    position.y as u32 + x * size + size,
-                ))
-                .unwrap();
-            self.canvas.present();
+            for (x, y, color) in sprite_picture.enumerate_pixels() {
+                let mut color: Color = sdl2::pixels::Color {
+                    r: color.0[0],
+                    g: color.0[1],
+                    b: color.0[2],
+                    a: color.0[3],
+                };
+
+                self.canvas.set_draw_color(color);
+
+                //Indsæt sprite, hvor hver pixel i sprite ganges med size
+                self.canvas
+                    .fill_rect(Rect::new(
+                        (sprite.position.x as u32 + x * sprite.size) as _,
+                        (sprite.position.y as u32 + y * sprite.size) as _,
+                        sprite.size,
+                        sprite.size,
+                    ))
+                    .unwrap();
+            }
         }
     }
 }

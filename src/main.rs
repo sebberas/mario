@@ -1,5 +1,6 @@
 use std::fs::*;
 use std::path::{Path, PathBuf};
+use std::str::SplitInclusive;
 
 use glam::*;
 use renderer::Renderer;
@@ -34,7 +35,17 @@ fn main() {
         background: vec4(1.0, 1.0, 1.0, 1.0),
     };
 
-    let mut renderer = Renderer::new(&mut canvas);
+    let mut sprite_list: Vec<Sprite> = vec![];
+
+    for i in 0..10 {
+        sprite_list.push(Sprite {
+            position: Vec2::from(((i * 100) as f32, 30.0)),
+            asset_path: String::from("assets/sprites/mario_test.png"),
+            size: 5,
+        })
+    }
+
+    let mut renderer = Renderer::new(&mut canvas, &mut sprite_list);
 
     let mut game = Game::new(&mut scene);
 
@@ -49,8 +60,11 @@ fn main() {
                 _ => {}
             }
         }
-        renderer.render_image(Vec2::from((0.0, 0.0)), 20);
+
         game.update(&mut scene);
+
+        renderer.add_sprite_list_to_canvas();
+        renderer.canvas.present();
     }
 
     game.on_destroy(&mut scene);

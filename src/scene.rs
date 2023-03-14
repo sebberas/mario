@@ -59,3 +59,20 @@ pub struct SceneId(usize);
 
 #[derive(Debug, Deserialize, Serialize)]
 pub struct SpriteId(usize);
+
+#[derive(Debug, Deserialize, Serialize)]
+pub struct Sprite {
+    pub position: Vec2,
+    pub asset_path: String,
+    pub size: u32,
+}
+
+impl Sprite {
+    pub fn new(position: Vec2, asset_path: String, size: u32) -> Sprite {
+        Sprite {
+            position,
+            asset_path,
+            size,
+        }
+    }
+}
