@@ -18,6 +18,17 @@ impl Renderer<'_> {
         }
     }
 
+    pub fn update(&mut self) {
+        self.add_sprite_list();
+        // self.add_background();
+        // self.add_enemies();
+        // self.add_entities();
+        // self.add_text();
+        // self.add_tiles();
+
+        self.canvas.present();
+    }
+
     pub fn add_sprite_list(&mut self) {
         for sprite in self.sprite_list.iter() {
             // converter sprite til jesu kristus mægtige ord
@@ -46,25 +57,25 @@ impl Renderer<'_> {
                     .unwrap();
             }
         }
+    }
 
-        pub fn add_background() {
-            todo!()
-        }
+    pub fn add_background(&mut self) {
+        todo!()
+    }
 
-        pub fn add_tiles() {
-            todo!()
-        }
+    pub fn add_tiles(&mut self) {
+        todo!()
+    }
 
-        pub fn add_text() {
-            todo!()
-        }
+    pub fn add_text(&mut self) {
+        todo!()
+    }
 
-        pub fn add_entities() {
-            todo!()
-        }
+    pub fn add_entities(&mut self) {
+        todo!()
+    }
 
-        pub fn add_enemies() {
-            todo!()
-        }
+    pub fn add_enemies(&mut self) {
+        todo!()
     }
 }

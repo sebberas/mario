@@ -4,7 +4,7 @@ use std::str::SplitInclusive;
 
 use glam::*;
 use renderer::Renderer;
-use sdl2::event::*;
+use sdl2::{event::*, render};
 
 use sdl2::keyboard::*;
 use sdl2::messagebox::*;
@@ -60,11 +60,8 @@ fn main() {
                 _ => {}
             }
         }
-
         game.update(&mut scene);
-
-        renderer.add_sprite_list();
-        renderer.canvas.present();
+        renderer.update();
     }
 
     game.on_destroy(&mut scene);
