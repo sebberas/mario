@@ -18,7 +18,7 @@ impl Renderer<'_> {
         }
     }
 
-    pub fn add_sprite_list_to_canvas(&mut self) {
+    pub fn add_sprite_list(&mut self) {
         for sprite in self.sprite_list.iter() {
             // converter sprite til jesu kristus mægtige ord
             let sprite_picture = image::open(&sprite.asset_path)
@@ -45,6 +45,26 @@ impl Renderer<'_> {
                     ))
                     .unwrap();
             }
+        }
+
+        pub fn add_background() {
+            todo!()
+        }
+
+        pub fn add_tiles() {
+            todo!()
+        }
+
+        pub fn add_text() {
+            todo!()
+        }
+
+        pub fn add_entities() {
+            todo!()
+        }
+
+        pub fn add_enemies() {
+            todo!()
         }
     }
 }

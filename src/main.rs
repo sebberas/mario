@@ -63,7 +63,7 @@ fn main() {
 
         game.update(&mut scene);
 
-        renderer.add_sprite_list_to_canvas();
+        renderer.add_sprite_list();
         renderer.canvas.present();
     }
 
