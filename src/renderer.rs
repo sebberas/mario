@@ -1,48 +1,48 @@
-use glam::Vec2;
+use glam::*;
 use sdl2::pixels::Color;
 use sdl2::rect::Rect;
 use sdl2::render::WindowCanvas;
 
+use crate::scene::{self, Rgba, Scene};
 use crate::Sprite;
+
+use crate::scene::*;
 
 pub struct Renderer<'a> {
     pub canvas: &'a mut WindowCanvas,
-    pub sprite_list: &'a mut Vec<Sprite>,
 }
 
 impl Renderer<'_> {
-    pub fn new<'a>(canvas: &'a mut WindowCanvas, sprite_list: &'a mut Vec<Sprite>) -> Renderer<'a> {
-        Renderer {
-            canvas,
-            sprite_list,
-        }
+    pub fn new<'a>(canvas: &'a mut WindowCanvas) -> Renderer<'a> {
+        Renderer { canvas }
     }
 
-    pub fn update(&mut self) {
-        self.add_sprite_list();
-        // self.add_background();
-        // self.add_enemies();
-        // self.add_entities();
-        // self.add_text();
-        // self.add_tiles();
+    pub fn update(&mut self, scene: &mut Scene) {
+        self.draw_background(scene.background);
+        self.draw_image(&scene.sprites);
+        // self.draw_enemies();
+        // self.draw_entities();
+        // self.draw_text();
+        // self.draw_tiles();
 
         self.canvas.present();
     }
 
-    pub fn add_sprite_list(&mut self) {
-        for sprite in self.sprite_list.iter() {
-            // converter sprite til jesu kristus mægtige ord
+    pub fn draw_image(&mut self, sprites: &[Sprite]) {
+        for sprite in sprites {
+            // converter sprite til islam
             let sprite_picture = image::open(&sprite.asset_path)
                 .expect("Image not found")
                 .to_rgba8();
 
             for (x, y, color) in sprite_picture.enumerate_pixels() {
-                let mut color: Color = sdl2::pixels::Color {
-                    r: color.0[0],
-                    g: color.0[1],
-                    b: color.0[2],
-                    a: color.0[3],
-                };
+                let col_vec = vec4(
+                    (color.0[0] * (color.0[3] / 255)) as f32,
+                    (color.0[1] * (color.0[3] / 255)) as f32,
+                    (color.0[2] * (color.0[3] / 255)) as f32,
+                    color.0[3] as f32,
+                );
+                let color = Color::from(Rgba::from(col_vec));
 
                 self.canvas.set_draw_color(color);
 
@@ -59,23 +59,24 @@ impl Renderer<'_> {
         }
     }
 
-    pub fn add_background(&mut self) {
+    pub fn draw_background(&mut self, color: Rgba) {
+        self.canvas.set_draw_color(Color::from(color));
+        self.canvas.clear();
+    }
+
+    pub fn draw_tiles(&mut self) {
         todo!()
     }
 
-    pub fn add_tiles(&mut self) {
+    pub fn draw_text(&mut self) {
         todo!()
     }
 
-    pub fn add_text(&mut self) {
+    pub fn draw_entities(&mut self) {
         todo!()
     }
 
-    pub fn add_entities(&mut self) {
-        todo!()
-    }
-
-    pub fn add_enemies(&mut self) {
+    pub fn draw_enemies(&mut self) {
         todo!()
     }
 }
