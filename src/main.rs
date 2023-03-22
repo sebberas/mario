@@ -1,21 +1,48 @@
+#![feature(let_chains)]
+
 use std::fs::*;
 use std::path::{Path, PathBuf};
 use std::str::SplitInclusive;
 
+use editor::Editor;
 use glam::*;
 use renderer::Renderer;
 use sdl2::event::*;
-
 use sdl2::keyboard::*;
 use sdl2::messagebox::*;
+use sdl2::video::*;
+use sdl2::VideoSubsystem;
 use serde::{Deserialize, Serialize};
 use serde_json as json;
+use task::TaskManager;
 
 use self::scene::*;
 
 mod audio;
 mod renderer;
 mod scene;
+mod task;
+
+mod editor;
+
+pub trait Layer: Sized {
+    fn new(system: VideoSubsystem) -> Self;
+
+    fn update(&mut self);
+
+    fn handle_events<'a>(&mut self, events: impl Iterator<Item = &'a Event>);
+
+    fn window(&self) -> &Window;
+    fn window_mut(&mut self) -> &mut Window;
+
+    fn show(&mut self) {
+        self.window_mut().show();
+    }
+
+    fn hide(&mut self) {
+        self.window_mut().hide();
+    }
+}
 
 fn main() {
     let sdl = sdl2::init().unwrap();
@@ -23,51 +50,31 @@ fn main() {
     let video = sdl.video().unwrap();
     let audio = sdl.audio().unwrap();
 
+    let mut editor = Editor::new(video.clone());
+
     let window = video.window("Super Mario Bros", 800, 600).build().unwrap();
     let mut canvas = window.into_canvas().build().unwrap();
 
-    let mut scene = Scene {
-        camera: Camera::new(vec2(0.0, 0.0)),
-        enemies: Vec::default(),
-        entities: Vec::default(),
-        text: Vec::default(),
-        tiles: Vec::default(),
-        background: vec4(1.0, 1.0, 1.0, 1.0),
-    };
-
-    let mut sprite_list: Vec<Sprite> = vec![];
-
-    for i in 0..10 {
-        sprite_list.push(Sprite {
-            position: Vec2::from(((i * 100) as f32, 30.0)),
-            asset_path: String::from("assets/sprites/mario_test.png"),
-            size: 5,
-        })
-    }
-
-    let mut renderer = Renderer::new(&mut canvas, &mut sprite_list);
-
-    let mut game = Game::new(&mut scene);
-
     'running: loop {
-        for event in event_pump.poll_iter() {
+        let events: Vec<_> = event_pump.poll_iter().collect();
+        editor.handle_events(events.iter());
+
+        for event in events {
             match event {
-                Event::Quit { .. }
-                | Event::KeyDown {
-                    keycode: Some(Keycode::Escape),
+                Event::Quit { .. } => break 'running,
+                Event::Window {
+                    window_id,
+                    win_event,
                     ..
-                } => break 'running,
+                } => {
+                    if window_id == canvas.window().id() && win_event == WindowEvent::Close {
+                        break 'running;
+                    }
+                }
                 _ => {}
             }
         }
-
-        game.update(&mut scene);
-
-        renderer.add_sprite_list_to_canvas();
-        renderer.canvas.present();
     }
-
-    game.on_destroy(&mut scene);
 }
 
 #[derive(Serialize, Deserialize, Debug, Default)]
