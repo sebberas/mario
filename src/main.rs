@@ -11,7 +11,7 @@ use sdl2::event::*;
 use sdl2::keyboard::*;
 use sdl2::messagebox::*;
 use sdl2::video::*;
-use sdl2::VideoSubsystem;
+use sdl2::{AudioSubsystem, VideoSubsystem};
 use serde::{Deserialize, Serialize};
 use serde_json as json;
 use task::TaskManager;
@@ -25,12 +25,18 @@ mod task;
 
 mod editor;
 
-pub trait Layer: Sized {
-    fn new(system: VideoSubsystem) -> Self;
+pub trait Layer {
+    fn new(video: VideoSubsystem, audio: AudioSubsystem) -> Self
+    where
+        Self: Sized;
 
     fn update(&mut self);
 
-    fn handle_events<'a>(&mut self, events: impl Iterator<Item = &'a Event>);
+    /// All window events that make it to an implementation of Layer are
+    /// guaranteed to belong to that layers window.
+    fn handle_events(&mut self, events: &mut dyn Iterator<Item = &Event>);
+
+    fn should_close(&self) -> bool;
 
     fn window(&self) -> &Window;
     fn window_mut(&mut self) -> &mut Window;
@@ -44,35 +50,64 @@ pub trait Layer: Sized {
     }
 }
 
+struct Runtime;
+impl Layer for Runtime {
+    fn new(video: VideoSubsystem, audio: AudioSubsystem) -> Self {
+        Self
+    }
+
+    fn update(&mut self) {}
+
+    fn handle_events(&mut self, events: &mut dyn Iterator<Item = &Event>) {}
+
+    fn should_close(&self) -> bool {
+        false
+    }
+
+    fn window(&self) -> &Window {
+        todo!()
+    }
+
+    fn window_mut(&mut self) -> &mut Window {
+        todo!()
+    }
+}
+
 fn main() {
     let sdl = sdl2::init().unwrap();
     let mut event_pump = sdl.event_pump().unwrap();
     let video = sdl.video().unwrap();
     let audio = sdl.audio().unwrap();
 
-    let mut editor = Editor::new(video.clone());
+    let mut layers: [Option<Box<dyn Layer>>; 1] = [
+        // Some(Box::new(Runtime::new(video.clone(), audio.clone()))),
+        Some(Box::new(Editor::new(video.clone(), audio.clone()))),
+    ];
 
-    let window = video.window("Super Mario Bros", 800, 600).build().unwrap();
-    let mut canvas = window.into_canvas().build().unwrap();
-
-    'running: loop {
+    loop {
         let events: Vec<_> = event_pump.poll_iter().collect();
-        editor.handle_events(events.iter());
 
-        for event in events {
-            match event {
-                Event::Quit { .. } => break 'running,
-                Event::Window {
-                    window_id,
-                    win_event,
-                    ..
-                } => {
-                    if window_id == canvas.window().id() && win_event == WindowEvent::Close {
-                        break 'running;
-                    }
-                }
-                _ => {}
+        for layer in &mut layers {
+            if let Some(layer) = layer {
+                let layer_id = layer.window().id();
+
+                let mut iter = events.iter().filter(|event| match event {
+                    Event::Window { window_id, .. } => *window_id == layer_id,
+                    Event::Quit { .. } => false,
+                    _ => true,
+                });
+
+                layer.handle_events(&mut iter);
+                layer.update();
             }
+
+            if layer.as_ref().map(|l| l.should_close()).unwrap_or(false) {
+                layer.take();
+            }
+        }
+
+        if layers.iter().all(Option::is_none) {
+            break;
         }
     }
 }

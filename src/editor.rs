@@ -1,7 +1,9 @@
 use sdl2::event::*;
+use sdl2::pixels::Color;
+use sdl2::rect::{Point, Rect};
 use sdl2::render::*;
 use sdl2::video::*;
-use sdl2::VideoSubsystem;
+use sdl2::{AudioSubsystem, VideoSubsystem};
 
 const SDL_WINDOW_INPUT_FOCUS: u32 = 0x00000200;
 const SDL_WINDOW_MOUSE_FOCUS: u32 = 0x00000400;
@@ -9,44 +11,66 @@ const SDL_WINDOW_MOUSE_FOCUS: u32 = 0x00000400;
 use crate::Layer;
 
 pub struct Editor {
-    system: VideoSubsystem,
+    video: VideoSubsystem,
     canvas: WindowCanvas,
+    should_close: bool,
 }
 
 impl Layer for Editor {
-    fn new(system: VideoSubsystem) -> Self {
-        let window = system.window("Editor", 800, 600).build().unwrap();
+    fn new(video: VideoSubsystem, audio: AudioSubsystem) -> Self {
+        let window = video.window("Editor", 1600, 1200).build().unwrap();
         let canvas = window.into_canvas().accelerated().build().unwrap();
-        Self { system, canvas }
+
+        Self {
+            video,
+            canvas,
+            should_close: false,
+        }
     }
 
-    fn update(&mut self) {}
+    fn update(&mut self) {
+        const TILES: u32 = 16;
 
-    fn handle_events<'a>(&mut self, events: impl Iterator<Item = &'a Event>) {
-        let window = self.canvas.window();
+        let Self { canvas, .. } = self;
 
-        // We should only handle window events that belongs to this window.
-        let events = events.filter(|e| {
-            if let Event::Window { window_id, .. } = e && &window.id() == window_id  {
-               true
-            } else {
-                false
-            }
-        });
+        canvas.set_draw_color(Color::RGB(229, 231, 235));
+        canvas.fill_rect(None).unwrap();
 
+        let (width, height) = canvas.window().size();
+        let size = height / TILES;
+
+        canvas.set_draw_color(Color::RGB(255, 0, 0));
+        for i in 0..(width / size) {
+            canvas.draw_line(
+                Point::new((i * size + size) as _, 0),
+                Point::new((i * size + size) as _, height as _),
+            );
+        }
+
+        for i in 0..TILES {
+            canvas.draw_line(
+                Point::new(0, (i * size + size) as _),
+                Point::new(width as _, (i * size + size) as _),
+            );
+        }
+
+        canvas.present();
+    }
+
+    fn handle_events(&mut self, events: &mut dyn Iterator<Item = &Event>) {
         for event in events {
             match event {
+                Event::Window { win_event, .. } => match *win_event {
+                    WindowEvent::Close => self.should_close = true,
+                    _ => {}
+                },
                 _ => {}
             }
-
-            if window.window_flags() & SDL_WINDOW_INPUT_FOCUS != 0 {
-                println!("keyboard focus");
-            }
-
-            if window.window_flags() & SDL_WINDOW_MOUSE_FOCUS != 0 {
-                println!("mouse focus");
-            }
         }
+    }
+
+    fn should_close(&self) -> bool {
+        self.should_close
     }
 
     fn window(&self) -> &Window {
