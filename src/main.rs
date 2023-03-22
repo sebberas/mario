@@ -12,8 +12,10 @@ use serde::{Deserialize, Serialize};
 use serde_json as json;
 
 use self::scene::*;
+use self::map::*;
 
 mod audio;
+mod map;
 mod renderer;
 mod scene;
 
@@ -25,19 +27,20 @@ fn main() {
 
     let window = video.window("Super Mario Bros", 800, 600).build().unwrap();
     let mut canvas = window.into_canvas().build().unwrap();
+    canvas.default_pixel_format();
+    canvas.set_blend_mode(sdl2::render::BlendMode::Blend);
 
     let mut scene = Scene {
         camera: Camera::new(vec2(0.0, 0.0)),
         enemies: Vec::default(),
         entities: Vec::default(),
         sprites: vec![Sprite::new(
-            vec2(50.0, 50.0),
+            (uvec2(0, 0), uvec2(16, 16)),
             String::from("assets/sprites/mario_test.png"),
-            20,
         )],
         text: Vec::default(),
-        tiles: Vec::default(),
-        background: vec4(1.0, 1.0, 1.0, 1.0).into(),
+        map_tiles: Vec::default(),
+        background: vec4(0.0, 1.0, 1.0, 0.0).into(),
     };
 
     let mut renderer = Renderer::new(&mut canvas);

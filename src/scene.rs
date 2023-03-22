@@ -2,6 +2,8 @@ use glam::*;
 use sdl2::pixels::*;
 use serde::{Deserialize, Serialize};
 
+use crate::map::*;
+
 #[derive(Serialize, Deserialize, Debug, Clone, Copy)]
 pub struct Rgba(Vec4);
 
@@ -68,11 +70,6 @@ pub enum Entity {
 }
 
 #[derive(Debug, Deserialize, Serialize)]
-pub struct Tile {
-    sprite: SpriteId,
-}
-
-#[derive(Debug, Deserialize, Serialize)]
 pub struct Text {}
 
 #[derive(Debug, Deserialize, Serialize)]
@@ -86,7 +83,7 @@ pub struct Scene {
 
     pub text: Vec<Text>,
 
-    pub tiles: Vec<Tile>,
+    pub map_tiles: Vec<MapTile>,
     pub background: Rgba,
 }
 
@@ -98,17 +95,15 @@ pub struct SpriteId(usize);
 
 #[derive(Debug, Deserialize, Serialize, Clone)]
 pub struct Sprite {
-    pub position: Vec2,
+    pub bounding_box: (UVec2, UVec2),
     pub asset_path: String,
-    pub size: u32,
 }
 
 impl Sprite {
-    pub fn new(position: Vec2, asset_path: String, size: u32) -> Sprite {
+    pub fn new(bounding_box: (UVec2, UVec2), asset_path: String) -> Sprite {
         Sprite {
-            position,
+            bounding_box,
             asset_path,
-            size,
         }
     }
 }
