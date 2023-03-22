@@ -1,4 +1,5 @@
 #![feature(let_chains)]
+#![feature(option_result_contains)]
 
 use std::fs::*;
 use std::path::{Path, PathBuf};
@@ -75,9 +76,9 @@ impl Layer for Runtime {
 
 fn main() {
     let sdl = sdl2::init().unwrap();
-    let mut event_pump = sdl.event_pump().unwrap();
     let video = sdl.video().unwrap();
     let audio = sdl.audio().unwrap();
+    let mut event_pump = sdl.event_pump().unwrap();
 
     let mut layers: [Option<Box<dyn Layer>>; 1] = [
         // Some(Box::new(Runtime::new(video.clone(), audio.clone()))),
@@ -93,6 +94,8 @@ fn main() {
 
                 let mut iter = events.iter().filter(|event| match event {
                     Event::Window { window_id, .. } => *window_id == layer_id,
+                    Event::MouseButtonDown { window_id, .. } => *window_id == layer_id,
+                    Event::KeyDown { window_id, .. } => *window_id == layer_id,
                     Event::Quit { .. } => false,
                     _ => true,
                 });
