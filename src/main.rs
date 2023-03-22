@@ -4,7 +4,7 @@ use std::str::SplitInclusive;
 
 use glam::*;
 use renderer::Renderer;
-use sdl2::event::*;
+use sdl2::{event::*, render};
 
 use sdl2::keyboard::*;
 use sdl2::messagebox::*;
@@ -30,22 +30,17 @@ fn main() {
         camera: Camera::new(vec2(0.0, 0.0)),
         enemies: Vec::default(),
         entities: Vec::default(),
+        sprites: vec![Sprite::new(
+            vec2(50.0, 50.0),
+            String::from("assets/sprites/mario_test.png"),
+            20,
+        )],
         text: Vec::default(),
         tiles: Vec::default(),
-        background: vec4(1.0, 1.0, 1.0, 1.0),
+        background: vec4(1.0, 1.0, 1.0, 1.0).into(),
     };
 
-    let mut sprite_list: Vec<Sprite> = vec![];
-
-    for i in 0..10 {
-        sprite_list.push(Sprite {
-            position: Vec2::from(((i * 100) as f32, 30.0)),
-            asset_path: String::from("assets/sprites/mario_test.png"),
-            size: 5,
-        })
-    }
-
-    let mut renderer = Renderer::new(&mut canvas, &mut sprite_list);
+    let mut renderer = Renderer::new(&mut canvas);
 
     let mut game = Game::new(&mut scene);
 
@@ -60,11 +55,8 @@ fn main() {
                 _ => {}
             }
         }
-
         game.update(&mut scene);
-
-        renderer.add_sprite_list_to_canvas();
-        renderer.canvas.present();
+        renderer.update(&mut scene);
     }
 
     game.on_destroy(&mut scene);
