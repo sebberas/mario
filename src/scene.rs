@@ -46,14 +46,19 @@ pub struct Camera {
 
 impl Camera {
     pub fn new(position: Vec2) -> Self {
-        Self {
-            position
-        }
+        Self { position }
     }
 }
 
 #[derive(Debug, Deserialize, Serialize)]
-pub enum Enemy {
+pub struct Enemy {
+    pub enemy_type: EnemyType,
+    pub position: UVec2,
+    // movement pattern?
+}
+
+#[derive(Debug, Deserialize, Serialize)]
+pub enum EnemyType {
     Goomba(),
     Piranha(),
     Koopa(),
@@ -80,8 +85,8 @@ pub struct Text {}
 pub struct Scene {
     pub camera: Camera,
 
-    pub entities: Vec<(Vec2, Entity)>,
-    pub enemies: Vec<(Vec2, Enemy)>,
+    pub entities: Vec<Entity>,
+    pub enemies: Vec<Enemy>,
 
     pub sprites: Vec<Sprite>,
 
@@ -108,6 +113,25 @@ impl Sprite {
         Sprite {
             bounding_box,
             asset_path,
+        }
+    }
+
+    pub fn from_enemy(enemy: &Enemy) -> Sprite {
+        match enemy.enemy_type {
+            EnemyType::Goomba() => Sprite::new((uvec2(0, 10), uvec2(0, 10)), String::from("")),
+            EnemyType::Koopa() => Sprite::new((uvec2(0, 10), uvec2(0, 10)), String::from("")),
+            EnemyType::Piranha() => Sprite::new((uvec2(0, 10), uvec2(0, 10)), String::from("")),
+            _ => unreachable!(),
+        }
+    }
+
+    pub fn from_entity(entity: &Entity) -> Sprite {
+        match entity {
+            Entity::Coin() => Sprite::new((uvec2(0, 10), uvec2(0, 10)), String::from("")),
+            Entity::Player() => Sprite::new((uvec2(0, 10), uvec2(0, 10)), String::from("")),
+            Entity::Pipe() => Sprite::new((uvec2(0, 10), uvec2(0, 10)), String::from("")),
+            Entity::Item() => Sprite::new((uvec2(0, 10), uvec2(0, 10)), String::from("")),
+            Entity::Block() => Sprite::new((uvec2(0, 10), uvec2(0, 10)), String::from("")),
         }
     }
 }

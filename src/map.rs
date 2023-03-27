@@ -3,7 +3,7 @@ use sdl2::pixels::*;
 use serde::{Deserialize, Serialize};
 
 use crate::renderer::*;
-use crate::scene::Sprite;
+use crate::scene::*;
 
 #[derive(Debug, Deserialize, Serialize, Clone, Copy)]
 pub enum Block {

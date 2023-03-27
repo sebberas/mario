@@ -6,6 +6,7 @@ use sdl2::render::WindowCanvas;
 use serde::de::Expected;
 
 use crate::map::*;
+use crate::scene;
 use crate::scene::*;
 
 pub struct Renderer<'a> {
@@ -83,12 +84,20 @@ impl Renderer<'_> {
         todo!()
     }
 
-    pub fn draw_entities(&mut self) {
-        todo!()
+    pub fn draw_entities(&mut self, scene: &mut Scene) {
+        let entity_size = 1;
+        // for entity in &scene.entities {
+        //     let sprite = Sprite::from_entity(entity);
+        //     self.draw_image(&scene.camera, &sprite, entit.position, enemy_size);
+        // }
     }
 
-    pub fn draw_enemies(&mut self) {
-        todo!()
+    pub fn draw_enemies(&mut self, scene: &mut Scene) {
+        let enemy_size = 1;
+        for enemy in &scene.enemies {
+            let sprite = Sprite::from_enemy(enemy);
+            self.draw_image(&scene.camera, &sprite, enemy.position, enemy_size);
+        }
     }
 
     pub fn move_camera(&mut self, scene: &mut Scene, camera_movement: Vec2) -> Vec2 {
