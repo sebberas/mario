@@ -3,21 +3,21 @@
 
 use std::fs::*;
 use std::path::{Path, PathBuf};
-use std::str::SplitInclusive;
 
 use editor::Editor;
 use glam::*;
-use renderer::Renderer;
 use sdl2::event::*;
 use sdl2::keyboard::*;
 use sdl2::messagebox::*;
+use sdl2::mouse::*;
 use sdl2::video::*;
 use sdl2::{AudioSubsystem, VideoSubsystem};
 use serde::{Deserialize, Serialize};
 use serde_json as json;
-use task::TaskManager;
 
+use self::renderer::*;
 use self::scene::*;
+use self::task::*;
 
 mod audio;
 mod renderer;
@@ -31,7 +31,7 @@ pub trait Layer {
     where
         Self: Sized;
 
-    fn update(&mut self);
+    fn update(&mut self, keyboard: KeyboardState, mouse: MouseState);
 
     /// All window events that make it to an implementation of Layer are
     /// guaranteed to belong to that layers window.
@@ -57,7 +57,7 @@ impl Layer for Runtime {
         Self
     }
 
-    fn update(&mut self) {}
+    fn update(&mut self, _: KeyboardState, _2: MouseState) {}
 
     fn handle_events(&mut self, events: &mut dyn Iterator<Item = &Event>) {}
 
@@ -90,18 +90,18 @@ fn main() {
 
         for layer in &mut layers {
             if let Some(layer) = layer {
-                let layer_id = layer.window().id();
+                let window_id = layer.window().id();
 
-                let mut iter = events.iter().filter(|event| match event {
-                    Event::Window { window_id, .. } => *window_id == layer_id,
-                    Event::MouseButtonDown { window_id, .. } => *window_id == layer_id,
-                    Event::KeyDown { window_id, .. } => *window_id == layer_id,
-                    Event::Quit { .. } => false,
-                    _ => true,
+                let mut iter = events.iter().filter(|event| {
+                    if event.get_window_id().contains(&window_id) {
+                        true
+                    } else {
+                        !matches!(event, Event::Quit { .. })
+                    }
                 });
 
                 layer.handle_events(&mut iter);
-                layer.update();
+                layer.update(event_pump.keyboard_state(), event_pump.mouse_state());
             }
 
             if layer.as_ref().map(|l| l.should_close()).unwrap_or(false) {
@@ -136,7 +136,7 @@ impl Game {
         let contents = json::to_string_pretty(self).unwrap();
 
         if write(Self::SAVE, contents).is_err() {
-            let msg = "Due to un unexpected error, the game could not be saved and your progress will be lost.";
+            let msg = "Due to an unexpected error, the game could not be saved and your progress will be lost.";
             let _ = show_simple_message_box(MessageBoxFlag::ERROR, "Saving Game", msg, None);
         }
     }
