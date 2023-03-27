@@ -40,11 +40,15 @@ impl From<Rgba> for Color {
 }
 
 #[derive(Debug, Deserialize, Serialize)]
-pub struct Camera(Vec2);
+pub struct Camera {
+    pub position: Vec2,
+}
 
 impl Camera {
     pub fn new(position: Vec2) -> Self {
-        Self(position)
+        Self {
+            position
+        }
     }
 }
 

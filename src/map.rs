@@ -5,24 +5,26 @@ use serde::{Deserialize, Serialize};
 use crate::renderer::*;
 use crate::scene::Sprite;
 
-#[derive(Debug, Deserialize, Serialize)]
+#[derive(Debug, Deserialize, Serialize, Clone, Copy)]
 pub enum Block {
-    Ground { asset_path: String },
-    Question { asset_path: String },
+    Ground,
+    Question,
 }
 
-impl Block {
-    pub fn asset(&self) -> String {
-        match self {
-            Self::Ground { asset_path } => String::from("assets/sprites/mario_test.png"),
-            Self::Question { asset_path } => String::from("assets/sprites/mario_test.png"),
-            _ => unreachable!(),
-        }
-    }
-}
-
-#[derive(Debug, Deserialize, Serialize)]
+#[derive(Debug, Deserialize, Serialize, Clone, Copy)]
 pub struct MapTile {
     pub block: Block,
     pub coordinate: UVec2,
+}
+
+impl Sprite {
+    pub fn from_block(block: &Block) -> Sprite {
+        // alt nedenstående skal hardcodes ind :'(
+
+        match block {
+            Block::Ground => Sprite::new((uvec2(0, 10), uvec2(0, 10)), String::from("ground")),
+            Block::Question => Sprite::new((uvec2(0, 10), uvec2(0, 10)), String::from("question")),
+            _ => unreachable!(),
+        }
+    }
 }

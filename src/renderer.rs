@@ -3,6 +3,7 @@ use image::imageops;
 use sdl2::pixels::Color;
 use sdl2::rect::Rect;
 use sdl2::render::WindowCanvas;
+use serde::de::Expected;
 
 use crate::map::*;
 use crate::scene::*;
@@ -18,20 +19,19 @@ impl Renderer<'_> {
 
     pub fn update(&mut self, scene: &mut Scene) {
         self.draw_background(scene.background);
-        //self.draw_sprite(&scene.sprites[0], vec2(100.0, 100.0), 2);
-        // self.draw_enemies();
-        // self.draw_entities();
-        // self.draw_text();
-        // self.draw_tiles();
 
         self.canvas.present();
     }
 
-    pub fn draw_image(&mut self, sprite: &Sprite, position: UVec2, size: u32) {
+    pub fn draw_image(&mut self, camera: &Camera, sprite: &Sprite, mut position: UVec2, size: u32) {
         // converter sprite til islam
         let mut assetpath_image = image::open(&sprite.asset_path)
             .expect("Image not found")
             .to_rgba8();
+
+        // move position with camera offset
+        position.x += camera.position.x as u32;
+        position.y += camera.position.y as u32;
 
         // bounding box
         let start_x = sprite.bounding_box.0.x as u32;
@@ -43,10 +43,10 @@ impl Renderer<'_> {
 
         for (x, y, color) in sprite_image.to_image().enumerate_pixels() {
             let col_vec = vec4(
-                map_range((0.0, 255.0), (0.0, 1.0), color.0[0] as f64) as f32,
-                map_range((0.0, 255.0), (0.0, 1.0), color.0[1] as f64) as f32,
-                map_range((0.0, 255.0), (0.0, 1.0), color.0[2] as f64) as f32,
-                map_range((0.0, 255.0), (0.0, 1.0), color.0[3] as f64) as f32,
+                map_range((0.0, 255.0), (0.0, 1.0), color.0[0] as f32),
+                map_range((0.0, 255.0), (0.0, 1.0), color.0[1] as f32),
+                map_range((0.0, 255.0), (0.0, 1.0), color.0[2] as f32),
+                map_range((0.0, 255.0), (0.0, 1.0), color.0[3] as f32),
             );
 
             let color = Color::from(Rgba::from(col_vec));
@@ -73,17 +73,9 @@ impl Renderer<'_> {
     pub fn draw_tiles(&mut self, scene: &mut Scene) {
         let tile_size = 8;
 
-        for tile in &scene.map_tiles {
-            let tile_sprite = Sprite::new(
-                (uvec2(0, 0), uvec2(16, 16)),
-                String::from(tile.block.asset()),
-            );
-
-            self.draw_image(
-                &tile_sprite,
-                uvec2(tile.coordinate.x, tile.coordinate.y),
-                tile_size,
-            );
+        for map_tile in &scene.map_tiles {
+            let sprite = Sprite::from_block(&map_tile.block);
+            self.draw_image(&scene.camera, &sprite, map_tile.coordinate, tile_size);
         }
     }
 
@@ -98,8 +90,12 @@ impl Renderer<'_> {
     pub fn draw_enemies(&mut self) {
         todo!()
     }
+
+    pub fn move_camera(&mut self, scene: &mut Scene, camera_movement: Vec2) -> Vec2 {
+        scene.camera.position + camera_movement
+    }
 }
 
-fn map_range(from_range: (f64, f64), to_range: (f64, f64), s: f64) -> f64 {
+fn map_range(from_range: (f32, f32), to_range: (f32, f32), s: f32) -> f32 {
     to_range.0 + (s - from_range.0) * (to_range.1 - to_range.0) / (from_range.1 - from_range.0)
 }
