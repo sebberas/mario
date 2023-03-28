@@ -15,12 +15,16 @@ use sdl2::{AudioSubsystem, VideoSubsystem};
 use serde::{Deserialize, Serialize};
 use serde_json as json;
 
+use self::map::*;
 use self::renderer::*;
 use self::scene::*;
 use self::task::*;
 
 mod audio;
 mod editor;
+mod game;
+mod input_handler;
+mod map;
 mod renderer;
 mod runtime;
 mod scene;
