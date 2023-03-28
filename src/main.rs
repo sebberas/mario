@@ -1,70 +1,85 @@
-use std::fs::*;
-use std::path::{Path, PathBuf};
-use std::str::SplitInclusive;
+#![feature(let_chains)]
+#![feature(option_result_contains)]
 
+use editor::Editor;
 use glam::*;
-use renderer::Renderer;
-use sdl2::{event::*, render};
-
+use sdl2::event::*;
 use sdl2::keyboard::*;
-use sdl2::messagebox::*;
-use serde::{Deserialize, Serialize};
-use serde_json as json;
+use sdl2::mouse::*;
+use sdl2::video::*;
+use sdl2::{AudioSubsystem, VideoSubsystem};
 
-use self::scene::*;
-use self::map::*;
+use self::runtime::*;
 
 mod audio;
-mod map;
-mod renderer;
-mod scene;
+mod editor;
 mod game;
 mod input_handler;
+mod map;
+mod renderer;
+mod runtime;
+mod scene;
+mod task;
+
+pub trait Layer {
+    fn new(video: VideoSubsystem, audio: AudioSubsystem) -> Self
+    where
+        Self: Sized;
+
+    fn update(&mut self, keyboard: KeyboardState, mouse: MouseState);
+
+    /// All window events that make it to an implementation of Layer are
+    /// guaranteed to belong to that layers window.
+    fn handle_events(&mut self, events: &mut dyn Iterator<Item = &Event>);
+
+    fn should_close(&self) -> bool;
+
+    fn window(&self) -> &Window;
+    fn window_mut(&mut self) -> &mut Window;
+
+    fn show(&mut self) {
+        self.window_mut().show();
+    }
+
+    fn hide(&mut self) {
+        self.window_mut().hide();
+    }
+}
 
 fn main() {
     let sdl = sdl2::init().unwrap();
-    let mut event_pump = sdl.event_pump().unwrap();
     let video = sdl.video().unwrap();
     let audio = sdl.audio().unwrap();
+    let mut event_pump = sdl.event_pump().unwrap();
 
-    let window = video.window("Super Mario Bros", 800, 600).build().unwrap();
-    let mut canvas = window.into_canvas().build().unwrap();
-    canvas.default_pixel_format();
-    canvas.set_blend_mode(sdl2::render::BlendMode::Blend);
+    let mut layers: [Option<Box<dyn Layer>>; 2] = [
+        Some(Box::new(Runtime::new(video.clone(), audio.clone()))),
+        Some(Box::new(Editor::new(video, audio))),
+    ];
 
-    let mut scene = Scene {
-        camera: Camera::new(vec2(0.0, 0.0)),
-        enemies: Vec::default(),
-        entities: Vec::default(),
-        sprites: vec![Sprite::new(
-            (uvec2(0, 0), uvec2(16, 16)),
-            String::from("assets/sprites/mario_test.png"),
-        )],
-        text: Vec::default(),
-        map_tiles: Vec::default(),
-        background: vec4(0.0, 1.0, 1.0, 0.0).into(),
-    };
+    loop {
+        let events: Vec<_> = event_pump.poll_iter().collect();
 
-    let mut renderer = Renderer::new(&mut canvas);
+        for layer in &mut layers {
+            if let Some(layer) = layer {
+                let window_id = layer.window().id();
 
-    let mut game = Game::new(&mut scene);
+                let mut iter = events.iter().filter(|event| {
+                    event.get_window_id().contains(&window_id)
+                        && !matches!(event, Event::Quit { .. })
+                });
 
-    'running: loop {
-        for event in event_pump.poll_iter() {
-            match event {
-                Event::Quit { .. }
-                | Event::KeyDown {
-                    keycode: Some(Keycode::Escape),
-                    ..
-                } => break 'running,
-                _ => {}
+                layer.handle_events(&mut iter);
+                layer.update(event_pump.keyboard_state(), event_pump.mouse_state());
+            }
+
+            if layer.as_ref().map(|l| l.should_close()).unwrap_or(false) {
+                layer.take();
             }
         }
-        game.update(&mut scene);
-        renderer.update(&mut scene);
+
+        if layers.iter().all(Option::is_none) {
+            break;
+        }
     }
-
-    game.on_destroy(&mut scene);
 }
-
-
