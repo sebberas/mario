@@ -16,14 +16,17 @@ use serde::{Deserialize, Serialize};
 use serde_json as json;
 use task::TaskManager;
 
+use self::map::*;
 use self::scene::*;
 
 mod audio;
+mod editor;
+mod game;
+mod input_handler;
+mod map;
 mod renderer;
 mod scene;
 mod task;
-
-mod editor;
 
 pub trait Layer: Sized {
     fn new(system: VideoSubsystem) -> Self;
@@ -54,6 +57,25 @@ fn main() {
 
     let window = video.window("Super Mario Bros", 800, 600).build().unwrap();
     let mut canvas = window.into_canvas().build().unwrap();
+    canvas.default_pixel_format();
+    canvas.set_blend_mode(sdl2::render::BlendMode::Blend);
+
+    let mut scene = Scene {
+        camera: Camera::new(vec2(0.0, 0.0)),
+        enemies: Vec::default(),
+        entities: Vec::default(),
+        sprites: vec![Sprite::new(
+            (uvec2(0, 0), uvec2(16, 16)),
+            String::from("assets/sprites/mario_test.png"),
+        )],
+        text: Vec::default(),
+        map_tiles: Vec::default(),
+        background: vec4(0.0, 1.0, 1.0, 0.0).into(),
+    };
+
+    // let mut renderer = Renderer::new(&mut canvas);
+
+    // let mut game = Game::new(&mut scene);
 
     'running: loop {
         let events: Vec<_> = event_pump.poll_iter().collect();
@@ -74,32 +96,7 @@ fn main() {
                 _ => {}
             }
         }
-    }
-}
-
-#[derive(Serialize, Deserialize, Debug, Default)]
-struct Game {
-    completed: Vec<SceneId>,
-}
-
-impl Game {
-    const SAVE: &str = "./assets/save.json";
-
-    pub fn new(scene: &mut Scene) -> Self {
-        let file = File::open("./assets/save.json").ok();
-
-        let game = file.map(|file| json::from_reader(file).unwrap());
-        game.unwrap_or_default()
-    }
-
-    pub fn update(&mut self, scene: &mut Scene) {}
-
-    pub fn on_destroy(&mut self, scene: &mut Scene) {
-        let contents = json::to_string_pretty(self).unwrap();
-
-        if write(Self::SAVE, contents).is_err() {
-            let msg = "Due to un unexpected error, the game could not be saved and your progress will be lost.";
-            let _ = show_simple_message_box(MessageBoxFlag::ERROR, "Saving Game", msg, None);
-        }
+        // game.update(&mut scene);
+        // renderer.update(&mut scene);
     }
 }

@@ -1,19 +1,68 @@
 use glam::*;
+use sdl2::pixels::*;
 use serde::{Deserialize, Serialize};
 
-pub type Rgba = Vec4;
+use crate::{map::*, renderer::Renderer};
+
+#[derive(Serialize, Deserialize, Debug, Clone, Copy)]
+pub struct Rgba(Vec4);
+
+impl From<Vec4> for Rgba {
+    fn from(value: Vec4) -> Self {
+        Self { 0: value }
+    }
+}
+
+impl From<Vec3> for Rgba {
+    fn from(value: Vec3) -> Self {
+        let Vec3 { x, y, z } = value;
+        let alpha = 1.0;
+        let color = vec4(x, y, z, alpha);
+        Self(color)
+    }
+}
+
+impl From<Rgba> for Color {
+    fn from(value: Rgba) -> Self {
+        let color: (u8, u8, u8, u8) = (
+            (value.0.x * 255.0) as u8,
+            (value.0.y * 255.0) as u8,
+            (value.0.z * 255.0) as u8,
+            (value.0.w * 255.0) as u8,
+        );
+        Color {
+            r: color.0,
+            g: color.1,
+            b: color.2,
+            a: color.3,
+        }
+    }
+}
+
+pub trait ToSprite {
+    fn to_sprite(&self) -> Sprite;
+}
 
 #[derive(Debug, Deserialize, Serialize)]
-pub struct Camera(Vec2);
+pub struct Camera {
+    pub position: Vec2,
+}
 
 impl Camera {
     pub fn new(position: Vec2) -> Self {
-        Self(position)
+        Self { position }
     }
 }
 
 #[derive(Debug, Deserialize, Serialize)]
-pub enum Enemy {
+pub struct Enemy {
+    pub enemy_type: EnemyType,
+    pub position: UVec2,
+    // movement pattern?
+}
+
+#[derive(Debug, Deserialize, Serialize)]
+pub enum EnemyType {
     Goomba(),
     Piranha(),
     Koopa(),
@@ -25,17 +74,18 @@ pub enum Item {
 }
 
 #[derive(Debug, Deserialize, Serialize)]
-pub enum Entity {
+pub struct Entity {
+    pub entity_type: EntityType,
+    pub position: UVec2,
+    // movement pattern?
+}
+#[derive(Debug, Deserialize, Serialize)]
+pub enum EntityType {
     Player(),
     Coin(),
     Pipe(),
     Block(),
     Item(),
-}
-
-#[derive(Debug, Deserialize, Serialize)]
-pub struct Tile {
-    sprite: SpriteId,
 }
 
 #[derive(Debug, Deserialize, Serialize)]
@@ -45,12 +95,14 @@ pub struct Text {}
 pub struct Scene {
     pub camera: Camera,
 
-    pub entities: Vec<(Vec2, Entity)>,
-    pub enemies: Vec<(Vec2, Enemy)>,
+    pub entities: Vec<Entity>,
+    pub enemies: Vec<Enemy>,
+
+    pub sprites: Vec<Sprite>,
 
     pub text: Vec<Text>,
 
-    pub tiles: Vec<Tile>,
+    pub map_tiles: Vec<MapTile>,
     pub background: Rgba,
 }
 
@@ -60,19 +112,40 @@ pub struct SceneId(usize);
 #[derive(Debug, Deserialize, Serialize)]
 pub struct SpriteId(usize);
 
-#[derive(Debug, Deserialize, Serialize)]
+#[derive(Debug, Deserialize, Serialize, Clone)]
 pub struct Sprite {
-    pub position: Vec2,
+    pub bounding_box: (UVec2, UVec2),
     pub asset_path: String,
-    pub size: u32,
 }
 
 impl Sprite {
-    pub fn new(position: Vec2, asset_path: String, size: u32) -> Sprite {
+    pub fn new(bounding_box: (UVec2, UVec2), asset_path: String) -> Sprite {
         Sprite {
-            position,
+            bounding_box,
             asset_path,
-            size,
+        }
+    }
+}
+
+impl ToSprite for Enemy {
+    fn to_sprite(&self) -> Sprite {
+        match self.enemy_type {
+            EnemyType::Goomba() => Sprite::new((uvec2(0, 10), uvec2(0, 10)), String::from("")),
+            EnemyType::Koopa() => Sprite::new((uvec2(0, 10), uvec2(0, 10)), String::from("")),
+            EnemyType::Piranha() => Sprite::new((uvec2(0, 10), uvec2(0, 10)), String::from("")),
+            _ => unreachable!(),
+        }
+    }
+}
+
+impl ToSprite for Entity {
+    fn to_sprite(&self) -> Sprite {
+        match self.entity_type {
+            EntityType::Coin() => Sprite::new((uvec2(0, 10), uvec2(0, 10)), String::from("")),
+            EntityType::Player() => Sprite::new((uvec2(0, 10), uvec2(0, 10)), String::from("")),
+            EntityType::Pipe() => Sprite::new((uvec2(0, 10), uvec2(0, 10)), String::from("")),
+            EntityType::Item() => Sprite::new((uvec2(0, 10), uvec2(0, 10)), String::from("")),
+            EntityType::Block() => Sprite::new((uvec2(0, 10), uvec2(0, 10)), String::from("")),
         }
     }
 }
