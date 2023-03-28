@@ -8,12 +8,12 @@ use crate::map::*;
 use crate::scene;
 use crate::scene::*;
 
-pub struct Renderer<'a> {
-    pub canvas: &'a mut WindowCanvas,
+pub struct Renderer {
+    pub canvas: WindowCanvas,
 }
 
-impl Renderer<'_> {
-    pub fn new(canvas: &'_ mut WindowCanvas) -> Renderer<'_> {
+impl Renderer {
+    pub fn new(canvas: WindowCanvas) -> Renderer {
         Renderer { canvas }
     }
 
