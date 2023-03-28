@@ -2,7 +2,7 @@ use glam::*;
 use sdl2::pixels::*;
 use serde::{Deserialize, Serialize};
 
-use crate::map::*;
+use crate::{map::*, renderer::Renderer};
 
 #[derive(Serialize, Deserialize, Debug, Clone, Copy)]
 pub struct Rgba(Vec4);
@@ -39,6 +39,10 @@ impl From<Rgba> for Color {
     }
 }
 
+pub trait ToSprite {
+    fn to_sprite(&self) -> Sprite;
+}
+
 #[derive(Debug, Deserialize, Serialize)]
 pub struct Camera {
     pub position: Vec2,
@@ -70,7 +74,13 @@ pub enum Item {
 }
 
 #[derive(Debug, Deserialize, Serialize)]
-pub enum Entity {
+pub struct Entity {
+    pub entity_type: EntityType,
+    pub position: UVec2,
+    // movement pattern?
+}
+#[derive(Debug, Deserialize, Serialize)]
+pub enum EntityType {
     Player(),
     Coin(),
     Pipe(),
@@ -115,23 +125,27 @@ impl Sprite {
             asset_path,
         }
     }
+}
 
-    pub fn from_enemy(enemy: &Enemy) -> Sprite {
-        match enemy.enemy_type {
+impl ToSprite for Enemy {
+    fn to_sprite(&self) -> Sprite {
+        match self.enemy_type {
             EnemyType::Goomba() => Sprite::new((uvec2(0, 10), uvec2(0, 10)), String::from("")),
             EnemyType::Koopa() => Sprite::new((uvec2(0, 10), uvec2(0, 10)), String::from("")),
             EnemyType::Piranha() => Sprite::new((uvec2(0, 10), uvec2(0, 10)), String::from("")),
             _ => unreachable!(),
         }
     }
+}
 
-    pub fn from_entity(entity: &Entity) -> Sprite {
-        match entity {
-            Entity::Coin() => Sprite::new((uvec2(0, 10), uvec2(0, 10)), String::from("")),
-            Entity::Player() => Sprite::new((uvec2(0, 10), uvec2(0, 10)), String::from("")),
-            Entity::Pipe() => Sprite::new((uvec2(0, 10), uvec2(0, 10)), String::from("")),
-            Entity::Item() => Sprite::new((uvec2(0, 10), uvec2(0, 10)), String::from("")),
-            Entity::Block() => Sprite::new((uvec2(0, 10), uvec2(0, 10)), String::from("")),
+impl ToSprite for Entity {
+    fn to_sprite(&self) -> Sprite {
+        match self.entity_type {
+            EntityType::Coin() => Sprite::new((uvec2(0, 10), uvec2(0, 10)), String::from("")),
+            EntityType::Player() => Sprite::new((uvec2(0, 10), uvec2(0, 10)), String::from("")),
+            EntityType::Pipe() => Sprite::new((uvec2(0, 10), uvec2(0, 10)), String::from("")),
+            EntityType::Item() => Sprite::new((uvec2(0, 10), uvec2(0, 10)), String::from("")),
+            EntityType::Block() => Sprite::new((uvec2(0, 10), uvec2(0, 10)), String::from("")),
         }
     }
 }

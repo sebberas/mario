@@ -3,7 +3,6 @@ use image::imageops;
 use sdl2::pixels::Color;
 use sdl2::rect::Rect;
 use sdl2::render::WindowCanvas;
-use serde::de::Expected;
 
 use crate::map::*;
 use crate::scene;
@@ -14,12 +13,14 @@ pub struct Renderer<'a> {
 }
 
 impl Renderer<'_> {
-    pub fn new<'a>(canvas: &'a mut WindowCanvas) -> Renderer<'a> {
+    pub fn new(canvas: &'_ mut WindowCanvas) -> Renderer<'_> {
         Renderer { canvas }
     }
 
     pub fn update(&mut self, scene: &mut Scene) {
+        self.move_camera(scene, scene.camera.position);
         self.draw_background(scene.background);
+        self.draw_sprites(scene);
 
         self.canvas.present();
     }
@@ -71,33 +72,40 @@ impl Renderer<'_> {
         self.canvas.clear();
     }
 
-    pub fn draw_tiles(&mut self, scene: &mut Scene) {
-        let tile_size = 8;
+    pub fn draw_sprites(&mut self, scene: &mut Scene) {
+        let tile_size = 1;
+        let enemy_size = 1;
+        let entity_size = 1;
 
+        // draw map_tiles
         for map_tile in &scene.map_tiles {
             let sprite = Sprite::from_block(&map_tile.block);
             self.draw_image(&scene.camera, &sprite, map_tile.coordinate, tile_size);
+        }
+
+        // draw enemies
+        for enemy in &scene.enemies {
+            self.draw_image(
+                &scene.camera,
+                &enemy.to_sprite(),
+                enemy.position,
+                enemy_size,
+            );
+        }
+
+        // draw entities
+        for entity in &scene.entities {
+            self.draw_image(
+                &scene.camera,
+                &entity.to_sprite(),
+                entity.position,
+                entity_size,
+            );
         }
     }
 
     pub fn draw_text(&mut self) {
         todo!()
-    }
-
-    pub fn draw_entities(&mut self, scene: &mut Scene) {
-        let entity_size = 1;
-        // for entity in &scene.entities {
-        //     let sprite = Sprite::from_entity(entity);
-        //     self.draw_image(&scene.camera, &sprite, entit.position, enemy_size);
-        // }
-    }
-
-    pub fn draw_enemies(&mut self, scene: &mut Scene) {
-        let enemy_size = 1;
-        for enemy in &scene.enemies {
-            let sprite = Sprite::from_enemy(enemy);
-            self.draw_image(&scene.camera, &sprite, enemy.position, enemy_size);
-        }
     }
 
     pub fn move_camera(&mut self, scene: &mut Scene, camera_movement: Vec2) -> Vec2 {

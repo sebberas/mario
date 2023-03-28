@@ -18,6 +18,8 @@ mod audio;
 mod map;
 mod renderer;
 mod scene;
+mod game;
+mod input_handler;
 
 fn main() {
     let sdl = sdl2::init().unwrap();
@@ -65,29 +67,4 @@ fn main() {
     game.on_destroy(&mut scene);
 }
 
-#[derive(Serialize, Deserialize, Debug, Default)]
-struct Game {
-    completed: Vec<SceneId>,
-}
 
-impl Game {
-    const SAVE: &str = "./assets/save.json";
-
-    pub fn new(scene: &mut Scene) -> Self {
-        let file = File::open("./assets/save.json").ok();
-
-        let game = file.map(|file| json::from_reader(file).unwrap());
-        game.unwrap_or_default()
-    }
-
-    pub fn update(&mut self, scene: &mut Scene) {}
-
-    pub fn on_destroy(&mut self, scene: &mut Scene) {
-        let contents = json::to_string_pretty(self).unwrap();
-
-        if write(Self::SAVE, contents).is_err() {
-            let msg = "Due to un unexpected error, the game could not be saved and your progress will be lost.";
-            let _ = show_simple_message_box(MessageBoxFlag::ERROR, "Saving Game", msg, None);
-        }
-    }
-}
