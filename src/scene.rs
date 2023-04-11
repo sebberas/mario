@@ -2,14 +2,14 @@ use glam::*;
 use sdl2::pixels::*;
 use serde::{Deserialize, Serialize};
 
-use crate::{map::*, renderer::Renderer};
+use crate::map::*;
 
 #[derive(Serialize, Deserialize, Debug, Clone, Copy)]
 pub struct Rgba(Vec4);
 
 impl From<Vec4> for Rgba {
     fn from(value: Vec4) -> Self {
-        Self { 0: value }
+        Self(value)
     }
 }
 
@@ -79,6 +79,7 @@ pub struct Entity {
     pub position: UVec2,
     // movement pattern?
 }
+
 #[derive(Debug, Deserialize, Serialize)]
 pub enum EntityType {
     Player(),
@@ -86,10 +87,16 @@ pub enum EntityType {
     Pipe(),
     Block(),
     Item(),
+    Mario(),
 }
 
 #[derive(Debug, Deserialize, Serialize)]
 pub struct Text {}
+
+#[derive(Debug, Deserialize, Serialize)]
+pub struct Player {
+    pub position: Vec2,
+}
 
 #[derive(Debug, Deserialize, Serialize)]
 pub struct Scene {
@@ -97,9 +104,9 @@ pub struct Scene {
 
     pub entities: Vec<Entity>,
     pub enemies: Vec<Enemy>,
+    pub player: Player,
 
     pub sprites: Vec<Sprite>,
-
     pub text: Vec<Text>,
 
     pub map_tiles: Vec<MapTile>,
@@ -146,6 +153,10 @@ impl ToSprite for Entity {
             EntityType::Pipe() => Sprite::new((uvec2(0, 10), uvec2(0, 10)), String::from("")),
             EntityType::Item() => Sprite::new((uvec2(0, 10), uvec2(0, 10)), String::from("")),
             EntityType::Block() => Sprite::new((uvec2(0, 10), uvec2(0, 10)), String::from("")),
+            EntityType::Mario() => Sprite::new(
+                (uvec2(0, 0), uvec2(16, 16)),
+                String::from("assets/sprites/mario_test.png"),
+            ),
         }
     }
 }
