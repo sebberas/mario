@@ -1,6 +1,3 @@
-#![feature(let_chains)]
-#![feature(option_result_contains)]
-
 use editor::Editor;
 use glam::*;
 use sdl2::event::*;
@@ -64,9 +61,9 @@ fn main() {
             if let Some(layer) = layer {
                 let window_id = layer.window().id();
 
-                let mut iter = events.iter().filter(|event| {
-                    event.get_window_id().contains(&window_id)
-                        && !matches!(event, Event::Quit { .. })
+                let mut iter = events.iter().filter(|event| match event.get_window_id() {
+                    Some(id) if id == window_id && !matches!(event, Event::Quit { .. }) => true,
+                    _ => false,
                 });
 
                 layer.handle_events(&mut iter);

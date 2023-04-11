@@ -66,7 +66,11 @@ impl Command for Insert {
     }
 
     fn undo(&mut self, state: &mut EditorState) {
-        if let Some(tile) = state.tiles.iter_mut().find(|tile| tile.contains(&self.0)) {
+        if let Some(tile) = state
+            .tiles
+            .iter_mut()
+            .find(|tile| tile.map_or(false, |_| true))
+        {
             *tile = None;
         }
     }
@@ -76,7 +80,11 @@ struct Remove(UVec2);
 
 impl Command for Remove {
     fn apply(&mut self, state: &mut EditorState) {
-        if let Some(tile) = state.tiles.iter_mut().find(|tile| tile.contains(&self.0)) {
+        if let Some(tile) = state
+            .tiles
+            .iter_mut()
+            .find(|tile| tile.map_or(false, |_| true))
+        {
             *tile = None;
         }
     }
@@ -230,7 +238,7 @@ impl Layer for Editor {
 
         for (keycode, keymod) in &self.key_clicks {
             match keycode {
-                Keycode::Z if keymod.contains(Mod::LCTRLMOD) => {
+                Keycode::Z => {
                     if let Some(mut command) = self.commands.pop() {
                         command.undo(state);
                     }
