@@ -12,6 +12,7 @@ mod audio;
 mod editor;
 mod game;
 mod input_handler;
+mod level;
 mod map;
 mod renderer;
 mod runtime;

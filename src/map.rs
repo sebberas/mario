@@ -5,13 +5,13 @@ use serde::{Deserialize, Serialize};
 use crate::renderer::*;
 use crate::scene::*;
 
-#[derive(Debug, Deserialize, Serialize, Clone, Copy)]
+#[derive(Debug, Deserialize, Serialize, Clone, Copy, PartialEq, Eq)]
 pub enum Block {
     Ground,
-    Question,
+    Question(Option<Item>),
 }
 
-#[derive(Debug, Deserialize, Serialize, Clone, Copy)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Deserialize, Serialize)]
 pub struct MapTile {
     pub block: Block,
     pub coordinate: UVec2,
@@ -23,7 +23,9 @@ impl Sprite {
 
         match block {
             Block::Ground => Sprite::new((uvec2(0, 10), uvec2(0, 10)), String::from("ground")),
-            Block::Question => Sprite::new((uvec2(0, 10), uvec2(0, 10)), String::from("question")),
+            Block::Question(..) => {
+                Sprite::new((uvec2(0, 10), uvec2(0, 10)), String::from("question"))
+            }
             _ => unreachable!(),
         }
     }
