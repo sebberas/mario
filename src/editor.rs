@@ -190,7 +190,7 @@ impl Layer for Editor {
         // let window = video.window("Editor", 1600, 800).build().unwrap();
         let mut window = windows::Window::new("Hello");
 
-        let menu = windows::new_menu(&[
+        let menu = windows::new_menu(vec![
             MenuItem::Action {
                 title: "Mario",
                 action: Box::new(|| {}),
