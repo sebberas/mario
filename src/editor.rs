@@ -17,16 +17,6 @@ const SDL_WINDOW_MOUSE_FOCUS: u32 = 0x00000400;
 
 use crate::Layer;
 
-// /// Represents a single command a user has made in the editor.
-// ///
-// /// A command can consist of multiple steps.
-// enum Command {
-//     Insert(UVec2),
-//     InsertMany { from: UVec2, to: Option<UVec2> },
-//     Remove(UVec2),
-//     RemoveMany { from: UVec2, to: Option<UVec2> },
-// }
-
 struct EditorState {
     pub tiles: Vec<Option<UVec2>>,
 }
@@ -69,6 +59,22 @@ impl Command for Insert {
         if let Some(tile) = state.tiles.iter_mut().find(|tile| tile.contains(&self.0)) {
             *tile = None;
         }
+    }
+}
+
+struct InsertMany {
+    from: UVec2,
+    to: Option<UVec2>,
+}
+
+impl Command for InsertMany {
+    fn apply(&mut self, state: &mut EditorState) {
+        let Self { from, to } = self;
+        let to = to.unwrap();
+    }
+
+    fn is_complete(&mut self) -> bool {
+        self.to.is_some()
     }
 }
 
