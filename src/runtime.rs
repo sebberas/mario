@@ -4,6 +4,7 @@ use sdl2::render::*;
 use sdl2::video::*;
 use sdl2::{AudioSubsystem, VideoSubsystem};
 
+use crate::game::{self, Game};
 use crate::renderer::*;
 use crate::scene::*;
 use crate::Layer;
@@ -11,6 +12,8 @@ use crate::Layer;
 pub struct Runtime {
     video: VideoSubsystem,
     audio: AudioSubsystem,
+
+    game: Game,
 
     should_close: bool,
 
@@ -24,13 +27,20 @@ impl Layer for Runtime {
         Self: Sized,
     {
         let window = video.window("Mario", 1200, 600).build().unwrap();
-        let canvas = window.into_canvas().accelerated().build().unwrap();
+        let mut canvas = window.into_canvas().accelerated().build().unwrap();
+
         let renderer = Renderer::new(canvas);
 
-        let scene = Scene {
+        let mut scene = Scene {
             camera: Camera::new(vec2(0.0, 0.0)),
             enemies: Vec::default(),
-            entities: Vec::default(),
+            entities: vec![Entity {
+                kind: EntityKind::Player,
+                position: uvec2(10, 10),
+            }],
+            player: Player {
+                position: vec2(10.0, 10.0),
+            },
             sprites: vec![Sprite::new(
                 (uvec2(0, 0), uvec2(16, 16)),
                 String::from("assets/sprites/mario_test.png"),
@@ -40,9 +50,12 @@ impl Layer for Runtime {
             background: vec4(0.0, 1.0, 1.0, 0.0).into(),
         };
 
+        let game = Game::new(&mut scene);
+
         Self {
             video,
             audio,
+            game,
             should_close: false,
             renderer,
             scene,
@@ -50,7 +63,8 @@ impl Layer for Runtime {
     }
 
     fn update(&mut self, keyboard: sdl2::keyboard::KeyboardState, mouse: sdl2::mouse::MouseState) {
-        self.renderer.update(&mut self.scene)
+        self.game.update(&mut self.scene, keyboard);
+        self.renderer.update(&mut self.scene);
     }
 
     fn handle_events(&mut self, events: &mut dyn Iterator<Item = &sdl2::event::Event>) {

@@ -2,7 +2,7 @@ use glam::*;
 use image::imageops;
 use sdl2::pixels::Color;
 use sdl2::rect::Rect;
-use sdl2::render::WindowCanvas;
+use sdl2::render::{BlendMode, WindowCanvas};
 
 use crate::map::*;
 use crate::scene;
@@ -13,13 +13,15 @@ pub struct Renderer {
 }
 
 impl Renderer {
-    pub fn new(canvas: WindowCanvas) -> Renderer {
+    pub fn new(mut canvas: WindowCanvas) -> Renderer {
+        canvas.set_blend_mode(BlendMode::Blend);
         Renderer { canvas }
     }
 
     pub fn update(&mut self, scene: &mut Scene) {
         self.move_camera(scene, scene.camera.position);
         self.draw_background(scene.background);
+        self.draw_player(scene);
         self.draw_sprites(scene);
 
         self.canvas.present();
@@ -102,6 +104,18 @@ impl Renderer {
                 entity_size,
             );
         }
+    }
+
+    pub fn draw_player(&mut self, scene: &mut Scene) {
+        let position = uvec2(
+            scene.player.position.x as u32,
+            scene.player.position.y as u32,
+        );
+        let player = Entity {
+            kind: EntityKind::Player,
+            position,
+        };
+        self.draw_image(&scene.camera, &player.to_sprite(), position, 1);
     }
 
     pub fn draw_text(&mut self) {

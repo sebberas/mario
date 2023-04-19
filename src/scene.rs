@@ -9,7 +9,7 @@ pub struct Rgba(Vec4);
 
 impl From<Vec4> for Rgba {
     fn from(value: Vec4) -> Self {
-        Self { 0: value }
+        Self(value)
     }
 }
 
@@ -91,14 +91,19 @@ pub enum EntityKind {
 pub struct Text {}
 
 #[derive(Debug, Deserialize, Serialize)]
+pub struct Player {
+    pub position: Vec2,
+}
+
+#[derive(Debug, Deserialize, Serialize)]
 pub struct Scene {
     pub camera: Camera,
 
     pub entities: Vec<Entity>,
     pub enemies: Vec<Enemy>,
+    pub player: Player,
 
     pub sprites: Vec<Sprite>,
-
     pub text: Vec<Text>,
 
     pub map_tiles: Vec<MapTile>,
