@@ -52,9 +52,9 @@ fn main() {
     let audio = sdl.audio().unwrap();
     let mut event_pump = sdl.event_pump().unwrap();
 
-    let mut layers: [Option<Box<dyn Layer>>; 2] = [
+    let mut layers: [Option<Box<dyn Layer>>; 1] = [
         Some(Box::new(Runtime::new(video.clone(), audio.clone()))),
-        Some(Box::new(Editor::new(video, audio))),
+        //Some(Box::new(Editor::new(video, audio))),
     ];
 
     loop {

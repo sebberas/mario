@@ -58,6 +58,7 @@ impl Camera {
 pub struct Enemy {
     pub position: UVec2,
     pub kind: EnemyKind,
+    pub is_shown: bool,
 }
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Deserialize, Serialize)]
@@ -77,11 +78,11 @@ pub enum Item {
 pub struct Entity {
     pub position: UVec2,
     pub kind: EntityKind,
+    pub is_shown: bool,
 }
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Deserialize, Serialize)]
 pub enum EntityKind {
-    Player,
     Coin,
     Pipe { id: usize },
     Item(Item),
@@ -93,6 +94,14 @@ pub struct Text {}
 #[derive(Debug, Deserialize, Serialize)]
 pub struct Player {
     pub position: Vec2,
+    pub speed: f32,
+    pub is_shown: bool,
+}
+
+impl ToSprite for Player {
+    fn to_sprite(&self) -> Sprite{
+        Sprite::new((uvec2(0, 0), uvec2(16, 16)), String::from("assets/sprites/mario_test.png"))
+    }
 }
 
 #[derive(Debug, Deserialize, Serialize)]
@@ -146,7 +155,6 @@ impl ToSprite for Entity {
     fn to_sprite(&self) -> Sprite {
         match self.kind {
             EntityKind::Coin => Sprite::new((uvec2(0, 10), uvec2(0, 10)), String::from("")),
-            EntityKind::Player => Sprite::new((uvec2(0, 10), uvec2(0, 10)), String::from("")),
             EntityKind::Pipe { .. } => Sprite::new((uvec2(0, 10), uvec2(0, 10)), String::from("")),
             EntityKind::Item(..) => Sprite::new((uvec2(0, 10), uvec2(0, 10)), String::from("")),
         }

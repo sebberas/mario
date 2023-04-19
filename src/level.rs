@@ -1,4 +1,5 @@
 use glam::*;
+use image::ColorType;
 use serde::{Deserialize, Serialize};
 
 use crate::map::*;
@@ -24,4 +25,5 @@ pub struct Segment {
     pub enemies: Vec<Enemy>,
     pub entities: Vec<Entity>,
     pub tiles: Vec<MapTile>,
+    pub background: UVec3,
 }

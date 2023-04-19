@@ -34,17 +34,13 @@ impl Layer for Runtime {
         let mut scene = Scene {
             camera: Camera::new(vec2(0.0, 0.0)),
             enemies: Vec::default(),
-            entities: vec![Entity {
-                kind: EntityKind::Player,
-                position: uvec2(10, 10),
-            }],
+            entities: Vec::default(),
             player: Player {
                 position: vec2(10.0, 10.0),
+                speed: 0.0,
+                is_shown: true,
             },
-            sprites: vec![Sprite::new(
-                (uvec2(0, 0), uvec2(16, 16)),
-                String::from("assets/sprites/mario_test.png"),
-            )],
+            sprites: Vec::default(),
             text: Vec::default(),
             map_tiles: Vec::default(),
             background: vec4(0.0, 1.0, 1.0, 0.0).into(),

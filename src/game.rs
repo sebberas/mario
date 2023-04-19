@@ -2,6 +2,7 @@ use std::fs::*;
 use std::path::{Path, PathBuf};
 use std::str::SplitInclusive;
 
+use glam::vec2;
 use sdl2::event::*;
 use sdl2::keyboard::*;
 use sdl2::messagebox::*;
@@ -38,22 +39,24 @@ impl Game {
     }
 
     pub fn move_player(&mut self, scene: &mut Scene, keyboard: sdl2::keyboard::KeyboardState) {
-        let mut speed = 1.0;
-        let acceleration = 1.1;
-        let max_speed = 3.0;
+        let acceleration = 0.01;
+        let max_speed = 0.1;
 
         if keyboard.is_scancode_pressed(Scancode::D) {
-            if speed < max_speed {
-                speed *= acceleration;
+            if scene.player.speed < max_speed {
+                scene.player.speed += acceleration;
+                println!("{:?}", scene.player.speed);
             }
-            scene.player.position.x += speed;
+            scene.player.position.x += scene.player.speed;
         }
 
         if keyboard.is_scancode_pressed(Scancode::A) {
-            if speed < max_speed {
-                speed *= acceleration;
+            if scene.player.speed < max_speed {
+                scene.player.speed += acceleration;
             }
-            scene.player.position.x -= speed;
+            scene.player.position.x -= scene.player.speed;
         }
+
+        if keyboard.is_scancode_pressed(Scancode::Space) {}
     }
 }
