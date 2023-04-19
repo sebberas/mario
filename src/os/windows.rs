@@ -12,29 +12,62 @@ pub struct Menu {
     handle: HMENU,
 }
 
-pub fn new_menu(items: &[MenuItem]) -> Menu {
-    let mut handle = unsafe { CreateMenu().unwrap() };
+pub fn new_menu(items: Vec<MenuItem>) -> Menu {
+    fn new_menu_recursive(parent: HMENU, items: Vec<MenuItem>, id: &mut u32) {
+        for (i, item) in items.into_iter().enumerate() {
+            match item {
+                MenuItem::Action { title, action } => {
+                    let title = title.encode_utf16().chain([0]).collect::<Vec<_>>();
+                    let item = MENUITEMINFOW {
+                        cbSize: std::mem::size_of::<MENUITEMINFOW>() as _,
+                        fMask: MENU_ITEM_MASK(0) | MIIM_ID | MIIM_STRING,
+                        fType: MFT_STRING,
+                        fState: MENU_ITEM_STATE(0),
+                        wID: *id,
+                        hSubMenu: HMENU::default(),
+                        hbmpChecked: HBITMAP::default(),
+                        hbmpUnchecked: HBITMAP::default(),
+                        dwItemData: 0,
+                        dwTypeData: PWSTR::from_raw(title.as_ptr() as *mut _),
+                        cch: 0,
+                        hbmpItem: HBITMAP::default(),
+                    };
 
-    for (i, item) in items.iter().enumerate() {
-        let buf = w!("MENU Man");
-        let menu_title = PWSTR(buf.as_ptr() as *mut _);
-        let menu_item = MENUITEMINFOW {
-            cbSize: std::mem::size_of::<MENUITEMINFOW>() as _,
-            fMask: MENU_ITEM_MASK(0) | MIIM_STRING,
-            fType: MFT_STRING,
-            fState: MENU_ITEM_STATE(0),
-            wID: 0,
-            hSubMenu: HMENU::default(),
-            hbmpChecked: HBITMAP::default(),
-            hbmpUnchecked: HBITMAP::default(),
-            dwItemData: 0,
-            dwTypeData: menu_title,
-            cch: 0,
-            hbmpItem: HBITMAP::default(),
-        };
+                    *id += 1;
 
-        unsafe { InsertMenuItemW(handle, 0, false, &menu_item) };
+                    unsafe { InsertMenuItemW(parent, i as _, true, &item) };
+                }
+                MenuItem::Divider => {}
+                MenuItem::SubMenu { title, items } => {
+                    // Handle submenu
+                    let sub = unsafe { CreateMenu().unwrap() };
+                    new_menu_recursive(sub, items, id);
+
+                    let title = title.encode_utf16().chain([0]).collect::<Vec<_>>();
+                    let item = MENUITEMINFOW {
+                        cbSize: std::mem::size_of::<MENUITEMINFOW>() as _,
+                        fMask: MENU_ITEM_MASK(0) | MIIM_SUBMENU | MIIM_STRING,
+                        fType: MFT_STRING,
+                        fState: MENU_ITEM_STATE(0),
+                        wID: 0,
+                        hSubMenu: sub,
+                        hbmpChecked: HBITMAP::default(),
+                        hbmpUnchecked: HBITMAP::default(),
+                        dwItemData: 0,
+                        dwTypeData: PWSTR::from_raw(title.as_ptr() as *mut _),
+                        cch: 0,
+                        hbmpItem: HBITMAP::default(),
+                    };
+
+                    unsafe { InsertMenuItemW(parent, i as _, true, &item) };
+                }
+            }
+        }
     }
+
+    let mut id = 1;
+    let handle = unsafe { CreateMenu().unwrap() };
+    new_menu_recursive(handle, items, &mut id);
 
     Menu { handle }
 }
