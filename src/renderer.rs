@@ -107,10 +107,13 @@ impl Renderer {
     }
 
     pub fn draw_player(&mut self, scene: &mut Scene) {
-        let position = uvec2(scene.player.position.x as u32, scene.player.position.y as u32);
+        let position = uvec2(
+            scene.player.position.x as u32,
+            scene.player.position.y as u32,
+        );
         let player = Entity {
-            entity_type: EntityType::Mario(),
-            position
+            kind: EntityKind::Player,
+            position,
         };
         self.draw_image(&scene.camera, &player.to_sprite(), position, 1);
     }

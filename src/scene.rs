@@ -54,40 +54,37 @@ impl Camera {
     }
 }
 
-#[derive(Debug, Deserialize, Serialize)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Deserialize, Serialize)]
 pub struct Enemy {
-    pub enemy_type: EnemyType,
     pub position: UVec2,
-    // movement pattern?
+    pub kind: EnemyKind,
 }
 
-#[derive(Debug, Deserialize, Serialize)]
-pub enum EnemyType {
-    Goomba(),
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Deserialize, Serialize)]
+pub enum EnemyKind {
+    Goomba { from: UVec2, to: UVec2 },
     Piranha(),
     Koopa(),
 }
 
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Deserialize, Serialize)]
 pub enum Item {
     FireFlower,
     Star,
 }
 
-#[derive(Debug, Deserialize, Serialize)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Deserialize, Serialize)]
 pub struct Entity {
-    pub entity_type: EntityType,
     pub position: UVec2,
-    // movement pattern?
+    pub kind: EntityKind,
 }
 
-#[derive(Debug, Deserialize, Serialize)]
-pub enum EntityType {
-    Player(),
-    Coin(),
-    Pipe(),
-    Block(),
-    Item(),
-    Mario(),
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Deserialize, Serialize)]
+pub enum EntityKind {
+    Player,
+    Coin,
+    Pipe { id: usize },
+    Item(Item),
 }
 
 #[derive(Debug, Deserialize, Serialize)]
@@ -136,10 +133,10 @@ impl Sprite {
 
 impl ToSprite for Enemy {
     fn to_sprite(&self) -> Sprite {
-        match self.enemy_type {
-            EnemyType::Goomba() => Sprite::new((uvec2(0, 10), uvec2(0, 10)), String::from("")),
-            EnemyType::Koopa() => Sprite::new((uvec2(0, 10), uvec2(0, 10)), String::from("")),
-            EnemyType::Piranha() => Sprite::new((uvec2(0, 10), uvec2(0, 10)), String::from("")),
+        match self.kind {
+            EnemyKind::Goomba { .. } => Sprite::new((uvec2(0, 10), uvec2(0, 10)), String::from("")),
+            EnemyKind::Koopa() => Sprite::new((uvec2(0, 10), uvec2(0, 10)), String::from("")),
+            EnemyKind::Piranha() => Sprite::new((uvec2(0, 10), uvec2(0, 10)), String::from("")),
             _ => unreachable!(),
         }
     }
@@ -147,16 +144,11 @@ impl ToSprite for Enemy {
 
 impl ToSprite for Entity {
     fn to_sprite(&self) -> Sprite {
-        match self.entity_type {
-            EntityType::Coin() => Sprite::new((uvec2(0, 10), uvec2(0, 10)), String::from("")),
-            EntityType::Player() => Sprite::new((uvec2(0, 10), uvec2(0, 10)), String::from("")),
-            EntityType::Pipe() => Sprite::new((uvec2(0, 10), uvec2(0, 10)), String::from("")),
-            EntityType::Item() => Sprite::new((uvec2(0, 10), uvec2(0, 10)), String::from("")),
-            EntityType::Block() => Sprite::new((uvec2(0, 10), uvec2(0, 10)), String::from("")),
-            EntityType::Mario() => Sprite::new(
-                (uvec2(0, 0), uvec2(16, 16)),
-                String::from("assets/sprites/mario_test.png"),
-            ),
+        match self.kind {
+            EntityKind::Coin => Sprite::new((uvec2(0, 10), uvec2(0, 10)), String::from("")),
+            EntityKind::Player => Sprite::new((uvec2(0, 10), uvec2(0, 10)), String::from("")),
+            EntityKind::Pipe { .. } => Sprite::new((uvec2(0, 10), uvec2(0, 10)), String::from("")),
+            EntityKind::Item(..) => Sprite::new((uvec2(0, 10), uvec2(0, 10)), String::from("")),
         }
     }
 }

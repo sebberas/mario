@@ -1,16 +1,15 @@
 use glam::*;
 use sdl2::event::*;
 use sdl2::keyboard::{KeyboardState, Keycode, Mod};
-use sdl2::messagebox::{
-    show_message_box, ButtonData, ClickedButton, MessageBoxButtonFlag, MessageBoxColorScheme,
-    MessageBoxFlag,
-};
-use sdl2::mouse::{MouseButton, MouseState, RelativeMouseState};
+use sdl2::messagebox::*;
+use sdl2::mouse::{MouseButton, MouseState};
 use sdl2::pixels::Color;
 use sdl2::rect::{Point, Rect};
 use sdl2::render::*;
 use sdl2::video::*;
 use sdl2::{AudioSubsystem, VideoSubsystem};
+
+use crate::os::{windows, MenuItem};
 
 const SDL_WINDOW_INPUT_FOCUS: u32 = 0x00000200;
 const SDL_WINDOW_MOUSE_FOCUS: u32 = 0x00000400;
@@ -129,14 +128,7 @@ impl Editor {
         const TITLE: &str = "Save Changes";
         const MSG: &str = "This file contains unsaved changes, do you wish to save before exiting?";
 
-        let button = show_message_box(
-            MessageBoxFlag::WARNING,
-            &BUTTONS,
-            TITLE,
-            MSG,
-            self.window(),
-            None,
-        );
+        let button = show_message_box(MessageBoxFlag::WARNING, &BUTTONS, TITLE, MSG, None, None);
 
         match button.unwrap() {
             ClickedButton::CloseButton => SaveButton::Cancel,
@@ -195,8 +187,31 @@ impl Editor {
 
 impl Layer for Editor {
     fn new(video: VideoSubsystem, audio: AudioSubsystem) -> Self {
-        let window = video.window("Editor", 1600, 800).build().unwrap();
-        let canvas = window.into_canvas().accelerated().build().unwrap();
+        // let window = video.window("Editor", 1600, 800).build().unwrap();
+        let mut window = windows::Window::new("Hello");
+
+        let menu = windows::new_menu(&[
+            MenuItem::Action {
+                title: "Mario",
+                action: Box::new(|| {}),
+            },
+            MenuItem::Action {
+                title: "Luigi",
+                action: Box::new(|| {}),
+            },
+        ]);
+
+        window.set_menu(&menu);
+
+        let mut canvas = window
+            .into_sdl2(video.clone())
+            .into_canvas()
+            .accelerated()
+            .build()
+            .unwrap();
+
+        canvas.window_mut().show();
+        canvas.window_mut().set_size(1600, 800).unwrap();
 
         Self {
             video,

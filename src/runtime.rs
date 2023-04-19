@@ -35,7 +35,7 @@ impl Layer for Runtime {
             camera: Camera::new(vec2(0.0, 0.0)),
             enemies: Vec::default(),
             entities: vec![Entity {
-                entity_type: EntityType::Mario(),
+                kind: EntityKind::Player,
                 position: uvec2(10, 10),
             }],
             player: Player {

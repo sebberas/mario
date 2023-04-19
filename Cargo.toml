@@ -12,4 +12,9 @@ image = "0.24.5"
 sdl2 = { version = "0.35.2", features = ["bundled"] }
 serde = { version = "1.0.153", features = ["derive"] }
 serde_json = "1.0.94"
-windows = "0.46.0"
+windows = { version = "0.46.0", features = [
+    "Win32_Foundation",
+    "Win32_Graphics_Gdi",
+    "Win32_System_LibraryLoader",
+    "Win32_UI_WindowsAndMessaging",
+] }
