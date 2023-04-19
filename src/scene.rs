@@ -64,8 +64,8 @@ pub struct Enemy {
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Deserialize, Serialize)]
 pub enum EnemyKind {
     Goomba { from: UVec2, to: UVec2 },
-    Piranha(),
-    Koopa(),
+    Piranha { position: UVec2 },
+    Koopa { position: UVec2 },
 }
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Deserialize, Serialize)]
@@ -99,8 +99,11 @@ pub struct Player {
 }
 
 impl ToSprite for Player {
-    fn to_sprite(&self) -> Sprite{
-        Sprite::new((uvec2(0, 0), uvec2(16, 16)), String::from("assets/sprites/mario_test.png"))
+    fn to_sprite(&self) -> Sprite {
+        Sprite::new(
+            (uvec2(0, 0), uvec2(16, 16)),
+            String::from("assets/sprites/mario_test.png"),
+        )
     }
 }
 
@@ -144,8 +147,10 @@ impl ToSprite for Enemy {
     fn to_sprite(&self) -> Sprite {
         match self.kind {
             EnemyKind::Goomba { .. } => Sprite::new((uvec2(0, 10), uvec2(0, 10)), String::from("")),
-            EnemyKind::Koopa() => Sprite::new((uvec2(0, 10), uvec2(0, 10)), String::from("")),
-            EnemyKind::Piranha() => Sprite::new((uvec2(0, 10), uvec2(0, 10)), String::from("")),
+            EnemyKind::Piranha { .. } => {
+                Sprite::new((uvec2(0, 10), uvec2(0, 10)), String::from(""))
+            }
+            EnemyKind::Koopa { .. } => Sprite::new((uvec2(0, 10), uvec2(0, 10)), String::from("")),
             _ => unreachable!(),
         }
     }

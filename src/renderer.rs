@@ -80,7 +80,7 @@ impl Renderer {
 
         // draw map_tiles
         for map_tile in &scene.map_tiles {
-            let sprite = Sprite::from_block(&map_tile.block);
+            let sprite = map_tile.block.to_sprite();
             self.draw_image(&scene.camera, &sprite, map_tile.coordinate, tile_size);
         }
 

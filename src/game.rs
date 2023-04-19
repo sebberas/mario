@@ -2,7 +2,7 @@ use std::fs::*;
 use std::path::{Path, PathBuf};
 use std::str::SplitInclusive;
 
-use glam::vec2;
+use glam::{uvec2, vec2};
 use sdl2::event::*;
 use sdl2::keyboard::*;
 use sdl2::messagebox::*;
@@ -10,6 +10,7 @@ use sdl2::render;
 use serde::{Deserialize, Serialize};
 use serde_json as json;
 
+use crate::map::*;
 use crate::scene::*;
 
 #[derive(Serialize, Deserialize, Debug, Default)]
@@ -27,6 +28,11 @@ impl Game {
 
     pub fn update(&mut self, scene: &mut Scene, keyboard: sdl2::keyboard::KeyboardState) {
         self.move_player(scene, keyboard);
+
+        scene.map_tiles.push(MapTile {
+            coordinate: uvec2(400, 400),
+            block: Block::Ground,
+        })
     }
 
     pub fn on_destroy(&mut self, scene: &mut Scene) {
