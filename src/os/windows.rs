@@ -12,10 +12,12 @@ pub struct Menu {
     handle: HMENU,
 }
 
-pub fn new_menu(items: Vec<MenuItem>) -> Menu {
+pub fn new_menu(items: &[MenuItem]) -> Menu {
     let mut handle = unsafe { CreateMenu().unwrap() };
+
     for (i, item) in items.iter().enumerate() {
-        let menu_title = PWSTR(w!("MENU Man").as_ptr() as *mut _);
+        let buf = w!("MENU Man");
+        let menu_title = PWSTR(buf.as_ptr() as *mut _);
         let menu_item = MENUITEMINFOW {
             cbSize: std::mem::size_of::<MENUITEMINFOW>() as _,
             fMask: MENU_ITEM_MASK(0) | MIIM_STRING,
@@ -34,7 +36,7 @@ pub fn new_menu(items: Vec<MenuItem>) -> Menu {
         unsafe { InsertMenuItemW(handle, 0, false, &menu_item) };
     }
 
-    todo!()
+    Menu { handle }
 }
 
 pub struct Window {
@@ -78,6 +80,8 @@ impl Window {
             )
         };
 
+        println!("got here");
+
         Self { instance, handle }
     }
 
@@ -87,6 +91,7 @@ impl Window {
 
     pub fn into_sdl2(self, subsystem: VideoSubsystem) -> video::Window {
         // SAFETY:
-        unsafe { video::Window::from_ll(subsystem, self.handle.0 as *mut _) }
+        let raw = unsafe { sdl2::sys::SDL_CreateWindowFrom(self.handle.0 as *mut _) };
+        unsafe { video::Window::from_ll(subsystem, raw) }
     }
 }

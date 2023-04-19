@@ -1,16 +1,16 @@
 pub mod windows;
 
-pub enum MenuItem {
+pub enum MenuItem<'a> {
     Divider,
     Action {
-        title: String,
+        title: &'a str,
         action: Box<dyn Fn() -> ()>,
     },
-    SubMenu(Vec<MenuItem>),
+    SubMenu(Vec<MenuItem<'a>>),
 }
 
 pub struct Menu(windows::Menu);
 
-pub fn new_menu(items: Vec<MenuItem>) -> Menu {
+pub fn new_menu(items: &[MenuItem]) -> Menu {
     Menu(windows::new_menu(items))
 }
