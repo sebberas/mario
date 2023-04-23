@@ -17,26 +17,12 @@ pub struct MapTile {
     pub coordinate: UVec2,
 }
 
-// impl Sprite {
-//     pub fn from_block(block: &Block) -> Sprite {
-//         // alt nedenstående skal hardcodes ind :'(
-
-//         match block {
-//             Block::Ground => Sprite::new((uvec2(0, 10), uvec2(0, 10)),
-// String::from("ground")),             Block::Question(..) => {
-//                 Sprite::new((uvec2(0, 10), uvec2(0, 10)),
-// String::from("question"))             }
-//             _ => unreachable!(),
-//         }
-//     }
-// }
-
 impl ToSprite for Block {
     fn to_sprite(&self) -> Sprite {
         match self {
             Block::Ground => Sprite::new(
-                (uvec2(0, 16), uvec2(16, 32)),
-                String::from("./sprites/tilesheet.png"),
+                (uvec2(0, 16), uvec2(16, 16)),
+                "./assets/sprites/tilesheet.png",
             ),
             Block::Question { .. } => todo!(),
         }

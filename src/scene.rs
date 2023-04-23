@@ -101,13 +101,14 @@ pub struct Player {
 impl ToSprite for Player {
     fn to_sprite(&self) -> Sprite {
         Sprite::new(
-            (uvec2(0, 0), uvec2(16, 16)),
-            String::from("assets/sprites/mario_test.png"),
+            (uvec2(0, 0), uvec2(12, 16)),
+            "assets/sprites/mario_test.png",
         )
     }
 }
 
 #[derive(Debug, Deserialize, Serialize)]
+#[serde(bound(deserialize = "'de: 'static"))]
 pub struct Scene {
     pub camera: Camera,
 
@@ -131,11 +132,15 @@ pub struct SpriteId(usize);
 #[derive(Debug, Deserialize, Serialize, Clone)]
 pub struct Sprite {
     pub bounding_box: (UVec2, UVec2),
-    pub asset_path: String,
+    pub asset_path: &'static str,
 }
 
 impl Sprite {
-    pub fn new(bounding_box: (UVec2, UVec2), asset_path: String) -> Sprite {
+    /// Creates a new sprite from a bounding box.
+    ///
+    /// The coordinates in the second UVec2 is relative to the top-left of the
+    /// bounding box.
+    pub fn new(bounding_box: (UVec2, UVec2), asset_path: &'static str) -> Sprite {
         Sprite {
             bounding_box,
             asset_path,
@@ -146,11 +151,9 @@ impl Sprite {
 impl ToSprite for Enemy {
     fn to_sprite(&self) -> Sprite {
         match self.kind {
-            EnemyKind::Goomba { .. } => Sprite::new((uvec2(0, 10), uvec2(0, 10)), String::from("")),
-            EnemyKind::Piranha { .. } => {
-                Sprite::new((uvec2(0, 10), uvec2(0, 10)), String::from(""))
-            }
-            EnemyKind::Koopa { .. } => Sprite::new((uvec2(0, 10), uvec2(0, 10)), String::from("")),
+            EnemyKind::Goomba { .. } => Sprite::new((uvec2(0, 10), uvec2(0, 10)), ""),
+            EnemyKind::Piranha { .. } => Sprite::new((uvec2(0, 10), uvec2(0, 10)), ""),
+            EnemyKind::Koopa { .. } => Sprite::new((uvec2(0, 10), uvec2(0, 10)), ""),
             _ => unreachable!(),
         }
     }
@@ -159,9 +162,9 @@ impl ToSprite for Enemy {
 impl ToSprite for Entity {
     fn to_sprite(&self) -> Sprite {
         match self.kind {
-            EntityKind::Coin => Sprite::new((uvec2(0, 10), uvec2(0, 10)), String::from("")),
-            EntityKind::Pipe { .. } => Sprite::new((uvec2(0, 10), uvec2(0, 10)), String::from("")),
-            EntityKind::Item(..) => Sprite::new((uvec2(0, 10), uvec2(0, 10)), String::from("")),
+            EntityKind::Coin => Sprite::new((uvec2(0, 10), uvec2(0, 10)), ""),
+            EntityKind::Pipe { .. } => Sprite::new((uvec2(0, 10), uvec2(0, 10)), ""),
+            EntityKind::Item(..) => Sprite::new((uvec2(0, 10), uvec2(0, 10)), ""),
         }
     }
 }

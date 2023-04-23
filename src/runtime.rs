@@ -1,3 +1,5 @@
+use std::time::Duration;
+
 use glam::*;
 use sdl2::event::{Event, WindowEvent};
 use sdl2::render::*;
@@ -59,8 +61,16 @@ impl Layer for Runtime {
     }
 
     fn update(&mut self, keyboard: sdl2::keyboard::KeyboardState, mouse: sdl2::mouse::MouseState) {
+        const MAX: Duration = Duration::from_nanos((16.667 * 1_000_000f32) as _);
+
         self.game.update(&mut self.scene, keyboard);
+
+        let start = std::time::Instant::now();
         self.renderer.update(&mut self.scene);
+        let end = std::time::Instant::now();
+
+        let elapsed = end - start;
+        println!("{elapsed:?}");
     }
 
     fn handle_events(&mut self, events: &mut dyn Iterator<Item = &sdl2::event::Event>) {

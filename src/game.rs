@@ -22,17 +22,22 @@ impl Game {
     pub fn new(scene: &mut Scene) -> Self {
         let file = File::open("./assets/save.json").ok();
 
+        scene.map_tiles.reserve(1024);
+        for i in 0..(1200 / 16) {
+            for j in 0..16 {
+                scene.map_tiles.push(MapTile {
+                    coordinate: uvec2(i * 16, 320 + j * 16),
+                    block: Block::Ground,
+                });
+            }
+        }
+
         let game = file.map(|file| json::from_reader(file).unwrap());
         game.unwrap_or_default()
     }
 
     pub fn update(&mut self, scene: &mut Scene, keyboard: sdl2::keyboard::KeyboardState) {
         self.move_player(scene, keyboard);
-
-        scene.map_tiles.push(MapTile {
-            coordinate: uvec2(400, 400),
-            block: Block::Ground,
-        })
     }
 
     pub fn on_destroy(&mut self, scene: &mut Scene) {
@@ -51,7 +56,7 @@ impl Game {
         if keyboard.is_scancode_pressed(Scancode::D) {
             if scene.player.speed < max_speed {
                 scene.player.speed += acceleration;
-                println!("{:?}", scene.player.speed);
+                // println!("{:?}", scene.player.speed);
             }
             scene.player.position.x += scene.player.speed;
         }
