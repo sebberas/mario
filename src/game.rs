@@ -10,10 +10,10 @@ use sdl2::render;
 use serde::{Deserialize, Serialize};
 use serde_json as json;
 
-use crate::map::*;
+use crate::map::{self, *};
 use crate::scene::*;
 
-#[derive(Serialize, Deserialize, Debug, Default)]
+#[derive(Serialize, Deserialize, Debug, Default, Clone, Copy)]
 pub struct Game {}
 
 impl Game {
@@ -52,6 +52,7 @@ impl Game {
     pub fn move_player(&mut self, scene: &mut Scene, keyboard: sdl2::keyboard::KeyboardState) {
         let acceleration = 0.01;
         let max_speed = 0.1;
+        let gravity = 0.1;
 
         if keyboard.is_scancode_pressed(Scancode::D) {
             if scene.player.speed < max_speed {
@@ -69,5 +70,45 @@ impl Game {
         }
 
         if keyboard.is_scancode_pressed(Scancode::Space) {}
+
+        let nearby_tiles = self.nearby_tiles(scene);
+
+        // gravity
+        for tile in nearby_tiles.iter() {
+            if self.position_to_coordinate(scene.player.position.y) < tile.coordinate.y {
+                println!("player: {}", self.position_to_coordinate(scene.player.position.y));
+                scene.player.position.y += gravity;
+            }
+        }
+    }
+
+    pub fn nearby_tiles(self, scene: &mut Scene) -> Vec<MapTile> {
+        let mut nearby_tiles = vec![];
+        let search_distance = 2000.0;
+        for block in scene.map_tiles.iter() {
+            // check x distance
+            if (block.coordinate.x as f32 - scene.player.position.x).abs() < search_distance
+                || (scene.player.position.x - block.coordinate.x as f32).abs() < search_distance
+            {
+                nearby_tiles.push(*block);
+            }
+
+            // check y distance
+            if (block.coordinate.y as f32 - scene.player.position.y).abs() < search_distance
+                || (scene.player.position.y - block.coordinate.y as f32).abs() < search_distance
+            {
+                nearby_tiles.push(*block);
+            }
+        }
+
+        return nearby_tiles;
+    }
+
+    pub fn coordinate_to_position(self, coordinate: u32) -> f32 {
+        coordinate as f32 * 16.0
+    }
+
+    pub fn position_to_coordinate(self, position: f32) -> u32 {
+        position as u32 / 16
     }
 }
