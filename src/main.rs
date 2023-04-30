@@ -1,4 +1,3 @@
-use editor::Editor;
 use glam::*;
 use sdl2::event::*;
 use sdl2::keyboard::*;
@@ -6,6 +5,7 @@ use sdl2::mouse::*;
 use sdl2::video::*;
 use sdl2::{AudioSubsystem, VideoSubsystem};
 
+use self::editor::*;
 use self::runtime::*;
 
 mod audio;
@@ -22,10 +22,6 @@ mod task;
 mod os;
 
 pub trait Layer {
-    fn new(video: VideoSubsystem, audio: AudioSubsystem) -> Self
-    where
-        Self: Sized;
-
     fn update(&mut self, keyboard: KeyboardState, mouse: MouseState);
 
     /// All window events that make it to an implementation of Layer are
@@ -52,9 +48,14 @@ fn main() {
     let audio = sdl.audio().unwrap();
     let mut event_pump = sdl.event_pump().unwrap();
 
-    let mut layers: [Option<Box<dyn Layer>>; 1] = [
-        Some(Box::new(Runtime::new(video.clone(), audio.clone()))),
-        //Some(Box::new(Editor::new(video, audio))),
+    let runtime = Runtime::new(video.clone(), audio.clone());
+    // let editor = Editor::new(video.clone(), audio.clone());
+    // let editor_tools = EditorTools::new(&editor, video.clone(), audio.clone());
+
+    let mut layers: Vec<Option<Box<dyn Layer>>> = vec![
+        Some(Box::new(runtime)),
+        // Some(Box::new(editor)),
+        // Some(Box::new(editor_tools)),
     ];
 
     loop {
@@ -64,10 +65,7 @@ fn main() {
             if let Some(layer) = layer {
                 let window_id = layer.window().id();
 
-                let mut iter = events.iter().filter(|event| match event.get_window_id() {
-                    Some(id) if id == window_id && !matches!(event, Event::Quit { .. }) => true,
-                    _ => false,
-                });
+                let mut iter = events.iter().filter(|event| matches!(event.get_window_id(), Some(id) if id == window_id && !matches!(event, Event::Quit { .. })));
 
                 layer.handle_events(&mut iter);
                 layer.update(event_pump.keyboard_state(), event_pump.mouse_state());

@@ -26,7 +26,7 @@ impl Game {
         for i in 0..(1200 / 16) {
             for j in 0..16 {
                 scene.map_tiles.push(MapTile {
-                    coordinate: uvec2(i * 16, 320 + j * 16),
+                    coordinate: uvec2(i * 16, j * 16),
                     block: Block::Ground,
                 });
             }

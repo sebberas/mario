@@ -19,8 +19,17 @@ pub struct Renderer {
 }
 
 impl Renderer {
+    const TILES: u32 = 16;
+
     pub fn new(mut canvas: WindowCanvas) -> Renderer {
         canvas.set_blend_mode(BlendMode::Blend);
+
+        let (width, height) = canvas.window().size();
+
+        canvas.set_logical_size(256, 256);
+        // canvas.set_integer_scale(true);
+        // canvas.set_scale(height as f32 / 16f32, height as f32 / 16f32);
+
         let texture_creator = canvas.texture_creator();
 
         Renderer {

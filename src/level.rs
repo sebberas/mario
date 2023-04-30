@@ -1,6 +1,10 @@
-use glam::*;
-use image::ColorType;
-use serde::{Deserialize, Serialize};
+use std::fs;
+use std::io::BufReader;
+use std::path::*;
+
+use ::glam::*;
+use ::serde::{Deserialize, Serialize};
+use ::serde_json as json;
 
 use crate::map::*;
 use crate::scene::*;
@@ -26,4 +30,14 @@ pub struct Segment {
     pub entities: Vec<Entity>,
     pub tiles: Vec<MapTile>,
     pub background: UVec3,
+}
+
+pub fn read_level(path: &impl AsRef<Path>) -> Result<Level, json::Error> {
+    let file = fs::File::open(path).unwrap();
+    json::from_reader(file)
+}
+
+pub fn write_level(path: &impl AsRef<Path>, level: &Level) -> Result<(), json::Error> {
+    let file = fs::File::create(path).unwrap();
+    json::to_writer_pretty(file, level)
 }

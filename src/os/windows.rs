@@ -96,11 +96,14 @@ impl Window {
 
         assert_ne!(unsafe { RegisterClassExW(&wcex) }, 0);
 
+        let title: Vec<_> = title.encode_utf16().chain([0]).collect();
+        let title = PCWSTR::from_raw(title.as_ptr());
+
         let handle = unsafe {
             CreateWindowExW(
                 WS_EX_APPWINDOW,
                 w!("mario"),
-                w!("Mario"),
+                title,
                 WS_OVERLAPPEDWINDOW,
                 0,
                 0,

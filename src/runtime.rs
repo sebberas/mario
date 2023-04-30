@@ -23,11 +23,8 @@ pub struct Runtime {
     scene: Scene,
 }
 
-impl Layer for Runtime {
-    fn new(video: sdl2::VideoSubsystem, audio: sdl2::AudioSubsystem) -> Self
-    where
-        Self: Sized,
-    {
+impl Runtime {
+    pub fn new(video: sdl2::VideoSubsystem, audio: sdl2::AudioSubsystem) -> Self {
         let window = video.window("Mario", 1200, 600).build().unwrap();
         let mut canvas = window.into_canvas().accelerated().build().unwrap();
 
@@ -59,7 +56,9 @@ impl Layer for Runtime {
             scene,
         }
     }
+}
 
+impl Layer for Runtime {
     fn update(&mut self, keyboard: sdl2::keyboard::KeyboardState, mouse: sdl2::mouse::MouseState) {
         const MAX: Duration = Duration::from_nanos((16.667 * 1_000_000f32) as _);
 
