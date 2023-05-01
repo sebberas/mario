@@ -50,7 +50,7 @@ impl Runtime {
             sprites: Vec::default(),
             text: Vec::default(),
             map_tiles: Vec::default(),
-            background: uvec3(255, 255, 255),
+            background: uvec3(146, 144, 255),
         };
 
         let game = Game::new(&mut scene);

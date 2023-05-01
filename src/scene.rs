@@ -55,17 +55,27 @@ impl Camera {
 }
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Deserialize, Serialize)]
+pub enum Direction {
+    Forward,
+    Backward,
+}
+
+#[derive(Debug, Clone, Copy, PartialEq, Deserialize, Serialize)]
 pub struct Enemy {
-    pub position: UVec2,
+    pub position: Vec2,
     pub kind: EnemyKind,
     pub is_shown: bool,
 }
 
-#[derive(Debug, Clone, Copy, PartialEq, Eq, Deserialize, Serialize)]
+#[derive(Debug, Clone, Copy, PartialEq, Deserialize, Serialize)]
 pub enum EnemyKind {
-    Goomba { from: UVec2, to: UVec2 },
-    Piranha { position: UVec2 },
-    Koopa { position: UVec2 },
+    Goomba {
+        from: Vec2,
+        to: Vec2,
+        direction: Direction,
+    },
+    Piranha {},
+    Koopa {},
 }
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Deserialize, Serialize)]

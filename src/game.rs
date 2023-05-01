@@ -66,10 +66,11 @@ impl Game {
         let state = file.map(|file| json::from_reader(file).unwrap());
 
         scene.enemies.push(Enemy {
-            position: uvec2(40, 40),
+            position: vec2(40f32, 40f32),
             kind: EnemyKind::Goomba {
-                from: uvec2(0, 0),
-                to: uvec2(5, 5),
+                from: vec2(2f32, 2f32),
+                to: vec2(100f32, 100f32),
+                direction: Direction::Forward,
             },
             is_shown: true,
         });
@@ -82,6 +83,39 @@ impl Game {
 
     pub fn update(&mut self, scene: &mut Scene, keyboard: KeyboardState) {
         self.move_player(scene, keyboard);
+
+        Self::update_enemies(scene);
+    }
+
+    pub fn update_enemies(scene: &mut Scene) {
+        // Movement
+        for enemy in &mut scene.enemies {
+            match &mut enemy.kind {
+                EnemyKind::Goomba {
+                    from,
+                    to,
+                    direction,
+                } => {
+                    const SPEED: f32 = 0.02;
+                    match direction {
+                        Direction::Forward => enemy.position.x += SPEED,
+                        Direction::Backward => enemy.position.x -= SPEED,
+                    }
+
+                    match enemy.position.x {
+                        x if x > to.x => *direction = Direction::Backward,
+                        x if x < from.x => *direction = Direction::Forward,
+                        _ => {}
+                    }
+                }
+                EnemyKind::Koopa { .. } => {}
+                _ => {}
+            }
+        }
+
+        // Collision
+
+        // Animation State
     }
 
     pub fn on_destroy(&mut self, scene: &mut Scene) {

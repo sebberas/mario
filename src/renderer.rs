@@ -1,12 +1,12 @@
 use std::collections::HashMap;
 use std::path::Path;
 
-use glam::*;
-use image::{imageops, GenericImageView, RgbaImage};
-use sdl2::pixels::{Color, PixelFormat, PixelFormatEnum};
-use sdl2::rect::{Point, Rect};
-use sdl2::render::*;
-use sdl2::video::*;
+use ::glam::*;
+use ::image::*;
+use ::sdl2::pixels::{Color, PixelFormat, PixelFormatEnum};
+use ::sdl2::rect::{Point, Rect};
+use ::sdl2::render::*;
+use ::sdl2::video::*;
 
 use crate::map::*;
 use crate::scene;
@@ -47,12 +47,12 @@ impl Renderer {
         self.canvas.clear();
 
         // self.move_camera(scene, scene.camera.position);
-        self.draw_background(Rgba::from(scene.background.as_vec3() / 255.0));
+        self.draw_background(scene::Rgba::from(scene.background.as_vec3() / 255.0));
         self.draw_tiles(scene);
 
         for enemy in &scene.enemies {
             let sprite = enemy.to_sprite();
-            self.draw_image(&scene.camera, &sprite, enemy.position, 1);
+            self.draw_image(&scene.camera, &sprite, enemy.position.as_uvec2(), 1);
         }
 
         // self.draw_sprites(scene);
@@ -82,9 +82,21 @@ impl Renderer {
             let UVec2 { x, y } = bounding_box.0;
             let [width, height] = bounding_box.1.to_array();
 
-            // if we are unable find the texture in the cache we have to
+            // If we are unable find the texture in the cache we have to
             // load it in from disk.
             let mut image = image::open(asset_path).unwrap().to_rgba8();
+
+            // #00298C  or #9290FF is used as background color on the tilesheets. This
+            // should just be made transparent. Since we cache the texture, we
+            // only pay the price of clearing these pixels once.
+            for x in 0..image.width() {
+                for y in 0..image.height() {
+                    let pixel = image.get_pixel(x, y);
+                    if pixel == &Rgba([0, 41, 140, 255]) || pixel == &Rgba([146, 144, 255, 255]) {
+                        image.put_pixel(x, y, Rgba([0, 0, 0, 0]));
+                    }
+                }
+            }
 
             let image_view = image.view(x, y, width, height);
             let pixels: Vec<_> = image_view
@@ -121,7 +133,7 @@ impl Renderer {
             .unwrap();
     }
 
-    pub fn draw_background(&mut self, color: Rgba) {
+    pub fn draw_background(&mut self, color: scene::Rgba) {
         self.canvas.set_draw_color(Color::from(color));
         self.canvas.fill_rect(None).unwrap();
     }
