@@ -104,8 +104,8 @@ pub struct Text {}
 #[derive(Debug, Deserialize, Serialize)]
 pub struct Player {
     pub position: Vec2,
-    pub speed: f32,
-    pub jump_speed: f32,
+    pub move_velocity: f32,
+    pub jump_velocity: f32,
     pub can_jump: bool,
     pub is_shown: bool,
 }

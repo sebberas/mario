@@ -10,6 +10,7 @@ use ::serde_json as json;
 
 use crate::level::*;
 use crate::map::*;
+use crate::scene;
 use crate::scene::*;
 
 #[derive(Debug, Clone)]
@@ -133,22 +134,22 @@ impl Game {
         let gravity = 0.5;
 
         if keyboard.is_scancode_pressed(Scancode::D) {
-            if scene.player.speed < max_speed {
-                scene.player.speed += acceleration;
+            if scene.player.move_velocity < max_speed {
+                scene.player.move_velocity += acceleration;
                 // println!("{:?}", scene.player.speed);
             }
-            scene.player.position.x += scene.player.speed;
+            scene.player.position.x += scene.player.move_velocity;
         }
 
         if keyboard.is_scancode_pressed(Scancode::A) {
-            if scene.player.speed < max_speed {
-                scene.player.speed += acceleration;
+            if scene.player.move_velocity < max_speed {
+                scene.player.move_velocity += acceleration;
             }
-            scene.player.position.x -= scene.player.speed;
+            scene.player.position.x -= scene.player.move_velocity;
         }
 
         if keyboard.is_scancode_pressed(Scancode::Space) && scene.player.can_jump == true {
-            scene.player.position.y -= scene.player.jump_speed;
+            scene.player.position.y -= scene.player.jump_velocity;
         }
 
         let nearby_tiles = Self::nearby_tiles(scene);
@@ -181,11 +182,89 @@ impl Game {
         return nearby_tiles;
     }
 
+    //takes nearby tiles and create a vec of bounding boxes
+    pub fn update_boundingboxes(tiles: Vec<MapTile>) -> Vec<BoundingBox> {
+        let mut bounding_boxes = vec![];
+
+        for tile in tiles {
+            let x = tile.coordinate.x;
+            let y = tile.coordinate.y;
+            bounding_boxes.push(BoundingBox::new(x as f32, y as f32, 16.0, 16.0));
+        }
+        return bounding_boxes;
+    }
+
+    pub fn check_collission(self, scene: &mut Scene, tiles: Vec<BoundingBox>) {
+        let player_collider = BoundingBox::new(
+            scene.player.position.x as f32,
+            scene.player.position.y as f32,
+            16.0,
+            16.0,
+        );
+
+        for tile in tiles {
+            if Self::collides(player_collider, tile).0 {
+                match Self::collides(player_collider, tile).1 {
+                    1 => scene.player.move_velocity = 0.0,
+                    2 => scene.player.move_velocity = 0.0,
+                    3 => scene.player.jump_velocity = 0.0,
+                    4 => scene.player.jump_velocity = 0.0,
+                    _ => unreachable!(),
+                }
+            }
+        }
+    }
+
+    pub fn collides(this: BoundingBox, that: BoundingBox) -> (bool, i32) {
+        let dx = (this.x + this.width / 2.0) - (that.x + that.width / 2.0);
+        let dy = (this.y + this.height / 2.0) - (that.y + that.height / 2.0);
+        let combined_half_widths = this.width / 2.0 + that.width / 2.0;
+        let combined_half_heights = this.height / 2.0 + that.height / 2.0;
+
+        if dx.abs() < combined_half_widths && dy.abs() < combined_half_heights {
+            let overlap_x = combined_half_widths - dx.abs();
+            let overlap_y = combined_half_heights - dy.abs();
+            if overlap_x < overlap_y {
+                if dx > 0.0 {
+                    (true, 1) // Collision on right side
+                } else {
+                    (true, 2) // Collision on left side
+                }
+            } else {
+                if dy > 0.0 {
+                    (true, 3) // Collision on bottom side
+                } else {
+                    (true, 4) // Collision on top side
+                }
+            }
+        } else {
+            (false, 0) // No collision
+        }
+    }
+
     pub fn coordinate_to_position(coordinate: u32) -> f32 {
         coordinate as f32 * 16.0
     }
 
     pub fn position_to_coordinate(position: f32) -> u32 {
         position as u32 / 16
+    }
+}
+
+#[derive(Debug, Clone, Copy)]
+pub struct BoundingBox {
+    x: f32,
+    y: f32,
+    width: f32,
+    height: f32,
+}
+impl BoundingBox {
+    pub fn new(x: f32, y: f32, width: f32, height: f32) -> BoundingBox {
+        BoundingBox {
+            x,
+            y,
+            width,
+            height,
+        }
     }
 }
