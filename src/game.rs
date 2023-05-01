@@ -52,7 +52,7 @@ impl Game {
     pub fn move_player(&mut self, scene: &mut Scene, keyboard: sdl2::keyboard::KeyboardState) {
         let acceleration = 0.01;
         let max_speed = 0.1;
-        let gravity = 0.1;
+        let gravity = 0.5;
 
         if keyboard.is_scancode_pressed(Scancode::D) {
             if scene.player.speed < max_speed {
@@ -69,16 +69,15 @@ impl Game {
             scene.player.position.x -= scene.player.speed;
         }
 
-        if keyboard.is_scancode_pressed(Scancode::Space) {}
+        if keyboard.is_scancode_pressed(Scancode::Space) && scene.player.can_jump == true {
+            scene.player.position.y -= scene.player.jump_speed;
+        }
 
         let nearby_tiles = self.nearby_tiles(scene);
 
         // gravity
-        for tile in nearby_tiles.iter() {
-            if self.position_to_coordinate(scene.player.position.y) < tile.coordinate.y {
-                println!("player: {}", self.position_to_coordinate(scene.player.position.y));
-                scene.player.position.y += gravity;
-            }
+        if self.position_to_coordinate(scene.player.position.y) <= 10 {
+            scene.player.position.y += gravity;
         }
     }
 
