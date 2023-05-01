@@ -1,12 +1,13 @@
 use std::time::Duration;
 
-use glam::*;
-use sdl2::event::{Event, WindowEvent};
-use sdl2::render::*;
-use sdl2::video::*;
-use sdl2::{AudioSubsystem, VideoSubsystem};
+use ::glam::*;
+use ::sdl2::event::{Event, WindowEvent};
+use ::sdl2::keyboard::*;
+use ::sdl2::mouse::*;
+use ::sdl2::video::*;
+use ::sdl2::{AudioSubsystem, VideoSubsystem};
 
-use crate::game::{self, Game};
+use crate::game::*;
 use crate::renderer::*;
 use crate::scene::*;
 use crate::Layer;
@@ -25,7 +26,12 @@ pub struct Runtime {
 
 impl Runtime {
     pub fn new(video: sdl2::VideoSubsystem, audio: sdl2::AudioSubsystem) -> Self {
-        let window = video.window("Mario", 1200, 600).build().unwrap();
+        let window = video
+            .window("Mario", 1200, 600)
+            .resizable()
+            .build()
+            .unwrap();
+
         let mut canvas = window.into_canvas().accelerated().build().unwrap();
 
         let renderer = Renderer::new(canvas);
@@ -44,7 +50,7 @@ impl Runtime {
             sprites: Vec::default(),
             text: Vec::default(),
             map_tiles: Vec::default(),
-            background: vec4(0.0, 1.0, 1.0, 0.0).into(),
+            background: uvec3(255, 255, 255),
         };
 
         let game = Game::new(&mut scene);
@@ -61,9 +67,7 @@ impl Runtime {
 }
 
 impl Layer for Runtime {
-    fn update(&mut self, keyboard: sdl2::keyboard::KeyboardState, mouse: sdl2::mouse::MouseState) {
-        const MAX: Duration = Duration::from_nanos((16.667 * 1_000_000f32) as _);
-
+    fn update(&mut self, keyboard: KeyboardState, mouse: MouseState) {
         self.game.update(&mut self.scene, keyboard);
 
         let start = std::time::Instant::now();

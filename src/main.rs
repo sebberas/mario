@@ -1,3 +1,5 @@
+#![feature(let_chains)]
+
 use glam::*;
 use sdl2::event::*;
 use sdl2::keyboard::*;

@@ -19,16 +19,19 @@ pub struct Renderer {
 }
 
 impl Renderer {
-    const TILES: u32 = 16;
+    const TILES_X: u32 = 25;
+    const TILES_Y: u32 = 18;
+    const TILE_SIZE: u32 = 16;
 
     pub fn new(mut canvas: WindowCanvas) -> Renderer {
         canvas.set_blend_mode(BlendMode::Blend);
 
-        let (width, height) = canvas.window().size();
-
-        canvas.set_logical_size(256, 256);
-        // canvas.set_integer_scale(true);
-        // canvas.set_scale(height as f32 / 16f32, height as f32 / 16f32);
+        canvas
+            .set_logical_size(
+                Self::TILES_X * Self::TILE_SIZE,
+                Self::TILES_Y * Self::TILE_SIZE,
+            )
+            .unwrap();
 
         let texture_creator = canvas.texture_creator();
 
@@ -40,10 +43,11 @@ impl Renderer {
     }
 
     pub fn update(&mut self, scene: &mut Scene) {
+        self.canvas.set_draw_color(Color::BLACK);
         self.canvas.clear();
 
         // self.move_camera(scene, scene.camera.position);
-        self.draw_background(scene.background);
+        self.draw_background(Rgba::from(scene.background.as_vec3() / 255.0));
         self.draw_tiles(scene);
         // self.draw_sprites(scene);
         self.draw_player(scene);
@@ -112,7 +116,7 @@ impl Renderer {
 
     pub fn draw_background(&mut self, color: Rgba) {
         self.canvas.set_draw_color(Color::from(color));
-        self.canvas.clear();
+        self.canvas.fill_rect(None).unwrap();
     }
 
     pub fn draw_sprites(&mut self, scene: &mut Scene) {

@@ -122,7 +122,7 @@ pub struct Scene {
     pub text: Vec<Text>,
 
     pub map_tiles: Vec<MapTile>,
-    pub background: Rgba,
+    pub background: UVec3,
 }
 
 #[derive(Debug, Deserialize, Serialize)]

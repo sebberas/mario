@@ -2,18 +2,44 @@ use std::fs::*;
 use std::path::{Path, PathBuf};
 use std::str::SplitInclusive;
 
-use glam::{uvec2, vec2};
-use sdl2::event::*;
-use sdl2::keyboard::*;
-use sdl2::messagebox::*;
-use sdl2::render;
-use serde::{Deserialize, Serialize};
-use serde_json as json;
+use ::glam::*;
+use ::sdl2::keyboard::*;
+use ::sdl2::messagebox::*;
+use ::serde::{Deserialize, Serialize};
+use ::serde_json as json;
 
-use crate::map::{self, *};
+use crate::level::*;
+use crate::map::*;
 use crate::scene::*;
 
-#[derive(Serialize, Deserialize, Debug, Default, Clone, Copy)]
+#[derive(Debug, Clone)]
+struct LevelManager {
+    directory: ReadDir,
+    names: Vec<String>,
+}
+
+impl LevelManager {
+    pub fn new(path: &impl AsRef<Path>) -> Self {
+        let path = path.as_ref().to_path_buf();
+        assert!(path.is_dir());
+
+        for entry in read_dir(path).unwrap() {
+            if let Ok(entry) = entry {
+                if entry.file_type().map(FileType::is_file).unwrap_or_default() {
+                    fil
+                }
+            }
+        }
+
+        Self { directory }
+    }
+
+    fn names(&self) -> &[String] {
+        todo!()
+    }
+}
+
+#[derive(Serialize, Deserialize, Debug, Clone)]
 pub struct Game {}
 
 impl Game {
@@ -33,10 +59,12 @@ impl Game {
         }
 
         let game = file.map(|file| json::from_reader(file).unwrap());
-        game.unwrap_or_default()
+        game.unwrap_or(Game)
     }
 
-    pub fn update(&mut self, scene: &mut Scene, keyboard: sdl2::keyboard::KeyboardState) {
+    pub fn update(&mut self, scene: &mut Scene, keyboard: KeyboardState) {
+        if let Some(level) = self.level_manager.get() {}
+
         self.move_player(scene, keyboard);
     }
 
@@ -49,7 +77,7 @@ impl Game {
         }
     }
 
-    pub fn move_player(&mut self, scene: &mut Scene, keyboard: sdl2::keyboard::KeyboardState) {
+    pub fn move_player(&mut self, scene: &mut Scene, keyboard: KeyboardState) {
         let acceleration = 0.01;
         let max_speed = 0.1;
         let gravity = 0.5;
@@ -73,15 +101,15 @@ impl Game {
             scene.player.position.y -= scene.player.jump_speed;
         }
 
-        let nearby_tiles = self.nearby_tiles(scene);
+        let nearby_tiles = Self::nearby_tiles(scene);
 
         // gravity
-        if self.position_to_coordinate(scene.player.position.y) <= 10 {
+        if Self::position_to_coordinate(scene.player.position.y) <= 10 {
             scene.player.position.y += gravity;
         }
     }
 
-    pub fn nearby_tiles(self, scene: &mut Scene) -> Vec<MapTile> {
+    pub fn nearby_tiles(scene: &mut Scene) -> Vec<MapTile> {
         let mut nearby_tiles = vec![];
         let search_distance = 2000.0;
         for block in scene.map_tiles.iter() {
@@ -103,11 +131,11 @@ impl Game {
         return nearby_tiles;
     }
 
-    pub fn coordinate_to_position(self, coordinate: u32) -> f32 {
+    pub fn coordinate_to_position(coordinate: u32) -> f32 {
         coordinate as f32 * 16.0
     }
 
-    pub fn position_to_coordinate(self, position: f32) -> u32 {
+    pub fn position_to_coordinate(position: f32) -> u32 {
         position as u32 / 16
     }
 }
