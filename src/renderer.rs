@@ -49,6 +49,12 @@ impl Renderer {
         // self.move_camera(scene, scene.camera.position);
         self.draw_background(Rgba::from(scene.background.as_vec3() / 255.0));
         self.draw_tiles(scene);
+
+        for enemy in &scene.enemies {
+            let sprite = enemy.to_sprite();
+            self.draw_image(&scene.camera, &sprite, enemy.position, 1);
+        }
+
         // self.draw_sprites(scene);
         self.draw_player(scene);
 
@@ -78,7 +84,8 @@ impl Renderer {
 
             // if we are unable find the texture in the cache we have to
             // load it in from disk.
-            let image = image::open(asset_path).unwrap().to_rgba8();
+            let mut image = image::open(asset_path).unwrap().to_rgba8();
+
             let image_view = image.view(x, y, width, height);
             let pixels: Vec<_> = image_view
                 .pixels()

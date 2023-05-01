@@ -153,9 +153,18 @@ impl Sprite {
 impl ToSprite for Enemy {
     fn to_sprite(&self) -> Sprite {
         match self.kind {
-            EnemyKind::Goomba { .. } => Sprite::new((uvec2(0, 10), uvec2(0, 10)), ""),
-            EnemyKind::Piranha { .. } => Sprite::new((uvec2(0, 10), uvec2(0, 10)), ""),
-            EnemyKind::Koopa { .. } => Sprite::new((uvec2(0, 10), uvec2(0, 10)), ""),
+            EnemyKind::Goomba { .. } => Sprite::new(
+                (uvec2(0, 16), uvec2(16, 16)),
+                "./assets/sprites/enemies.png",
+            ),
+            EnemyKind::Piranha { .. } => Sprite::new(
+                (uvec2(0, 10), uvec2(16, 16)),
+                "./assets/sprites/enemies.png",
+            ),
+            EnemyKind::Koopa { .. } => Sprite::new(
+                (uvec2(0, 10), uvec2(16, 16)),
+                "./assets/sprites/enemies.png",
+            ),
             _ => unreachable!(),
         }
     }

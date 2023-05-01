@@ -14,24 +14,31 @@ use crate::scene::*;
 
 #[derive(Debug, Clone)]
 struct LevelManager {
-    directory: ReadDir,
-    names: Vec<String>,
+    levels: Vec<PathBuf>,
+    level_names: Vec<String>,
 }
 
 impl LevelManager {
     pub fn new(path: &impl AsRef<Path>) -> Self {
-        let path = path.as_ref().to_path_buf();
-        assert!(path.is_dir());
+        let mut levels = Vec::new();
+        let mut level_names = Vec::new();
 
-        for entry in read_dir(path).unwrap() {
-            if let Ok(entry) = entry {
-                if entry.file_type().map(FileType::is_file).unwrap_or_default() {
-                    fil
-                }
+        let directory = read_dir(path).unwrap();
+        for entry in directory.flatten() {
+            // We consider all files that ends in .level inside of the levels folder a valid
+            // level.
+            let path = entry.path();
+            if path.is_file() && path.ends_with(".level") {
+                let file_name = path.file_name().unwrap();
+                level_names.push(file_name.to_str().unwrap().to_owned());
+                levels.push(path);
             }
         }
 
-        Self { directory }
+        Self {
+            levels,
+            level_names,
+        }
     }
 
     fn names(&self) -> &[String] {
@@ -39,39 +46,48 @@ impl LevelManager {
     }
 }
 
-#[derive(Serialize, Deserialize, Debug, Clone)]
-pub struct Game {}
+#[derive(Serialize, Deserialize, Debug, Default, Clone)]
+pub struct GameState {}
+
+#[derive(Debug, Clone)]
+pub struct Game {
+    level_manager: LevelManager,
+    state: GameState,
+}
 
 impl Game {
-    const SAVE: &str = "./assets/save.json";
+    const SAVE_PATH: &str = "./assets/save.json";
+    const LEVEL_PATH: &str = "./assets/levels";
 
     pub fn new(scene: &mut Scene) -> Self {
+        let level_manager = LevelManager::new(&Self::LEVEL_PATH);
+
         let file = File::open("./assets/save.json").ok();
+        let state = file.map(|file| json::from_reader(file).unwrap());
 
-        scene.map_tiles.reserve(1024);
-        for i in 0..(1200 / 16) {
-            for j in 0..16 {
-                scene.map_tiles.push(MapTile {
-                    coordinate: uvec2(i * 16, j * 16),
-                    block: Block::Ground,
-                });
-            }
+        scene.enemies.push(Enemy {
+            position: uvec2(40, 40),
+            kind: EnemyKind::Goomba {
+                from: uvec2(0, 0),
+                to: uvec2(5, 5),
+            },
+            is_shown: true,
+        });
+
+        Self {
+            level_manager,
+            state: state.unwrap_or_default(),
         }
-
-        let game = file.map(|file| json::from_reader(file).unwrap());
-        game.unwrap_or(Game)
     }
 
     pub fn update(&mut self, scene: &mut Scene, keyboard: KeyboardState) {
-        if let Some(level) = self.level_manager.get() {}
-
         self.move_player(scene, keyboard);
     }
 
     pub fn on_destroy(&mut self, scene: &mut Scene) {
-        let contents = json::to_string_pretty(self).unwrap();
+        let contents = json::to_string_pretty(&self.state).unwrap();
 
-        if write(Self::SAVE, contents).is_err() {
+        if write(Self::SAVE_PATH, contents).is_err() {
             let msg = "Due to un unexpected error, the game could not be saved and your progress will be lost.";
             let _ = show_simple_message_box(MessageBoxFlag::ERROR, "Saving Game", msg, None);
         }
