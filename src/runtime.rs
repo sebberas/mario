@@ -49,8 +49,8 @@ impl Runtime {
             entities: Vec::default(),
             player: Player {
                 position: vec2(10.0, 10.0),
-                speed: 0.0,
-                jump_speed: 2.0,
+                move_velocity: 0.0,
+                jump_velocity: 0.0,
                 can_jump: true,
                 is_shown: true,
             },
