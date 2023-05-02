@@ -1,0 +1,67 @@
+{
+  "name": "test",
+  "difficulty": "Easy",
+  "start": 0,
+  "segments": [
+    {
+      "spawn": [
+        20,
+        20
+      ],
+      "enemies": [
+        {
+          "position": [
+            64.0,
+            64.0
+          ],
+          "kind": {
+            "Goomba": {
+              "from": [
+                20.0,
+                20.0
+              ],
+              "to": [
+                40.0,
+                20.0
+              ],
+              "direction": "Forward"
+            }
+          }
+        }
+      ],
+      "entities": [
+        {
+          "position": [
+            120,
+            192
+          ],
+          "kind": {
+            "Pipe": {
+              "id": 1
+            }
+          }
+        }
+      ],
+      "tiles": [],
+      "background": [
+        146,
+        144,
+        255
+      ]
+    },
+    {
+      "spawn": [
+        30,
+        20
+      ],
+      "enemies": [],
+      "entities": [],
+      "tiles": [],
+      "background": [
+        255,
+        255,
+        255
+      ]
+    }
+  ]
+}

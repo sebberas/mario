@@ -64,7 +64,6 @@ pub enum Direction {
 pub struct Enemy {
     pub position: Vec2,
     pub kind: EnemyKind,
-    pub is_shown: bool,
 }
 
 impl Enemy {
@@ -102,7 +101,6 @@ pub enum Item {
 pub struct Entity {
     pub position: UVec2,
     pub kind: EntityKind,
-    pub is_shown: bool,
 }
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Deserialize, Serialize)]
@@ -145,7 +143,7 @@ pub struct Scene {
     pub sprites: Vec<Sprite>,
     pub text: Vec<Text>,
 
-    pub map_tiles: Vec<MapTile>,
+    pub tiles: Vec<MapTile>,
     pub background: UVec3,
 }
 
@@ -198,7 +196,10 @@ impl ToSprite for Entity {
     fn to_sprite(&self) -> Sprite {
         match self.kind {
             EntityKind::Coin => Sprite::new((uvec2(0, 10), uvec2(0, 10)), ""),
-            EntityKind::Pipe { .. } => Sprite::new((uvec2(0, 10), uvec2(0, 10)), ""),
+            EntityKind::Pipe { .. } => Sprite::new(
+                (uvec2(119, 196), uvec2(33, 34)),
+                "./assets/sprites/tilesheet.png",
+            ),
             EntityKind::Item(..) => Sprite::new((uvec2(0, 10), uvec2(0, 10)), ""),
         }
     }

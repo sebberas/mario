@@ -56,7 +56,7 @@ impl Runtime {
             },
             sprites: Vec::default(),
             text: Vec::default(),
-            map_tiles: Vec::default(),
+            tiles: Vec::default(),
             background: uvec3(146, 144, 255),
         };
 
@@ -97,7 +97,7 @@ impl Layer for Runtime {
         let end = std::time::Instant::now();
 
         let elapsed = end - start;
-        println!("{elapsed:?}");
+        // println!("{elapsed:?}");
     }
 
     fn handle_events(&mut self, events: &mut dyn Iterator<Item = &sdl2::event::Event>) {

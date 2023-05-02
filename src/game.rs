@@ -22,6 +22,7 @@ pub struct GameSystems {
 struct LevelManager {
     levels: Vec<PathBuf>,
     level_names: Vec<String>,
+    current: Option<Level>,
 }
 
 impl LevelManager {
@@ -34,9 +35,11 @@ impl LevelManager {
             // We consider all files that ends in .level inside of the levels folder a valid
             // level.
             let path = entry.path();
-            if path.is_file() && path.ends_with(".level") {
+            if path.is_file() && let Some(extension) = path.extension() && extension.to_str().unwrap() == "level" {
                 let file_name = path.file_name().unwrap();
-                level_names.push(file_name.to_str().unwrap().to_owned());
+                let file_name = file_name.to_str().unwrap().strip_suffix(".level").unwrap();
+
+                level_names.push(file_name.to_owned());
                 levels.push(path);
             }
         }
@@ -44,7 +47,22 @@ impl LevelManager {
         Self {
             levels,
             level_names,
+            current: None,
         }
+    }
+
+    pub fn load(&mut self, name: &str) -> &Level {
+        let i = self
+            .level_names
+            .iter()
+            .enumerate()
+            .find_map(|(i, level_name)| if level_name == name { Some(i) } else { None })
+            .unwrap();
+
+        let level = read_level(&self.levels[i]).unwrap();
+
+        self.current = Some(level);
+        self.current.as_ref().unwrap()
     }
 
     fn names(&self) -> &[String] {
@@ -62,37 +80,101 @@ pub struct Game {
 }
 
 impl Game {
+    fn load_level(&mut self, level_name: &str, scene: &mut Scene) {
+        let level = self.level_manager.load(level_name);
+        if let Some(start) = level.start {
+            self.load_segment(start, scene);
+        }
+    }
+
+    fn load_segment(&mut self, segment_id: usize, scene: &mut Scene) {
+        let level = self
+            .level_manager
+            .current
+            .as_ref()
+            .expect("No level is loaded");
+
+        let segment = &level.segments[segment_id];
+
+        scene.enemies = segment.enemies.clone();
+        scene.entities = segment.entities.clone();
+        scene.tiles = segment.tiles.clone();
+        scene.background = segment.background;
+    }
+}
+
+impl Game {
     const SAVE_PATH: &str = "./assets/save.json";
-    const LEVEL_PATH: &str = "./assets/levels";
+    const LEVEL_PATH: &str = "./assets/levels/";
 
     pub fn new(scene: &mut Scene, systems: &GameSystems) -> Self {
         let level_manager = LevelManager::new(&Self::LEVEL_PATH);
 
+        let level = Level {
+            name: "test".to_string(),
+            difficulty: Difficulty::Easy,
+            start: Some(0),
+            segments: vec![
+                Segment {
+                    spawn: Some(uvec2(20, 20)),
+                    enemies: vec![Enemy {
+                        position: vec2(64.0, 64.0),
+                        kind: EnemyKind::Goomba {
+                            from: vec2(20.0, 20.0),
+                            to: vec2(40.0, 20.0),
+                            direction: Direction::Forward,
+                        },
+                    }],
+                    tiles: Vec::default(),
+                    entities: vec![Entity {
+                        kind: EntityKind::Pipe { id: 1 },
+                        position: uvec2(120, 192),
+                    }],
+                    background: uvec3(146, 144, 255),
+                },
+                Segment {
+                    spawn: Some(uvec2(30, 20)),
+                    enemies: Vec::default(),
+                    tiles: Vec::default(),
+                    entities: Vec::default(),
+                    background: uvec3(255, 255, 255),
+                },
+            ],
+        };
+
+        write_level(&"./assets/levels/Level 2.level", &level).unwrap();
+
         let file = File::open("./assets/save.json").ok();
         let state = file.map(|file| json::from_reader(file).unwrap());
 
-        systems
-            .audio
-            .start(&"./assets/audio/tracks/running_about.wav");
+        // systems
+        //     .audio
+        //     .start(&"./assets/audio/tracks/running_about.wav");
 
-        scene.enemies.push(Enemy {
-            position: vec2(40f32, 40f32),
-            kind: EnemyKind::Goomba {
-                from: vec2(2f32, 2f32),
-                to: vec2(100f32, 100f32),
-                direction: Direction::Forward,
-            },
-            is_shown: true,
-        });
-
-        Self {
+        let mut game = Self {
             level_manager,
             state: state.unwrap_or_default(),
-        }
+        };
+
+        game.load_level("Level 2", scene);
+        game
     }
 
     pub fn update(&mut self, scene: &mut Scene, systems: &GameSystems, keyboard: KeyboardState) {
-        self.move_player(scene, keyboard);
+        self.move_player(scene, &keyboard);
+
+        for Entity { position, kind } in scene.entities.clone() {
+            if let EntityKind::Pipe { id } = kind {
+                if scene.player.position.x >= position.x as f32
+                    && scene.player.position.x < (position.x + 32) as f32
+                    && scene.player.position.y + 16.0 == position.y as f32
+                    && keyboard.is_scancode_pressed(Scancode::S)
+                {
+                    self.load_segment(id, scene);
+                    break;
+                }
+            }
+        }
 
         Self::update_enemies(scene);
     }
@@ -159,7 +241,7 @@ impl Game {
         }
     }
 
-    pub fn move_player(&mut self, scene: &mut Scene, keyboard: KeyboardState) {
+    pub fn move_player(&mut self, scene: &mut Scene, keyboard: &KeyboardState) {
         let acceleration = 0.01;
         let max_speed = 0.5;
         let gravity = 0.5;
@@ -194,7 +276,7 @@ impl Game {
     pub fn nearby_tiles(scene: &mut Scene) -> Vec<MapTile> {
         let mut nearby_tiles = vec![];
         let search_distance = 2000.0;
-        for block in scene.map_tiles.iter() {
+        for block in scene.tiles.iter() {
             // check x distance
             if (block.coordinate.x as f32 - scene.player.position.x).abs() < search_distance
                 || (scene.player.position.x - block.coordinate.x as f32).abs() < search_distance

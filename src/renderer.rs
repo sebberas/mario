@@ -55,6 +55,11 @@ impl Renderer {
             self.draw_image(&scene.camera, &sprite, enemy.position.as_uvec2(), 1);
         }
 
+        for entity in &scene.entities {
+            let sprite = entity.to_sprite();
+            self.draw_image(&scene.camera, &sprite, entity.position, 1);
+        }
+
         // self.draw_sprites(scene);
         self.draw_player(scene);
 
@@ -62,7 +67,7 @@ impl Renderer {
     }
 
     pub fn draw_tiles(&mut self, scene: &mut Scene) {
-        for MapTile { block, coordinate } in &scene.map_tiles {
+        for MapTile { block, coordinate } in &scene.tiles {
             let sprite = block.to_sprite();
             self.draw_image(&scene.camera, &sprite, *coordinate, 1);
         }
@@ -94,7 +99,7 @@ impl Renderer {
                 for y in 0..image.height() {
                     let pixel = image.get_pixel(x, y);
                     if pixel == &Rgba([0, 41, 140, 255]) || pixel == &Rgba([146, 144, 255, 255]) {
-                        image.put_pixel(x, y, Rgba([0, 0, 0, 0]));
+                        // image.put_pixel(x, y, Rgba([0, 0, 0, 0]));
                     }
                 }
             }

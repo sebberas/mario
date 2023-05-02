@@ -20,6 +20,7 @@ pub enum Difficulty {
 pub struct Level {
     pub name: String,
     pub difficulty: Difficulty,
+    pub start: Option<usize>,
     pub segments: Vec<Segment>,
 }
 
