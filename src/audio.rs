@@ -1,14 +1,36 @@
 use std::collections::HashMap;
 use std::fs::*;
 use std::path::*;
-use std::sync::{Arc, RwLock};
+use std::sync::{Arc, Mutex, RwLock};
 use std::time::Duration;
 
-use sdl2::audio::AudioSpecWAV;
+use sdl2::audio::{AudioCVT, AudioCallback, AudioDevice, AudioSpecDesired, AudioSpecWAV};
 use sdl2::AudioSubsystem;
+
+struct Sound {
+    data: Vec<u8>,
+    position: usize,
+}
+
+impl AudioCallback for Sound {
+    type Channel = u8;
+
+    fn callback(&mut self, output: &mut [Self::Channel]) {
+        let Self { data, position } = self;
+
+        for item in output {
+            // [0, 255] -> [-128, 127]
+            let point = data.get(*position).map(|p| *p as f32).unwrap_or(0f32) - 128f32;
+            let scaled = (point + 128f32) as u8;
+            *item = scaled;
+            *position += 1;
+        }
+    }
+}
 
 struct AudioManagerShared {
     system: AudioSubsystem,
+    device: Mutex<Option<AudioDevice<Sound>>>,
     files: RwLock<HashMap<PathBuf, (Option<AudioSpecWAV>, bool)>>,
 }
 
@@ -21,13 +43,20 @@ impl AudioManager {
     pub fn new(system: AudioSubsystem) -> Self {
         Self(Arc::new(AudioManagerShared {
             system,
+            device: Mutex::new(None),
             files: RwLock::new(HashMap::new()),
         }))
     }
 
     /// Updates the audio manager.
     /// This function is called once pr. frame by the underlying "engine".
-    pub fn update(&mut self) {}
+    pub fn update(&mut self) {
+        let mut device = self.0.device.lock().unwrap();
+        if let Some(device) = device.as_mut() {
+            println!("yeet");
+            device.resume();
+        }
+    }
 
     /// Registers an entire directory for the manager.
     ///
@@ -95,7 +124,39 @@ impl AudioManager {
     /// - Panics if `path` hasn't been registered with the audio manager.
     /// - Panics if `path` isn't pointing to a file.
     pub fn start(&self, path: &impl AsRef<Path>) {
-        let files = self.0.files.read();
+        let mut files = self.0.files.write().unwrap();
+
+        let (stream, _) = files.get_mut(path.as_ref()).unwrap();
+        let stream = if let Some(stream) = stream.as_mut() {
+            stream
+        } else {
+            let stream = AudioSpecWAV::load_wav(path).unwrap();
+            files.insert((path.as_ref()).to_owned(), (Some(stream), false));
+            files.get_mut(path.as_ref()).unwrap().0.as_mut().unwrap()
+        };
+
+        let spec = AudioSpecDesired {
+            freq: Some(44_100),
+            channels: Some(1),
+            samples: None,
+        };
+
+        let device = self.0.system.open_playback(None, &spec, |spec| {
+            let converter = AudioCVT::new(
+                stream.format,
+                stream.channels,
+                stream.freq,
+                spec.format,
+                spec.channels,
+                spec.freq,
+            )
+            .unwrap();
+            let data = converter.convert(stream.buffer().to_vec());
+
+            Sound { data, position: 0 }
+        });
+
+        *self.0.device.lock().unwrap() = Some(device.unwrap());
     }
 
     /// Stops playing the audio in `path`

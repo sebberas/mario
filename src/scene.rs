@@ -67,6 +67,20 @@ pub struct Enemy {
     pub is_shown: bool,
 }
 
+impl Enemy {
+    pub fn is_goomba(&self) -> bool {
+        matches!(self.kind, EnemyKind::Goomba { .. })
+    }
+
+    pub fn is_piranha(&self) -> bool {
+        matches!(self.kind, EnemyKind::Piranha { .. })
+    }
+
+    pub fn is_koopa(&self) -> bool {
+        matches!(self.kind, EnemyKind::Koopa { .. })
+    }
+}
+
 #[derive(Debug, Clone, Copy, PartialEq, Deserialize, Serialize)]
 pub enum EnemyKind {
     Goomba {
@@ -80,8 +94,8 @@ pub enum EnemyKind {
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Deserialize, Serialize)]
 pub enum Item {
-    FireFlower,
-    Star,
+    Mushroom,
+    Flower,
 }
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Deserialize, Serialize)]
@@ -113,8 +127,8 @@ pub struct Player {
 impl ToSprite for Player {
     fn to_sprite(&self) -> Sprite {
         Sprite::new(
-            (uvec2(0, 0), uvec2(12, 16)),
-            "assets/sprites/mario_test.png",
+            (uvec2(0, 8), uvec2(16, 16)),
+            "assets/sprites/characters.png",
         )
     }
 }

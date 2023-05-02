@@ -68,6 +68,7 @@ impl Renderer {
         }
     }
 
+    // TODO: Figure out how to sub-sample textures.
     pub fn draw_image(&mut self, camera: &Camera, sprite: &Sprite, mut position: UVec2, size: u32) {
         let Self { cache, canvas, .. } = self;
 

@@ -5,11 +5,11 @@ use sdl2::event::*;
 use sdl2::keyboard::*;
 use sdl2::mouse::*;
 use sdl2::video::*;
-use sdl2::{AudioSubsystem, VideoSubsystem};
 
 use self::editor::*;
 use self::runtime::*;
 
+mod animation;
 mod audio;
 mod editor;
 mod game;
@@ -51,14 +51,14 @@ fn main() {
     let mut event_pump = sdl.event_pump().unwrap();
 
     let runtime = Runtime::new(video.clone(), audio.clone());
-    // let editor = Editor::new(video.clone(), audio.clone());
-    // let editor_tools = EditorTools::new(&editor, video.clone(), audio.clone());
+    let mut layers: Vec<Option<Box<dyn Layer>>> = vec![Some(Box::new(runtime))];
 
-    let mut layers: Vec<Option<Box<dyn Layer>>> = vec![
-        Some(Box::new(runtime)),
-        // Some(Box::new(editor)),
-        // Some(Box::new(editor_tools)),
-    ];
+    if std::env::args().any(|arg| arg.contains("editor")) {
+        let editor = Box::new(Editor::new(video.clone(), audio.clone()));
+        let editor_tools = Box::new(EditorTools::new(&editor, video, audio));
+        layers.push(Some(editor));
+        layers.push(Some(editor_tools));
+    }
 
     loop {
         let events: Vec<_> = event_pump.poll_iter().collect();

@@ -8,9 +8,14 @@ use ::sdl2::messagebox::*;
 use ::serde::{Deserialize, Serialize};
 use ::serde_json as json;
 
+use crate::audio::*;
 use crate::level::*;
 use crate::map::*;
 use crate::scene::*;
+
+pub struct GameSystems {
+    pub audio: AudioManager,
+}
 
 #[derive(Debug, Clone)]
 struct LevelManager {
@@ -59,11 +64,15 @@ impl Game {
     const SAVE_PATH: &str = "./assets/save.json";
     const LEVEL_PATH: &str = "./assets/levels";
 
-    pub fn new(scene: &mut Scene) -> Self {
+    pub fn new(scene: &mut Scene, systems: &GameSystems) -> Self {
         let level_manager = LevelManager::new(&Self::LEVEL_PATH);
 
         let file = File::open("./assets/save.json").ok();
         let state = file.map(|file| json::from_reader(file).unwrap());
+
+        systems
+            .audio
+            .start(&"./assets/audio/tracks/running_about.wav");
 
         scene.enemies.push(Enemy {
             position: vec2(40f32, 40f32),
@@ -81,41 +90,63 @@ impl Game {
         }
     }
 
-    pub fn update(&mut self, scene: &mut Scene, keyboard: KeyboardState) {
+    pub fn update(&mut self, scene: &mut Scene, systems: &GameSystems, keyboard: KeyboardState) {
         self.move_player(scene, keyboard);
 
         Self::update_enemies(scene);
     }
 
     pub fn update_enemies(scene: &mut Scene) {
-        // Movement
-        for enemy in &mut scene.enemies {
-            match &mut enemy.kind {
-                EnemyKind::Goomba {
-                    from,
-                    to,
-                    direction,
-                } => {
-                    const SPEED: f32 = 0.02;
-                    match direction {
-                        Direction::Forward => enemy.position.x += SPEED,
-                        Direction::Backward => enemy.position.x -= SPEED,
-                    }
+        let Scene { enemies, .. } = scene;
+        // TODO: Multhreaaaaaaaading goooooooo brrrrrrrrrrrrrrrrr
+        // Spawn three tasks that take ownership of the different types of enemies.
+        // These three tasks handle all logic that is required for that type of enemy
+        // except player to enemy collision. Then
+        // await those tasks and combine all the new enemies again. Essentially three
+        // heap-allocations, but the branch predictor is very happy. Maybe slower, but
+        // Steen likey like.
 
-                    match enemy.position.x {
-                        x if x > to.x => *direction = Direction::Backward,
-                        x if x < from.x => *direction = Direction::Forward,
-                        _ => {}
-                    }
-                }
-                EnemyKind::Koopa { .. } => {}
-                _ => {}
-            }
-        }
+        // Movement
+        let goombas: Vec<_> = enemies
+            .iter()
+            .filter(|enemy| enemy.is_goomba())
+            .cloned()
+            .collect();
+
+        let goombas = Self::update_goombas(goombas);
+
+        enemies.clear();
+        enemies.extend(goombas);
 
         // Collision
 
         // Animation State
+    }
+
+    pub fn update_goombas(mut goombas: Vec<Enemy>) -> Vec<Enemy> {
+        const SPEED: f32 = 0.5;
+
+        for goomba in goombas.iter_mut() {
+            let Enemy { position, kind, .. } = goomba;
+            let EnemyKind::Goomba {
+                from,
+                to,
+                direction,
+            } = kind else { unreachable!() };
+
+            match direction {
+                Direction::Forward => position.x += SPEED,
+                Direction::Backward => position.x -= SPEED,
+            }
+
+            match position.x {
+                x if x > to.x => *direction = Direction::Backward,
+                x if x < from.x => *direction = Direction::Forward,
+                _ => {}
+            }
+        }
+
+        goombas
     }
 
     pub fn on_destroy(&mut self, scene: &mut Scene) {
@@ -129,7 +160,7 @@ impl Game {
 
     pub fn move_player(&mut self, scene: &mut Scene, keyboard: KeyboardState) {
         let acceleration = 0.01;
-        let max_speed = 0.1;
+        let max_speed = 0.5;
         let gravity = 0.5;
 
         if keyboard.is_scancode_pressed(Scancode::D) {

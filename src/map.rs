@@ -1,8 +1,6 @@
-use glam::*;
-use sdl2::pixels::*;
-use serde::{Deserialize, Serialize};
+use ::glam::*;
+use ::serde::{Deserialize, Serialize};
 
-use crate::renderer::*;
 use crate::scene::*;
 
 #[derive(Debug, Deserialize, Serialize, Clone, Copy, PartialEq, Eq)]

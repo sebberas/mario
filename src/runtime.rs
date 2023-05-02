@@ -7,6 +7,7 @@ use ::sdl2::mouse::*;
 use ::sdl2::video::*;
 use ::sdl2::{AudioSubsystem, VideoSubsystem};
 
+use crate::audio::AudioManager;
 use crate::game::*;
 use crate::renderer::*;
 use crate::scene::*;
@@ -16,12 +17,13 @@ pub struct Runtime {
     video: VideoSubsystem,
     audio: AudioSubsystem,
 
-    game: Game,
-
     should_close: bool,
 
     renderer: Renderer,
     scene: Scene,
+
+    systems: GameSystems,
+    game: Game,
 }
 
 impl Runtime {
@@ -32,7 +34,12 @@ impl Runtime {
             .build()
             .unwrap();
 
-        let mut canvas = window.into_canvas().accelerated().build().unwrap();
+        let mut canvas = window
+            .into_canvas()
+            .accelerated()
+            .present_vsync()
+            .build()
+            .unwrap();
 
         let renderer = Renderer::new(canvas);
 
@@ -53,22 +60,37 @@ impl Runtime {
             background: uvec3(146, 144, 255),
         };
 
-        let game = Game::new(&mut scene);
+        let mut systems = {
+            let mut audio_manager = AudioManager::new(audio.clone());
+            audio_manager.register_dir(&"./assets/audio", true);
+
+            GameSystems {
+                audio: audio_manager,
+            }
+        };
+
+        let game = Game::new(&mut scene, &systems);
 
         Self {
             video,
             audio,
-            game,
             should_close: false,
             renderer,
             scene,
+
+            systems,
+            game,
         }
     }
 }
 
 impl Layer for Runtime {
     fn update(&mut self, keyboard: KeyboardState, mouse: MouseState) {
-        self.game.update(&mut self.scene, keyboard);
+        let Self { game, systems, .. } = self;
+
+        game.update(&mut self.scene, systems, keyboard);
+
+        systems.audio.update();
 
         let start = std::time::Instant::now();
         self.renderer.update(&mut self.scene);
