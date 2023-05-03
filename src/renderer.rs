@@ -19,7 +19,7 @@ pub struct Renderer {
 }
 
 impl Renderer {
-    pub const TILES_X: u32 = 25;
+    pub const TILES_X: u32 = 70;
     pub const TILES_Y: u32 = 18;
     pub const TILE_SIZE: u32 = 16;
 
@@ -69,7 +69,7 @@ impl Renderer {
     pub fn draw_tiles(&mut self, scene: &mut Scene) {
         for MapTile { block, coordinate } in &scene.tiles {
             let sprite = block.to_sprite();
-            self.draw_image(&scene.camera, &sprite, *coordinate, 1);
+            self.draw_image(&scene.camera, &sprite, *coordinate * 16, 1);
         }
     }
 

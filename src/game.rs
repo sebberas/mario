@@ -118,19 +118,19 @@ impl Game {
             start: Some(0),
             segments: vec![
                 Segment {
-                    spawn: Some(uvec2(20, 20)),
+                    spawn: Some(uvec2(20, 2)),
                     enemies: vec![
                         Enemy {
-                            position: vec2(64.0, 13.0 * Renderer::TILE_SIZE as f32),
+                            position: vec2(64.0, 210.0 as f32),
                             kind: EnemyKind::Goomba {
-                                from: vec2(20.0, 20.0),
-                                to: vec2(100.0, 20.0),
+                                from: vec2(20.0, 210.0),
+                                to: vec2(100.0, 210.0),
                                 direction: Direction::Forward,
                                 frame: RefCell::new(0),
                             },
                         },
                         Enemy {
-                            position: vec2(128.0, 10.0 * Renderer::TILE_SIZE as f32),
+                            position: vec2(128.0, 20.0 as f32),
                             kind: EnemyKind::Koopa {
                                 frame: RefCell::new(0),
                             },
@@ -143,10 +143,9 @@ impl Game {
                     tiles: {
                         let mut tiles = Vec::with_capacity((Renderer::TILES_X * 4) as _);
                         for i in 0..Renderer::TILES_X {
-                            for j in 0..4 {
-                                let x = i * Renderer::TILE_SIZE;
-                                let y = (Renderer::TILES_Y - 5) * Renderer::TILE_SIZE
-                                    + j * Renderer::TILE_SIZE;
+                            for j in 0..2 {
+                                let x = i;
+                                let y = (Renderer::TILES_Y - 2) + j;
 
                                 tiles.push(MapTile {
                                     block: Block::Ground,
@@ -157,10 +156,14 @@ impl Game {
                         for i in 0..4 {
                             tiles.push(MapTile {
                                 block: Block::Ground,
-                                coordinate: uvec2(
-                                    64 + i * Renderer::TILE_SIZE,
-                                    12 * Renderer::TILE_SIZE,
-                                ),
+                                coordinate: uvec2(10 + i, 12),
+                            });
+                        }
+
+                        for i in 0..4 {
+                            tiles.push(MapTile {
+                                block: Block::Ground,
+                                coordinate: uvec2(21 + i, 12),
                             });
                         }
 
@@ -175,9 +178,8 @@ impl Game {
                         let mut tiles = Vec::with_capacity((Renderer::TILES_X * 4) as _);
                         for i in 0..Renderer::TILES_X {
                             for j in 0..4 {
-                                let x = i * Renderer::TILE_SIZE;
-                                let y = (Renderer::TILES_Y - 5) * Renderer::TILE_SIZE
-                                    + j * Renderer::TILE_SIZE;
+                                let x = i;
+                                let y = (Renderer::TILES_Y - 5) + j;
 
                                 tiles.push(MapTile {
                                     block: Block::Ground,
@@ -412,9 +414,9 @@ pub fn nearby_tiles(scene: &mut Scene) -> Vec<MapTile> {
 pub fn closest_ground(scene: &mut Scene, nearby_tiles: &Vec<MapTile>) -> Option<BoundingBox> {
     let mut closest_tile = None;
     for tile in nearby_tiles.iter() {
-        if tile.coordinate.y == (position_to_coordinate(scene.player.position.y) + 1) * 16
-            && (tile.coordinate.x == position_to_coordinate(scene.player.position.x) * 16
-                || tile.coordinate.x == (position_to_coordinate(scene.player.position.x) + 1) * 16)
+        if tile.coordinate.y == (position_to_coordinate(scene.player.position.y) + 1)
+            && (tile.coordinate.x == position_to_coordinate(scene.player.position.x)
+                || tile.coordinate.x == (position_to_coordinate(scene.player.position.x) + 1))
         {
             let tile_position = (
                 coordinate_to_position(tile.coordinate.x),
@@ -438,9 +440,9 @@ pub fn closest_side(scene: &mut Scene, tiles: &Vec<MapTile>) -> Option<BoundingB
         // println!("{coordinate}");
 
         let [x, y] = tile.coordinate.to_array();
-        if (x == (position_to_coordinate(player.position.x) + 1) * Renderer::TILE_SIZE
-            || x == (position_to_coordinate(player.position.x)) * Renderer::TILE_SIZE)
-            && y == position_to_coordinate(player.position.y) * Renderer::TILE_SIZE
+        if (x == (position_to_coordinate(player.position.x) + 1)
+            || x == (position_to_coordinate(player.position.x)))
+            && y == position_to_coordinate(player.position.y)
         {
             return Some(tile.collider());
         }
