@@ -331,12 +331,12 @@ impl Game {
         }
 
         if let Some(collider) = closest_side(scene, &nearby_tiles.clone()) {
-            println!("Player: {:?}", scene.player.collider());
-            println!("Collider: {collider:?}");
             match scene.player.collider().collides_with(&collider) {
-                Some(Hit::Left) | Some(Hit::Right) => {
-                    scene.player.move_velocity = 0.0;
-                    println!("x");
+                Some(Hit::Left) => {
+                    scene.player.move_velocity = -scene.player.move_velocity;
+                }
+                Some(Hit::Right) => {
+                    scene.player.move_velocity = -scene.player.move_velocity;
                 }
                 Some(Hit::Bottom) => scene.player.jump_velocity = 0.0,
                 Some(Hit::Top) => scene.player.jump_velocity = 0.0,
