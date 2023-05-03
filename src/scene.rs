@@ -2,7 +2,7 @@ use glam::*;
 use sdl2::pixels::*;
 use serde::{Deserialize, Serialize};
 
-use crate::map::*;
+use crate::{map::*, game::BoundingBox};
 
 #[derive(Serialize, Deserialize, Debug, Clone, Copy)]
 pub struct Rgba(Vec4);
@@ -129,6 +129,12 @@ impl ToSprite for Player {
             (uvec2(0, 8), uvec2(16, 16)),
             "assets/sprites/characters.png",
         )
+    }
+}
+
+impl Player {
+    pub fn collider(&self) -> BoundingBox {  
+        BoundingBox::new(self.position.x as f32,self.position.y as f32, 16.0, 16.0)
     }
 }
 

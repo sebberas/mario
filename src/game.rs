@@ -265,6 +265,10 @@ impl Game {
         let max_jumpspeed = 5.0;
         let gravity_acceleration = 0.03;
 
+        // handle collision
+        let nearby_tiles = &scene.tiles;
+
+        // move left and right
         if keyboard.is_scancode_pressed(Scancode::D) {
             if scene.player.move_velocity < max_movespeed {
                 scene.player.move_velocity += move_acceleration;
@@ -281,127 +285,79 @@ impl Game {
 
         if keyboard.is_scancode_pressed(Scancode::Space) && scene.player.can_jump == true {
             scene.player.jump_velocity = max_jumpspeed;
+            println!("jump");
         }
         if scene.player.jump_velocity >= 0.0 {
             scene.player.position.y -= scene.player.jump_velocity;
         }
 
-        // handle collision
-        let nearby_tiles = Self::nearby_tiles(scene);
-        let colliders = Self::update_boundingboxes(nearby_tiles);
-        Self::check_collission(scene, colliders);
-
-        // gravity
-        if Self::position_to_coordinate(scene.player.position.y) <= 10 {
+        if let Some(collider) = closest_ground(scene, &nearby_tiles.clone()) {
+            // not falling...
+            scene.player.fall_velocity = 0.0;
+            scene.player.jump_velocity = 0.0;
+            scene.player.can_jump = true;
+        } else {
+            // in air, accelerate
             if scene.player.fall_velocity <= max_fallspeed {
                 scene.player.fall_velocity += gravity_acceleration;
                 scene.player.jump_velocity -= scene.player.fall_velocity;
             }
-            // player is in air
+            // update
             scene.player.position.y += scene.player.fall_velocity;
             scene.player.can_jump = false;
-        } else {
-            // if not falling...
-            scene.player.fall_velocity = 0.0;
-            scene.player.jump_velocity = 0.0;
-            scene.player.can_jump = true;
+        }
+    }
+}
+
+pub fn nearby_tiles(scene: &mut Scene) -> Vec<MapTile> {
+    let mut nearby_tiles = vec![];
+    let search_distance = 2000.0;
+    for block in scene.tiles.iter() {
+        // check x distance
+        if (block.coordinate.x as f32 - scene.player.position.x).abs() < search_distance
+            || (scene.player.position.x - block.coordinate.x as f32).abs() < search_distance
+        {
+            nearby_tiles.push(*block);
         }
 
-        // println!(
-        //     "fall_velocity {:?} jump_vel {:?}",
-        //     scene.player.fall_velocity, scene.player.jump_velocity
-        // );
-    }
-
-    pub fn nearby_tiles(scene: &mut Scene) -> Vec<MapTile> {
-        let mut nearby_tiles = vec![];
-        let search_distance = 2000.0;
-        for block in scene.tiles.iter() {
-            // check x distance
-            if (block.coordinate.x as f32 - scene.player.position.x).abs() < search_distance
-                || (scene.player.position.x - block.coordinate.x as f32).abs() < search_distance
-            {
-                nearby_tiles.push(*block);
-            }
-
-            // check y distance
-            if (block.coordinate.y as f32 - scene.player.position.y).abs() < search_distance
-                || (scene.player.position.y - block.coordinate.y as f32).abs() < search_distance
-            {
-                nearby_tiles.push(*block);
-            }
-        }
-
-        return nearby_tiles;
-    }
-
-    //takes nearby tiles and create a vec of bounding boxes
-    pub fn update_boundingboxes(tiles: Vec<MapTile>) -> Vec<BoundingBox> {
-        let mut bounding_boxes = vec![];
-
-        for tile in tiles {
-            let x = Self::coordinate_to_position(tile.coordinate.x);
-            let y = Self::coordinate_to_position(tile.coordinate.y);
-            bounding_boxes.push(BoundingBox::new(x as f32, y as f32, 16.0, 16.0));
-        }
-        return bounding_boxes;
-    }
-
-    pub fn check_collission(scene: &mut Scene, tiles: Vec<BoundingBox>) {
-        let player_collider = BoundingBox::new(
-            scene.player.position.x as f32,
-            scene.player.position.y as f32,
-            16.0,
-            16.0,
-        );
-
-        for tile in tiles {
-            if Self::collision_handler(player_collider, tile).0 {
-                match Self::collision_handler(player_collider, tile).1 {
-                    1 => scene.player.move_velocity = 0.0,
-                    2 => scene.player.move_velocity = 0.0,
-                    3 => scene.player.jump_velocity = 0.0,
-                    4 => scene.player.jump_velocity = 0.0,
-                    _ => unreachable!(),
-                }
-            }
+        // check y distance
+        if (block.coordinate.y as f32 - scene.player.position.y).abs() < search_distance
+            || (scene.player.position.y - block.coordinate.y as f32).abs() < search_distance
+        {
+            nearby_tiles.push(*block);
         }
     }
 
-    pub fn collision_handler(this: BoundingBox, that: BoundingBox) -> (bool, i32) {
-        let dx = (this.x + this.width / 2.0) - (that.x + that.width / 2.0);
-        let dy = (this.y + this.height / 2.0) - (that.y + that.height / 2.0);
-        let combined_half_widths = this.width / 2.0 + that.width / 2.0;
-        let combined_half_heights = this.height / 2.0 + that.height / 2.0;
+    return nearby_tiles;
+}
 
-        if dx.abs() < combined_half_widths && dy.abs() < combined_half_heights {
-            let overlap_x = combined_half_widths - dx.abs();
-            let overlap_y = combined_half_heights - dy.abs();
-            if overlap_x < overlap_y {
-                if dx > 0.0 {
-                    (true, 1) // Collision on right side
-                } else {
-                    (true, 2) // Collision on left side
-                }
-            } else {
-                if dy > 0.0 {
-                    (true, 3) // Collision on bottom side
-                } else {
-                    (true, 4) // Collision on top side
-                }
-            }
-        } else {
-            (false, 0) // No collision
+pub fn closest_ground(scene: &mut Scene, nearby_tiles: &Vec<MapTile>) -> Option<BoundingBox> {
+    let mut closest_tile = None;
+    for tile in nearby_tiles.iter() {
+        if tile.coordinate.y == (position_to_coordinate(scene.player.position.y) + 1) * 16
+            && tile.coordinate.x == position_to_coordinate(scene.player.position.y) * 16
+        {
+            let tile_position = (
+                coordinate_to_position(tile.coordinate.x),
+                coordinate_to_position(tile.coordinate.y),
+            );
+            closest_tile = Some(BoundingBox::new(
+                tile_position.0,
+                tile_position.1,
+                16.0,
+                16.0,
+            ))
         }
     }
+    return closest_tile;
+}
 
-    pub fn coordinate_to_position(coordinate: u32) -> f32 {
-        coordinate as f32 * 16.0
-    }
+pub fn coordinate_to_position(coordinate: u32) -> f32 {
+    coordinate as f32 * 16.0
+}
 
-    pub fn position_to_coordinate(position: f32) -> u32 {
-        position as u32 / 16
-    }
+pub fn position_to_coordinate(position: f32) -> u32 {
+    position as u32 / 16
 }
 
 #[derive(Debug, Clone, Copy)]
@@ -420,4 +376,38 @@ impl BoundingBox {
             height,
         }
     }
+    pub fn collides_with(&self, other: &Self) -> Option<Hit> {
+        let dx = (self.x + self.width / 2.0) - (other.x + other.width / 2.0);
+        let dy = (self.y + self.height / 2.0) - (other.y + other.height / 2.0);
+        let combined_half_widths = self.width / 2.0 + other.width / 2.0;
+        let combined_half_heights = self.height / 2.0 + other.height / 2.0;
+
+        if dx.abs() < combined_half_widths && dy.abs() < combined_half_heights {
+            let overlap_x = combined_half_widths - dx.abs();
+            let overlap_y = combined_half_heights - dy.abs();
+            if overlap_x < overlap_y {
+                if dx > 0.0 {
+                    Some(Hit::Right) // Collision on right side
+                } else {
+                    Some(Hit::Left) // Collision on left side
+                }
+            } else {
+                if dy > 0.0 {
+                    Some(Hit::Bottom) // Collision on bottom side
+                } else {
+                    Some(Hit::Top) // Collision on top side
+                }
+            }
+        } else {
+            None // No collision
+        }
+    }
+}
+
+#[derive(Debug, Clone, Copy)]
+pub enum Hit {
+    Top,
+    Right,
+    Bottom,
+    Left,
 }
