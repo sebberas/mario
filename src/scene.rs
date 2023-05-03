@@ -4,7 +4,8 @@ use glam::*;
 use sdl2::pixels::*;
 use serde::{Deserialize, Serialize};
 
-use crate::{map::*, game::BoundingBox};
+use crate::game::BoundingBox;
+use crate::map::*;
 
 #[derive(Serialize, Deserialize, Debug, Clone, Copy)]
 pub struct Rgba(Vec4);
@@ -154,7 +155,6 @@ impl ToSprite for Player {
                 false,
             )
         } else if self.move_velocity != 0.0 {
-            println!("{frame:?}");
             match *frame {
                 0 | 1 | 2 => {
                     *frame += 1;
@@ -198,8 +198,8 @@ impl ToSprite for Player {
 }
 
 impl Player {
-    pub fn collider(&self) -> BoundingBox {  
-        BoundingBox::new(self.position.x as f32,self.position.y as f32, 16.0, 16.0)
+    pub fn collider(&self) -> BoundingBox {
+        BoundingBox::new(self.position.x as f32, self.position.y as f32, 16.0, 16.0)
     }
 }
 
