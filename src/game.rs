@@ -286,6 +286,11 @@ impl Game {
             scene.player.position.y -= scene.player.jump_velocity;
         }
 
+        // handle collision
+        let nearby_tiles = Self::nearby_tiles(scene);
+        let colliders = Self::update_boundingboxes(nearby_tiles);
+        Self::check_collission(scene, colliders);
+
         // gravity
         if Self::position_to_coordinate(scene.player.position.y) <= 10 {
             if scene.player.fall_velocity <= max_fallspeed {
@@ -335,14 +340,14 @@ impl Game {
         let mut bounding_boxes = vec![];
 
         for tile in tiles {
-            let x = tile.coordinate.x;
-            let y = tile.coordinate.y;
+            let x = Self::coordinate_to_position(tile.coordinate.x);
+            let y = Self::coordinate_to_position(tile.coordinate.y);
             bounding_boxes.push(BoundingBox::new(x as f32, y as f32, 16.0, 16.0));
         }
         return bounding_boxes;
     }
 
-    pub fn check_collission(self, scene: &mut Scene, tiles: Vec<BoundingBox>) {
+    pub fn check_collission(scene: &mut Scene, tiles: Vec<BoundingBox>) {
         let player_collider = BoundingBox::new(
             scene.player.position.x as f32,
             scene.player.position.y as f32,
@@ -351,8 +356,8 @@ impl Game {
         );
 
         for tile in tiles {
-            if Self::collides(player_collider, tile).0 {
-                match Self::collides(player_collider, tile).1 {
+            if Self::collision_handler(player_collider, tile).0 {
+                match Self::collision_handler(player_collider, tile).1 {
                     1 => scene.player.move_velocity = 0.0,
                     2 => scene.player.move_velocity = 0.0,
                     3 => scene.player.jump_velocity = 0.0,
@@ -363,7 +368,7 @@ impl Game {
         }
     }
 
-    pub fn collides(this: BoundingBox, that: BoundingBox) -> (bool, i32) {
+    pub fn collision_handler(this: BoundingBox, that: BoundingBox) -> (bool, i32) {
         let dx = (this.x + this.width / 2.0) - (that.x + that.width / 2.0);
         let dy = (this.y + this.height / 2.0) - (that.y + that.height / 2.0);
         let combined_half_widths = this.width / 2.0 + that.width / 2.0;
