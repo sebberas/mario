@@ -9,7 +9,7 @@ use sdl2::video::*;
 use self::editor::*;
 use self::runtime::*;
 
-mod animation;
+//mod animation;
 mod audio;
 mod editor;
 mod game;

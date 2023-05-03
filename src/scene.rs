@@ -118,6 +118,7 @@ pub struct Player {
     pub position: Vec2,
     pub move_velocity: f32,
     pub jump_velocity: f32,
+    pub fall_velocity: f32,
     pub can_jump: bool,
     pub is_shown: bool,
 }

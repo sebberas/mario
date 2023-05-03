@@ -260,11 +260,13 @@ impl Game {
 
     pub fn move_player(&mut self, scene: &mut Scene, keyboard: &KeyboardState) {
         let acceleration = 0.01;
-        let max_speed = 0.5;
-        let gravity = 0.5;
+        let max_movespeed = 1.0;
+        let max_fallspeed = 3.0;
+        let max_jumpspeed = 4.0;
+        let gravity = 0.02;
 
         if keyboard.is_scancode_pressed(Scancode::D) {
-            if scene.player.move_velocity < max_speed {
+            if scene.player.move_velocity < max_movespeed {
                 scene.player.move_velocity += acceleration;
                 // println!("{:?}", scene.player.speed);
             }
@@ -272,7 +274,7 @@ impl Game {
         }
 
         if keyboard.is_scancode_pressed(Scancode::A) {
-            if scene.player.move_velocity < max_speed {
+            if scene.player.move_velocity < max_movespeed {
                 scene.player.move_velocity += acceleration;
             }
             scene.player.position.x -= scene.player.move_velocity;
@@ -286,8 +288,15 @@ impl Game {
 
         // gravity
         if Self::position_to_coordinate(scene.player.position.y) <= 10 {
-            scene.player.position.y += gravity;
+            if scene.player.fall_velocity <= max_fallspeed {
+                scene.player.fall_velocity += gravity;
+            }
+            scene.player.position.y += scene.player.fall_velocity;
+        } else {
+            scene.player.fall_velocity = 0.0;
         }
+
+        println!("fall_velocity {:?}", scene.player.fall_velocity);
     }
 
     pub fn nearby_tiles(scene: &mut Scene) -> Vec<MapTile> {
