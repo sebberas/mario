@@ -6,23 +6,23 @@
     {
       "spawn": [
         20,
-        20
+        2
       ],
       "enemies": [
         {
           "position": [
             64.0,
-            208.0
+            230.0
           ],
           "kind": {
             "Goomba": {
               "from": [
                 20.0,
-                20.0
+                230.0
               ],
               "to": [
                 100.0,
-                20.0
+                230.0
               ],
               "direction": "Forward"
             }
@@ -31,7 +31,7 @@
         {
           "position": [
             128.0,
-            160.0
+            20.0
           ],
           "kind": {
             "Koopa": {
@@ -58,728 +58,1036 @@
           "block": "Ground",
           "coordinate": [
             0,
-            208
+            16
           ]
         },
         {
           "block": "Ground",
           "coordinate": [
             0,
-            224
+            17
           ]
         },
         {
           "block": "Ground",
           "coordinate": [
-            0,
-            240
+            1,
+            16
           ]
         },
         {
           "block": "Ground",
           "coordinate": [
-            0,
-            256
+            1,
+            17
+          ]
+        },
+        {
+          "block": "Ground",
+          "coordinate": [
+            2,
+            16
+          ]
+        },
+        {
+          "block": "Ground",
+          "coordinate": [
+            2,
+            17
+          ]
+        },
+        {
+          "block": "Ground",
+          "coordinate": [
+            3,
+            16
+          ]
+        },
+        {
+          "block": "Ground",
+          "coordinate": [
+            3,
+            17
+          ]
+        },
+        {
+          "block": "Ground",
+          "coordinate": [
+            4,
+            16
+          ]
+        },
+        {
+          "block": "Ground",
+          "coordinate": [
+            4,
+            17
+          ]
+        },
+        {
+          "block": "Ground",
+          "coordinate": [
+            5,
+            16
+          ]
+        },
+        {
+          "block": "Ground",
+          "coordinate": [
+            5,
+            17
+          ]
+        },
+        {
+          "block": "Ground",
+          "coordinate": [
+            6,
+            16
+          ]
+        },
+        {
+          "block": "Ground",
+          "coordinate": [
+            6,
+            17
+          ]
+        },
+        {
+          "block": "Ground",
+          "coordinate": [
+            7,
+            16
+          ]
+        },
+        {
+          "block": "Ground",
+          "coordinate": [
+            7,
+            17
+          ]
+        },
+        {
+          "block": "Ground",
+          "coordinate": [
+            8,
+            16
+          ]
+        },
+        {
+          "block": "Ground",
+          "coordinate": [
+            8,
+            17
+          ]
+        },
+        {
+          "block": "Ground",
+          "coordinate": [
+            9,
+            16
+          ]
+        },
+        {
+          "block": "Ground",
+          "coordinate": [
+            9,
+            17
+          ]
+        },
+        {
+          "block": "Ground",
+          "coordinate": [
+            10,
+            16
+          ]
+        },
+        {
+          "block": "Ground",
+          "coordinate": [
+            10,
+            17
+          ]
+        },
+        {
+          "block": "Ground",
+          "coordinate": [
+            11,
+            16
+          ]
+        },
+        {
+          "block": "Ground",
+          "coordinate": [
+            11,
+            17
+          ]
+        },
+        {
+          "block": "Ground",
+          "coordinate": [
+            12,
+            16
+          ]
+        },
+        {
+          "block": "Ground",
+          "coordinate": [
+            12,
+            17
+          ]
+        },
+        {
+          "block": "Ground",
+          "coordinate": [
+            13,
+            16
+          ]
+        },
+        {
+          "block": "Ground",
+          "coordinate": [
+            13,
+            17
+          ]
+        },
+        {
+          "block": "Ground",
+          "coordinate": [
+            14,
+            16
+          ]
+        },
+        {
+          "block": "Ground",
+          "coordinate": [
+            14,
+            17
+          ]
+        },
+        {
+          "block": "Ground",
+          "coordinate": [
+            15,
+            16
+          ]
+        },
+        {
+          "block": "Ground",
+          "coordinate": [
+            15,
+            17
           ]
         },
         {
           "block": "Ground",
           "coordinate": [
             16,
-            208
+            16
           ]
         },
         {
           "block": "Ground",
           "coordinate": [
             16,
-            224
+            17
           ]
         },
         {
           "block": "Ground",
           "coordinate": [
-            16,
-            240
+            17,
+            16
           ]
         },
         {
           "block": "Ground",
           "coordinate": [
-            16,
-            256
+            17,
+            17
+          ]
+        },
+        {
+          "block": "Ground",
+          "coordinate": [
+            18,
+            16
+          ]
+        },
+        {
+          "block": "Ground",
+          "coordinate": [
+            18,
+            17
+          ]
+        },
+        {
+          "block": "Ground",
+          "coordinate": [
+            19,
+            16
+          ]
+        },
+        {
+          "block": "Ground",
+          "coordinate": [
+            19,
+            17
+          ]
+        },
+        {
+          "block": "Ground",
+          "coordinate": [
+            20,
+            16
+          ]
+        },
+        {
+          "block": "Ground",
+          "coordinate": [
+            20,
+            17
+          ]
+        },
+        {
+          "block": "Ground",
+          "coordinate": [
+            21,
+            16
+          ]
+        },
+        {
+          "block": "Ground",
+          "coordinate": [
+            21,
+            17
+          ]
+        },
+        {
+          "block": "Ground",
+          "coordinate": [
+            22,
+            16
+          ]
+        },
+        {
+          "block": "Ground",
+          "coordinate": [
+            22,
+            17
+          ]
+        },
+        {
+          "block": "Ground",
+          "coordinate": [
+            23,
+            16
+          ]
+        },
+        {
+          "block": "Ground",
+          "coordinate": [
+            23,
+            17
+          ]
+        },
+        {
+          "block": "Ground",
+          "coordinate": [
+            24,
+            16
+          ]
+        },
+        {
+          "block": "Ground",
+          "coordinate": [
+            24,
+            17
+          ]
+        },
+        {
+          "block": "Ground",
+          "coordinate": [
+            25,
+            16
+          ]
+        },
+        {
+          "block": "Ground",
+          "coordinate": [
+            25,
+            17
+          ]
+        },
+        {
+          "block": "Ground",
+          "coordinate": [
+            26,
+            16
+          ]
+        },
+        {
+          "block": "Ground",
+          "coordinate": [
+            26,
+            17
+          ]
+        },
+        {
+          "block": "Ground",
+          "coordinate": [
+            27,
+            16
+          ]
+        },
+        {
+          "block": "Ground",
+          "coordinate": [
+            27,
+            17
+          ]
+        },
+        {
+          "block": "Ground",
+          "coordinate": [
+            28,
+            16
+          ]
+        },
+        {
+          "block": "Ground",
+          "coordinate": [
+            28,
+            17
+          ]
+        },
+        {
+          "block": "Ground",
+          "coordinate": [
+            29,
+            16
+          ]
+        },
+        {
+          "block": "Ground",
+          "coordinate": [
+            29,
+            17
+          ]
+        },
+        {
+          "block": "Ground",
+          "coordinate": [
+            30,
+            16
+          ]
+        },
+        {
+          "block": "Ground",
+          "coordinate": [
+            30,
+            17
+          ]
+        },
+        {
+          "block": "Ground",
+          "coordinate": [
+            31,
+            16
+          ]
+        },
+        {
+          "block": "Ground",
+          "coordinate": [
+            31,
+            17
           ]
         },
         {
           "block": "Ground",
           "coordinate": [
             32,
-            208
+            16
           ]
         },
         {
           "block": "Ground",
           "coordinate": [
             32,
-            224
+            17
           ]
         },
         {
           "block": "Ground",
           "coordinate": [
-            32,
-            240
+            33,
+            16
           ]
         },
         {
           "block": "Ground",
           "coordinate": [
-            32,
-            256
+            33,
+            17
+          ]
+        },
+        {
+          "block": "Ground",
+          "coordinate": [
+            34,
+            16
+          ]
+        },
+        {
+          "block": "Ground",
+          "coordinate": [
+            34,
+            17
+          ]
+        },
+        {
+          "block": "Ground",
+          "coordinate": [
+            35,
+            16
+          ]
+        },
+        {
+          "block": "Ground",
+          "coordinate": [
+            35,
+            17
+          ]
+        },
+        {
+          "block": "Ground",
+          "coordinate": [
+            36,
+            16
+          ]
+        },
+        {
+          "block": "Ground",
+          "coordinate": [
+            36,
+            17
+          ]
+        },
+        {
+          "block": "Ground",
+          "coordinate": [
+            37,
+            16
+          ]
+        },
+        {
+          "block": "Ground",
+          "coordinate": [
+            37,
+            17
+          ]
+        },
+        {
+          "block": "Ground",
+          "coordinate": [
+            38,
+            16
+          ]
+        },
+        {
+          "block": "Ground",
+          "coordinate": [
+            38,
+            17
+          ]
+        },
+        {
+          "block": "Ground",
+          "coordinate": [
+            39,
+            16
+          ]
+        },
+        {
+          "block": "Ground",
+          "coordinate": [
+            39,
+            17
+          ]
+        },
+        {
+          "block": "Ground",
+          "coordinate": [
+            40,
+            16
+          ]
+        },
+        {
+          "block": "Ground",
+          "coordinate": [
+            40,
+            17
+          ]
+        },
+        {
+          "block": "Ground",
+          "coordinate": [
+            41,
+            16
+          ]
+        },
+        {
+          "block": "Ground",
+          "coordinate": [
+            41,
+            17
+          ]
+        },
+        {
+          "block": "Ground",
+          "coordinate": [
+            42,
+            16
+          ]
+        },
+        {
+          "block": "Ground",
+          "coordinate": [
+            42,
+            17
+          ]
+        },
+        {
+          "block": "Ground",
+          "coordinate": [
+            43,
+            16
+          ]
+        },
+        {
+          "block": "Ground",
+          "coordinate": [
+            43,
+            17
+          ]
+        },
+        {
+          "block": "Ground",
+          "coordinate": [
+            44,
+            16
+          ]
+        },
+        {
+          "block": "Ground",
+          "coordinate": [
+            44,
+            17
+          ]
+        },
+        {
+          "block": "Ground",
+          "coordinate": [
+            45,
+            16
+          ]
+        },
+        {
+          "block": "Ground",
+          "coordinate": [
+            45,
+            17
+          ]
+        },
+        {
+          "block": "Ground",
+          "coordinate": [
+            46,
+            16
+          ]
+        },
+        {
+          "block": "Ground",
+          "coordinate": [
+            46,
+            17
+          ]
+        },
+        {
+          "block": "Ground",
+          "coordinate": [
+            47,
+            16
+          ]
+        },
+        {
+          "block": "Ground",
+          "coordinate": [
+            47,
+            17
           ]
         },
         {
           "block": "Ground",
           "coordinate": [
             48,
-            208
+            16
           ]
         },
         {
           "block": "Ground",
           "coordinate": [
             48,
-            224
+            17
           ]
         },
         {
           "block": "Ground",
           "coordinate": [
-            48,
-            240
+            49,
+            16
           ]
         },
         {
           "block": "Ground",
           "coordinate": [
-            48,
-            256
+            49,
+            17
+          ]
+        },
+        {
+          "block": "Ground",
+          "coordinate": [
+            50,
+            16
+          ]
+        },
+        {
+          "block": "Ground",
+          "coordinate": [
+            50,
+            17
+          ]
+        },
+        {
+          "block": "Ground",
+          "coordinate": [
+            51,
+            16
+          ]
+        },
+        {
+          "block": "Ground",
+          "coordinate": [
+            51,
+            17
+          ]
+        },
+        {
+          "block": "Ground",
+          "coordinate": [
+            52,
+            16
+          ]
+        },
+        {
+          "block": "Ground",
+          "coordinate": [
+            52,
+            17
+          ]
+        },
+        {
+          "block": "Ground",
+          "coordinate": [
+            53,
+            16
+          ]
+        },
+        {
+          "block": "Ground",
+          "coordinate": [
+            53,
+            17
+          ]
+        },
+        {
+          "block": "Ground",
+          "coordinate": [
+            54,
+            16
+          ]
+        },
+        {
+          "block": "Ground",
+          "coordinate": [
+            54,
+            17
+          ]
+        },
+        {
+          "block": "Ground",
+          "coordinate": [
+            55,
+            16
+          ]
+        },
+        {
+          "block": "Ground",
+          "coordinate": [
+            55,
+            17
+          ]
+        },
+        {
+          "block": "Ground",
+          "coordinate": [
+            56,
+            16
+          ]
+        },
+        {
+          "block": "Ground",
+          "coordinate": [
+            56,
+            17
+          ]
+        },
+        {
+          "block": "Ground",
+          "coordinate": [
+            57,
+            16
+          ]
+        },
+        {
+          "block": "Ground",
+          "coordinate": [
+            57,
+            17
+          ]
+        },
+        {
+          "block": "Ground",
+          "coordinate": [
+            58,
+            16
+          ]
+        },
+        {
+          "block": "Ground",
+          "coordinate": [
+            58,
+            17
+          ]
+        },
+        {
+          "block": "Ground",
+          "coordinate": [
+            59,
+            16
+          ]
+        },
+        {
+          "block": "Ground",
+          "coordinate": [
+            59,
+            17
+          ]
+        },
+        {
+          "block": "Ground",
+          "coordinate": [
+            60,
+            16
+          ]
+        },
+        {
+          "block": "Ground",
+          "coordinate": [
+            60,
+            17
+          ]
+        },
+        {
+          "block": "Ground",
+          "coordinate": [
+            61,
+            16
+          ]
+        },
+        {
+          "block": "Ground",
+          "coordinate": [
+            61,
+            17
+          ]
+        },
+        {
+          "block": "Ground",
+          "coordinate": [
+            62,
+            16
+          ]
+        },
+        {
+          "block": "Ground",
+          "coordinate": [
+            62,
+            17
+          ]
+        },
+        {
+          "block": "Ground",
+          "coordinate": [
+            63,
+            16
+          ]
+        },
+        {
+          "block": "Ground",
+          "coordinate": [
+            63,
+            17
           ]
         },
         {
           "block": "Ground",
           "coordinate": [
             64,
-            208
+            16
           ]
         },
         {
           "block": "Ground",
           "coordinate": [
             64,
-            224
+            17
           ]
         },
         {
           "block": "Ground",
           "coordinate": [
-            64,
-            240
+            65,
+            16
           ]
         },
         {
           "block": "Ground",
           "coordinate": [
-            64,
-            256
+            65,
+            17
           ]
         },
         {
           "block": "Ground",
           "coordinate": [
-            80,
-            208
+            66,
+            16
           ]
         },
         {
           "block": "Ground",
           "coordinate": [
-            80,
-            224
+            66,
+            17
           ]
         },
         {
           "block": "Ground",
           "coordinate": [
-            80,
-            240
+            67,
+            16
           ]
         },
         {
           "block": "Ground",
           "coordinate": [
-            80,
-            256
+            67,
+            17
           ]
         },
         {
           "block": "Ground",
           "coordinate": [
-            96,
-            208
+            68,
+            16
           ]
         },
         {
           "block": "Ground",
           "coordinate": [
-            96,
-            224
+            68,
+            17
           ]
         },
         {
           "block": "Ground",
           "coordinate": [
-            96,
-            240
+            69,
+            16
           ]
         },
         {
           "block": "Ground",
           "coordinate": [
-            96,
-            256
+            69,
+            17
           ]
         },
         {
           "block": "Ground",
           "coordinate": [
-            112,
-            208
+            10,
+            12
           ]
         },
         {
           "block": "Ground",
           "coordinate": [
-            112,
-            224
+            11,
+            12
           ]
         },
         {
           "block": "Ground",
           "coordinate": [
-            112,
-            240
+            12,
+            12
           ]
         },
         {
           "block": "Ground",
           "coordinate": [
-            112,
-            256
+            13,
+            12
           ]
         },
         {
           "block": "Ground",
           "coordinate": [
-            128,
-            208
+            21,
+            12
           ]
         },
         {
           "block": "Ground",
           "coordinate": [
-            128,
-            224
+            22,
+            12
           ]
         },
         {
           "block": "Ground",
           "coordinate": [
-            128,
-            240
+            23,
+            12
           ]
         },
         {
           "block": "Ground",
           "coordinate": [
-            128,
-            256
-          ]
-        },
-        {
-          "block": "Ground",
-          "coordinate": [
-            144,
-            208
-          ]
-        },
-        {
-          "block": "Ground",
-          "coordinate": [
-            144,
-            224
-          ]
-        },
-        {
-          "block": "Ground",
-          "coordinate": [
-            144,
-            240
-          ]
-        },
-        {
-          "block": "Ground",
-          "coordinate": [
-            144,
-            256
-          ]
-        },
-        {
-          "block": "Ground",
-          "coordinate": [
-            160,
-            208
-          ]
-        },
-        {
-          "block": "Ground",
-          "coordinate": [
-            160,
-            224
-          ]
-        },
-        {
-          "block": "Ground",
-          "coordinate": [
-            160,
-            240
-          ]
-        },
-        {
-          "block": "Ground",
-          "coordinate": [
-            160,
-            256
-          ]
-        },
-        {
-          "block": "Ground",
-          "coordinate": [
-            176,
-            208
-          ]
-        },
-        {
-          "block": "Ground",
-          "coordinate": [
-            176,
-            224
-          ]
-        },
-        {
-          "block": "Ground",
-          "coordinate": [
-            176,
-            240
-          ]
-        },
-        {
-          "block": "Ground",
-          "coordinate": [
-            176,
-            256
-          ]
-        },
-        {
-          "block": "Ground",
-          "coordinate": [
-            192,
-            208
-          ]
-        },
-        {
-          "block": "Ground",
-          "coordinate": [
-            192,
-            224
-          ]
-        },
-        {
-          "block": "Ground",
-          "coordinate": [
-            192,
-            240
-          ]
-        },
-        {
-          "block": "Ground",
-          "coordinate": [
-            192,
-            256
-          ]
-        },
-        {
-          "block": "Ground",
-          "coordinate": [
-            208,
-            208
-          ]
-        },
-        {
-          "block": "Ground",
-          "coordinate": [
-            208,
-            224
-          ]
-        },
-        {
-          "block": "Ground",
-          "coordinate": [
-            208,
-            240
-          ]
-        },
-        {
-          "block": "Ground",
-          "coordinate": [
-            208,
-            256
-          ]
-        },
-        {
-          "block": "Ground",
-          "coordinate": [
-            224,
-            208
-          ]
-        },
-        {
-          "block": "Ground",
-          "coordinate": [
-            224,
-            224
-          ]
-        },
-        {
-          "block": "Ground",
-          "coordinate": [
-            224,
-            240
-          ]
-        },
-        {
-          "block": "Ground",
-          "coordinate": [
-            224,
-            256
-          ]
-        },
-        {
-          "block": "Ground",
-          "coordinate": [
-            240,
-            208
-          ]
-        },
-        {
-          "block": "Ground",
-          "coordinate": [
-            240,
-            224
-          ]
-        },
-        {
-          "block": "Ground",
-          "coordinate": [
-            240,
-            240
-          ]
-        },
-        {
-          "block": "Ground",
-          "coordinate": [
-            240,
-            256
-          ]
-        },
-        {
-          "block": "Ground",
-          "coordinate": [
-            256,
-            208
-          ]
-        },
-        {
-          "block": "Ground",
-          "coordinate": [
-            256,
-            224
-          ]
-        },
-        {
-          "block": "Ground",
-          "coordinate": [
-            256,
-            240
-          ]
-        },
-        {
-          "block": "Ground",
-          "coordinate": [
-            256,
-            256
-          ]
-        },
-        {
-          "block": "Ground",
-          "coordinate": [
-            272,
-            208
-          ]
-        },
-        {
-          "block": "Ground",
-          "coordinate": [
-            272,
-            224
-          ]
-        },
-        {
-          "block": "Ground",
-          "coordinate": [
-            272,
-            240
-          ]
-        },
-        {
-          "block": "Ground",
-          "coordinate": [
-            272,
-            256
-          ]
-        },
-        {
-          "block": "Ground",
-          "coordinate": [
-            288,
-            208
-          ]
-        },
-        {
-          "block": "Ground",
-          "coordinate": [
-            288,
-            224
-          ]
-        },
-        {
-          "block": "Ground",
-          "coordinate": [
-            288,
-            240
-          ]
-        },
-        {
-          "block": "Ground",
-          "coordinate": [
-            288,
-            256
-          ]
-        },
-        {
-          "block": "Ground",
-          "coordinate": [
-            304,
-            208
-          ]
-        },
-        {
-          "block": "Ground",
-          "coordinate": [
-            304,
-            224
-          ]
-        },
-        {
-          "block": "Ground",
-          "coordinate": [
-            304,
-            240
-          ]
-        },
-        {
-          "block": "Ground",
-          "coordinate": [
-            304,
-            256
-          ]
-        },
-        {
-          "block": "Ground",
-          "coordinate": [
-            320,
-            208
-          ]
-        },
-        {
-          "block": "Ground",
-          "coordinate": [
-            320,
-            224
-          ]
-        },
-        {
-          "block": "Ground",
-          "coordinate": [
-            320,
-            240
-          ]
-        },
-        {
-          "block": "Ground",
-          "coordinate": [
-            320,
-            256
-          ]
-        },
-        {
-          "block": "Ground",
-          "coordinate": [
-            336,
-            208
-          ]
-        },
-        {
-          "block": "Ground",
-          "coordinate": [
-            336,
-            224
-          ]
-        },
-        {
-          "block": "Ground",
-          "coordinate": [
-            336,
-            240
-          ]
-        },
-        {
-          "block": "Ground",
-          "coordinate": [
-            336,
-            256
-          ]
-        },
-        {
-          "block": "Ground",
-          "coordinate": [
-            352,
-            208
-          ]
-        },
-        {
-          "block": "Ground",
-          "coordinate": [
-            352,
-            224
-          ]
-        },
-        {
-          "block": "Ground",
-          "coordinate": [
-            352,
-            240
-          ]
-        },
-        {
-          "block": "Ground",
-          "coordinate": [
-            352,
-            256
-          ]
-        },
-        {
-          "block": "Ground",
-          "coordinate": [
-            368,
-            208
-          ]
-        },
-        {
-          "block": "Ground",
-          "coordinate": [
-            368,
-            224
-          ]
-        },
-        {
-          "block": "Ground",
-          "coordinate": [
-            368,
-            240
-          ]
-        },
-        {
-          "block": "Ground",
-          "coordinate": [
-            368,
-            256
-          ]
-        },
-        {
-          "block": "Ground",
-          "coordinate": [
-            384,
-            208
-          ]
-        },
-        {
-          "block": "Ground",
-          "coordinate": [
-            384,
-            224
-          ]
-        },
-        {
-          "block": "Ground",
-          "coordinate": [
-            384,
-            240
-          ]
-        },
-        {
-          "block": "Ground",
-          "coordinate": [
-            384,
-            256
-          ]
-        },
-        {
-          "block": "Ground",
-          "coordinate": [
-            64,
-            192
-          ]
-        },
-        {
-          "block": "Ground",
-          "coordinate": [
-            80,
-            192
-          ]
-        },
-        {
-          "block": "Ground",
-          "coordinate": [
-            96,
-            192
-          ]
-        },
-        {
-          "block": "Ground",
-          "coordinate": [
-            112,
-            192
+            24,
+            12
           ]
         }
       ],
@@ -796,11 +1104,1972 @@
       ],
       "enemies": [],
       "entities": [],
-      "tiles": [],
+      "tiles": [
+        {
+          "block": "Ground",
+          "coordinate": [
+            0,
+            13
+          ]
+        },
+        {
+          "block": "Ground",
+          "coordinate": [
+            0,
+            14
+          ]
+        },
+        {
+          "block": "Ground",
+          "coordinate": [
+            0,
+            15
+          ]
+        },
+        {
+          "block": "Ground",
+          "coordinate": [
+            0,
+            16
+          ]
+        },
+        {
+          "block": "Ground",
+          "coordinate": [
+            1,
+            13
+          ]
+        },
+        {
+          "block": "Ground",
+          "coordinate": [
+            1,
+            14
+          ]
+        },
+        {
+          "block": "Ground",
+          "coordinate": [
+            1,
+            15
+          ]
+        },
+        {
+          "block": "Ground",
+          "coordinate": [
+            1,
+            16
+          ]
+        },
+        {
+          "block": "Ground",
+          "coordinate": [
+            2,
+            13
+          ]
+        },
+        {
+          "block": "Ground",
+          "coordinate": [
+            2,
+            14
+          ]
+        },
+        {
+          "block": "Ground",
+          "coordinate": [
+            2,
+            15
+          ]
+        },
+        {
+          "block": "Ground",
+          "coordinate": [
+            2,
+            16
+          ]
+        },
+        {
+          "block": "Ground",
+          "coordinate": [
+            3,
+            13
+          ]
+        },
+        {
+          "block": "Ground",
+          "coordinate": [
+            3,
+            14
+          ]
+        },
+        {
+          "block": "Ground",
+          "coordinate": [
+            3,
+            15
+          ]
+        },
+        {
+          "block": "Ground",
+          "coordinate": [
+            3,
+            16
+          ]
+        },
+        {
+          "block": "Ground",
+          "coordinate": [
+            4,
+            13
+          ]
+        },
+        {
+          "block": "Ground",
+          "coordinate": [
+            4,
+            14
+          ]
+        },
+        {
+          "block": "Ground",
+          "coordinate": [
+            4,
+            15
+          ]
+        },
+        {
+          "block": "Ground",
+          "coordinate": [
+            4,
+            16
+          ]
+        },
+        {
+          "block": "Ground",
+          "coordinate": [
+            5,
+            13
+          ]
+        },
+        {
+          "block": "Ground",
+          "coordinate": [
+            5,
+            14
+          ]
+        },
+        {
+          "block": "Ground",
+          "coordinate": [
+            5,
+            15
+          ]
+        },
+        {
+          "block": "Ground",
+          "coordinate": [
+            5,
+            16
+          ]
+        },
+        {
+          "block": "Ground",
+          "coordinate": [
+            6,
+            13
+          ]
+        },
+        {
+          "block": "Ground",
+          "coordinate": [
+            6,
+            14
+          ]
+        },
+        {
+          "block": "Ground",
+          "coordinate": [
+            6,
+            15
+          ]
+        },
+        {
+          "block": "Ground",
+          "coordinate": [
+            6,
+            16
+          ]
+        },
+        {
+          "block": "Ground",
+          "coordinate": [
+            7,
+            13
+          ]
+        },
+        {
+          "block": "Ground",
+          "coordinate": [
+            7,
+            14
+          ]
+        },
+        {
+          "block": "Ground",
+          "coordinate": [
+            7,
+            15
+          ]
+        },
+        {
+          "block": "Ground",
+          "coordinate": [
+            7,
+            16
+          ]
+        },
+        {
+          "block": "Ground",
+          "coordinate": [
+            8,
+            13
+          ]
+        },
+        {
+          "block": "Ground",
+          "coordinate": [
+            8,
+            14
+          ]
+        },
+        {
+          "block": "Ground",
+          "coordinate": [
+            8,
+            15
+          ]
+        },
+        {
+          "block": "Ground",
+          "coordinate": [
+            8,
+            16
+          ]
+        },
+        {
+          "block": "Ground",
+          "coordinate": [
+            9,
+            13
+          ]
+        },
+        {
+          "block": "Ground",
+          "coordinate": [
+            9,
+            14
+          ]
+        },
+        {
+          "block": "Ground",
+          "coordinate": [
+            9,
+            15
+          ]
+        },
+        {
+          "block": "Ground",
+          "coordinate": [
+            9,
+            16
+          ]
+        },
+        {
+          "block": "Ground",
+          "coordinate": [
+            10,
+            13
+          ]
+        },
+        {
+          "block": "Ground",
+          "coordinate": [
+            10,
+            14
+          ]
+        },
+        {
+          "block": "Ground",
+          "coordinate": [
+            10,
+            15
+          ]
+        },
+        {
+          "block": "Ground",
+          "coordinate": [
+            10,
+            16
+          ]
+        },
+        {
+          "block": "Ground",
+          "coordinate": [
+            11,
+            13
+          ]
+        },
+        {
+          "block": "Ground",
+          "coordinate": [
+            11,
+            14
+          ]
+        },
+        {
+          "block": "Ground",
+          "coordinate": [
+            11,
+            15
+          ]
+        },
+        {
+          "block": "Ground",
+          "coordinate": [
+            11,
+            16
+          ]
+        },
+        {
+          "block": "Ground",
+          "coordinate": [
+            12,
+            13
+          ]
+        },
+        {
+          "block": "Ground",
+          "coordinate": [
+            12,
+            14
+          ]
+        },
+        {
+          "block": "Ground",
+          "coordinate": [
+            12,
+            15
+          ]
+        },
+        {
+          "block": "Ground",
+          "coordinate": [
+            12,
+            16
+          ]
+        },
+        {
+          "block": "Ground",
+          "coordinate": [
+            13,
+            13
+          ]
+        },
+        {
+          "block": "Ground",
+          "coordinate": [
+            13,
+            14
+          ]
+        },
+        {
+          "block": "Ground",
+          "coordinate": [
+            13,
+            15
+          ]
+        },
+        {
+          "block": "Ground",
+          "coordinate": [
+            13,
+            16
+          ]
+        },
+        {
+          "block": "Ground",
+          "coordinate": [
+            14,
+            13
+          ]
+        },
+        {
+          "block": "Ground",
+          "coordinate": [
+            14,
+            14
+          ]
+        },
+        {
+          "block": "Ground",
+          "coordinate": [
+            14,
+            15
+          ]
+        },
+        {
+          "block": "Ground",
+          "coordinate": [
+            14,
+            16
+          ]
+        },
+        {
+          "block": "Ground",
+          "coordinate": [
+            15,
+            13
+          ]
+        },
+        {
+          "block": "Ground",
+          "coordinate": [
+            15,
+            14
+          ]
+        },
+        {
+          "block": "Ground",
+          "coordinate": [
+            15,
+            15
+          ]
+        },
+        {
+          "block": "Ground",
+          "coordinate": [
+            15,
+            16
+          ]
+        },
+        {
+          "block": "Ground",
+          "coordinate": [
+            16,
+            13
+          ]
+        },
+        {
+          "block": "Ground",
+          "coordinate": [
+            16,
+            14
+          ]
+        },
+        {
+          "block": "Ground",
+          "coordinate": [
+            16,
+            15
+          ]
+        },
+        {
+          "block": "Ground",
+          "coordinate": [
+            16,
+            16
+          ]
+        },
+        {
+          "block": "Ground",
+          "coordinate": [
+            17,
+            13
+          ]
+        },
+        {
+          "block": "Ground",
+          "coordinate": [
+            17,
+            14
+          ]
+        },
+        {
+          "block": "Ground",
+          "coordinate": [
+            17,
+            15
+          ]
+        },
+        {
+          "block": "Ground",
+          "coordinate": [
+            17,
+            16
+          ]
+        },
+        {
+          "block": "Ground",
+          "coordinate": [
+            18,
+            13
+          ]
+        },
+        {
+          "block": "Ground",
+          "coordinate": [
+            18,
+            14
+          ]
+        },
+        {
+          "block": "Ground",
+          "coordinate": [
+            18,
+            15
+          ]
+        },
+        {
+          "block": "Ground",
+          "coordinate": [
+            18,
+            16
+          ]
+        },
+        {
+          "block": "Ground",
+          "coordinate": [
+            19,
+            13
+          ]
+        },
+        {
+          "block": "Ground",
+          "coordinate": [
+            19,
+            14
+          ]
+        },
+        {
+          "block": "Ground",
+          "coordinate": [
+            19,
+            15
+          ]
+        },
+        {
+          "block": "Ground",
+          "coordinate": [
+            19,
+            16
+          ]
+        },
+        {
+          "block": "Ground",
+          "coordinate": [
+            20,
+            13
+          ]
+        },
+        {
+          "block": "Ground",
+          "coordinate": [
+            20,
+            14
+          ]
+        },
+        {
+          "block": "Ground",
+          "coordinate": [
+            20,
+            15
+          ]
+        },
+        {
+          "block": "Ground",
+          "coordinate": [
+            20,
+            16
+          ]
+        },
+        {
+          "block": "Ground",
+          "coordinate": [
+            21,
+            13
+          ]
+        },
+        {
+          "block": "Ground",
+          "coordinate": [
+            21,
+            14
+          ]
+        },
+        {
+          "block": "Ground",
+          "coordinate": [
+            21,
+            15
+          ]
+        },
+        {
+          "block": "Ground",
+          "coordinate": [
+            21,
+            16
+          ]
+        },
+        {
+          "block": "Ground",
+          "coordinate": [
+            22,
+            13
+          ]
+        },
+        {
+          "block": "Ground",
+          "coordinate": [
+            22,
+            14
+          ]
+        },
+        {
+          "block": "Ground",
+          "coordinate": [
+            22,
+            15
+          ]
+        },
+        {
+          "block": "Ground",
+          "coordinate": [
+            22,
+            16
+          ]
+        },
+        {
+          "block": "Ground",
+          "coordinate": [
+            23,
+            13
+          ]
+        },
+        {
+          "block": "Ground",
+          "coordinate": [
+            23,
+            14
+          ]
+        },
+        {
+          "block": "Ground",
+          "coordinate": [
+            23,
+            15
+          ]
+        },
+        {
+          "block": "Ground",
+          "coordinate": [
+            23,
+            16
+          ]
+        },
+        {
+          "block": "Ground",
+          "coordinate": [
+            24,
+            13
+          ]
+        },
+        {
+          "block": "Ground",
+          "coordinate": [
+            24,
+            14
+          ]
+        },
+        {
+          "block": "Ground",
+          "coordinate": [
+            24,
+            15
+          ]
+        },
+        {
+          "block": "Ground",
+          "coordinate": [
+            24,
+            16
+          ]
+        },
+        {
+          "block": "Ground",
+          "coordinate": [
+            25,
+            13
+          ]
+        },
+        {
+          "block": "Ground",
+          "coordinate": [
+            25,
+            14
+          ]
+        },
+        {
+          "block": "Ground",
+          "coordinate": [
+            25,
+            15
+          ]
+        },
+        {
+          "block": "Ground",
+          "coordinate": [
+            25,
+            16
+          ]
+        },
+        {
+          "block": "Ground",
+          "coordinate": [
+            26,
+            13
+          ]
+        },
+        {
+          "block": "Ground",
+          "coordinate": [
+            26,
+            14
+          ]
+        },
+        {
+          "block": "Ground",
+          "coordinate": [
+            26,
+            15
+          ]
+        },
+        {
+          "block": "Ground",
+          "coordinate": [
+            26,
+            16
+          ]
+        },
+        {
+          "block": "Ground",
+          "coordinate": [
+            27,
+            13
+          ]
+        },
+        {
+          "block": "Ground",
+          "coordinate": [
+            27,
+            14
+          ]
+        },
+        {
+          "block": "Ground",
+          "coordinate": [
+            27,
+            15
+          ]
+        },
+        {
+          "block": "Ground",
+          "coordinate": [
+            27,
+            16
+          ]
+        },
+        {
+          "block": "Ground",
+          "coordinate": [
+            28,
+            13
+          ]
+        },
+        {
+          "block": "Ground",
+          "coordinate": [
+            28,
+            14
+          ]
+        },
+        {
+          "block": "Ground",
+          "coordinate": [
+            28,
+            15
+          ]
+        },
+        {
+          "block": "Ground",
+          "coordinate": [
+            28,
+            16
+          ]
+        },
+        {
+          "block": "Ground",
+          "coordinate": [
+            29,
+            13
+          ]
+        },
+        {
+          "block": "Ground",
+          "coordinate": [
+            29,
+            14
+          ]
+        },
+        {
+          "block": "Ground",
+          "coordinate": [
+            29,
+            15
+          ]
+        },
+        {
+          "block": "Ground",
+          "coordinate": [
+            29,
+            16
+          ]
+        },
+        {
+          "block": "Ground",
+          "coordinate": [
+            30,
+            13
+          ]
+        },
+        {
+          "block": "Ground",
+          "coordinate": [
+            30,
+            14
+          ]
+        },
+        {
+          "block": "Ground",
+          "coordinate": [
+            30,
+            15
+          ]
+        },
+        {
+          "block": "Ground",
+          "coordinate": [
+            30,
+            16
+          ]
+        },
+        {
+          "block": "Ground",
+          "coordinate": [
+            31,
+            13
+          ]
+        },
+        {
+          "block": "Ground",
+          "coordinate": [
+            31,
+            14
+          ]
+        },
+        {
+          "block": "Ground",
+          "coordinate": [
+            31,
+            15
+          ]
+        },
+        {
+          "block": "Ground",
+          "coordinate": [
+            31,
+            16
+          ]
+        },
+        {
+          "block": "Ground",
+          "coordinate": [
+            32,
+            13
+          ]
+        },
+        {
+          "block": "Ground",
+          "coordinate": [
+            32,
+            14
+          ]
+        },
+        {
+          "block": "Ground",
+          "coordinate": [
+            32,
+            15
+          ]
+        },
+        {
+          "block": "Ground",
+          "coordinate": [
+            32,
+            16
+          ]
+        },
+        {
+          "block": "Ground",
+          "coordinate": [
+            33,
+            13
+          ]
+        },
+        {
+          "block": "Ground",
+          "coordinate": [
+            33,
+            14
+          ]
+        },
+        {
+          "block": "Ground",
+          "coordinate": [
+            33,
+            15
+          ]
+        },
+        {
+          "block": "Ground",
+          "coordinate": [
+            33,
+            16
+          ]
+        },
+        {
+          "block": "Ground",
+          "coordinate": [
+            34,
+            13
+          ]
+        },
+        {
+          "block": "Ground",
+          "coordinate": [
+            34,
+            14
+          ]
+        },
+        {
+          "block": "Ground",
+          "coordinate": [
+            34,
+            15
+          ]
+        },
+        {
+          "block": "Ground",
+          "coordinate": [
+            34,
+            16
+          ]
+        },
+        {
+          "block": "Ground",
+          "coordinate": [
+            35,
+            13
+          ]
+        },
+        {
+          "block": "Ground",
+          "coordinate": [
+            35,
+            14
+          ]
+        },
+        {
+          "block": "Ground",
+          "coordinate": [
+            35,
+            15
+          ]
+        },
+        {
+          "block": "Ground",
+          "coordinate": [
+            35,
+            16
+          ]
+        },
+        {
+          "block": "Ground",
+          "coordinate": [
+            36,
+            13
+          ]
+        },
+        {
+          "block": "Ground",
+          "coordinate": [
+            36,
+            14
+          ]
+        },
+        {
+          "block": "Ground",
+          "coordinate": [
+            36,
+            15
+          ]
+        },
+        {
+          "block": "Ground",
+          "coordinate": [
+            36,
+            16
+          ]
+        },
+        {
+          "block": "Ground",
+          "coordinate": [
+            37,
+            13
+          ]
+        },
+        {
+          "block": "Ground",
+          "coordinate": [
+            37,
+            14
+          ]
+        },
+        {
+          "block": "Ground",
+          "coordinate": [
+            37,
+            15
+          ]
+        },
+        {
+          "block": "Ground",
+          "coordinate": [
+            37,
+            16
+          ]
+        },
+        {
+          "block": "Ground",
+          "coordinate": [
+            38,
+            13
+          ]
+        },
+        {
+          "block": "Ground",
+          "coordinate": [
+            38,
+            14
+          ]
+        },
+        {
+          "block": "Ground",
+          "coordinate": [
+            38,
+            15
+          ]
+        },
+        {
+          "block": "Ground",
+          "coordinate": [
+            38,
+            16
+          ]
+        },
+        {
+          "block": "Ground",
+          "coordinate": [
+            39,
+            13
+          ]
+        },
+        {
+          "block": "Ground",
+          "coordinate": [
+            39,
+            14
+          ]
+        },
+        {
+          "block": "Ground",
+          "coordinate": [
+            39,
+            15
+          ]
+        },
+        {
+          "block": "Ground",
+          "coordinate": [
+            39,
+            16
+          ]
+        },
+        {
+          "block": "Ground",
+          "coordinate": [
+            40,
+            13
+          ]
+        },
+        {
+          "block": "Ground",
+          "coordinate": [
+            40,
+            14
+          ]
+        },
+        {
+          "block": "Ground",
+          "coordinate": [
+            40,
+            15
+          ]
+        },
+        {
+          "block": "Ground",
+          "coordinate": [
+            40,
+            16
+          ]
+        },
+        {
+          "block": "Ground",
+          "coordinate": [
+            41,
+            13
+          ]
+        },
+        {
+          "block": "Ground",
+          "coordinate": [
+            41,
+            14
+          ]
+        },
+        {
+          "block": "Ground",
+          "coordinate": [
+            41,
+            15
+          ]
+        },
+        {
+          "block": "Ground",
+          "coordinate": [
+            41,
+            16
+          ]
+        },
+        {
+          "block": "Ground",
+          "coordinate": [
+            42,
+            13
+          ]
+        },
+        {
+          "block": "Ground",
+          "coordinate": [
+            42,
+            14
+          ]
+        },
+        {
+          "block": "Ground",
+          "coordinate": [
+            42,
+            15
+          ]
+        },
+        {
+          "block": "Ground",
+          "coordinate": [
+            42,
+            16
+          ]
+        },
+        {
+          "block": "Ground",
+          "coordinate": [
+            43,
+            13
+          ]
+        },
+        {
+          "block": "Ground",
+          "coordinate": [
+            43,
+            14
+          ]
+        },
+        {
+          "block": "Ground",
+          "coordinate": [
+            43,
+            15
+          ]
+        },
+        {
+          "block": "Ground",
+          "coordinate": [
+            43,
+            16
+          ]
+        },
+        {
+          "block": "Ground",
+          "coordinate": [
+            44,
+            13
+          ]
+        },
+        {
+          "block": "Ground",
+          "coordinate": [
+            44,
+            14
+          ]
+        },
+        {
+          "block": "Ground",
+          "coordinate": [
+            44,
+            15
+          ]
+        },
+        {
+          "block": "Ground",
+          "coordinate": [
+            44,
+            16
+          ]
+        },
+        {
+          "block": "Ground",
+          "coordinate": [
+            45,
+            13
+          ]
+        },
+        {
+          "block": "Ground",
+          "coordinate": [
+            45,
+            14
+          ]
+        },
+        {
+          "block": "Ground",
+          "coordinate": [
+            45,
+            15
+          ]
+        },
+        {
+          "block": "Ground",
+          "coordinate": [
+            45,
+            16
+          ]
+        },
+        {
+          "block": "Ground",
+          "coordinate": [
+            46,
+            13
+          ]
+        },
+        {
+          "block": "Ground",
+          "coordinate": [
+            46,
+            14
+          ]
+        },
+        {
+          "block": "Ground",
+          "coordinate": [
+            46,
+            15
+          ]
+        },
+        {
+          "block": "Ground",
+          "coordinate": [
+            46,
+            16
+          ]
+        },
+        {
+          "block": "Ground",
+          "coordinate": [
+            47,
+            13
+          ]
+        },
+        {
+          "block": "Ground",
+          "coordinate": [
+            47,
+            14
+          ]
+        },
+        {
+          "block": "Ground",
+          "coordinate": [
+            47,
+            15
+          ]
+        },
+        {
+          "block": "Ground",
+          "coordinate": [
+            47,
+            16
+          ]
+        },
+        {
+          "block": "Ground",
+          "coordinate": [
+            48,
+            13
+          ]
+        },
+        {
+          "block": "Ground",
+          "coordinate": [
+            48,
+            14
+          ]
+        },
+        {
+          "block": "Ground",
+          "coordinate": [
+            48,
+            15
+          ]
+        },
+        {
+          "block": "Ground",
+          "coordinate": [
+            48,
+            16
+          ]
+        },
+        {
+          "block": "Ground",
+          "coordinate": [
+            49,
+            13
+          ]
+        },
+        {
+          "block": "Ground",
+          "coordinate": [
+            49,
+            14
+          ]
+        },
+        {
+          "block": "Ground",
+          "coordinate": [
+            49,
+            15
+          ]
+        },
+        {
+          "block": "Ground",
+          "coordinate": [
+            49,
+            16
+          ]
+        },
+        {
+          "block": "Ground",
+          "coordinate": [
+            50,
+            13
+          ]
+        },
+        {
+          "block": "Ground",
+          "coordinate": [
+            50,
+            14
+          ]
+        },
+        {
+          "block": "Ground",
+          "coordinate": [
+            50,
+            15
+          ]
+        },
+        {
+          "block": "Ground",
+          "coordinate": [
+            50,
+            16
+          ]
+        },
+        {
+          "block": "Ground",
+          "coordinate": [
+            51,
+            13
+          ]
+        },
+        {
+          "block": "Ground",
+          "coordinate": [
+            51,
+            14
+          ]
+        },
+        {
+          "block": "Ground",
+          "coordinate": [
+            51,
+            15
+          ]
+        },
+        {
+          "block": "Ground",
+          "coordinate": [
+            51,
+            16
+          ]
+        },
+        {
+          "block": "Ground",
+          "coordinate": [
+            52,
+            13
+          ]
+        },
+        {
+          "block": "Ground",
+          "coordinate": [
+            52,
+            14
+          ]
+        },
+        {
+          "block": "Ground",
+          "coordinate": [
+            52,
+            15
+          ]
+        },
+        {
+          "block": "Ground",
+          "coordinate": [
+            52,
+            16
+          ]
+        },
+        {
+          "block": "Ground",
+          "coordinate": [
+            53,
+            13
+          ]
+        },
+        {
+          "block": "Ground",
+          "coordinate": [
+            53,
+            14
+          ]
+        },
+        {
+          "block": "Ground",
+          "coordinate": [
+            53,
+            15
+          ]
+        },
+        {
+          "block": "Ground",
+          "coordinate": [
+            53,
+            16
+          ]
+        },
+        {
+          "block": "Ground",
+          "coordinate": [
+            54,
+            13
+          ]
+        },
+        {
+          "block": "Ground",
+          "coordinate": [
+            54,
+            14
+          ]
+        },
+        {
+          "block": "Ground",
+          "coordinate": [
+            54,
+            15
+          ]
+        },
+        {
+          "block": "Ground",
+          "coordinate": [
+            54,
+            16
+          ]
+        },
+        {
+          "block": "Ground",
+          "coordinate": [
+            55,
+            13
+          ]
+        },
+        {
+          "block": "Ground",
+          "coordinate": [
+            55,
+            14
+          ]
+        },
+        {
+          "block": "Ground",
+          "coordinate": [
+            55,
+            15
+          ]
+        },
+        {
+          "block": "Ground",
+          "coordinate": [
+            55,
+            16
+          ]
+        },
+        {
+          "block": "Ground",
+          "coordinate": [
+            56,
+            13
+          ]
+        },
+        {
+          "block": "Ground",
+          "coordinate": [
+            56,
+            14
+          ]
+        },
+        {
+          "block": "Ground",
+          "coordinate": [
+            56,
+            15
+          ]
+        },
+        {
+          "block": "Ground",
+          "coordinate": [
+            56,
+            16
+          ]
+        },
+        {
+          "block": "Ground",
+          "coordinate": [
+            57,
+            13
+          ]
+        },
+        {
+          "block": "Ground",
+          "coordinate": [
+            57,
+            14
+          ]
+        },
+        {
+          "block": "Ground",
+          "coordinate": [
+            57,
+            15
+          ]
+        },
+        {
+          "block": "Ground",
+          "coordinate": [
+            57,
+            16
+          ]
+        },
+        {
+          "block": "Ground",
+          "coordinate": [
+            58,
+            13
+          ]
+        },
+        {
+          "block": "Ground",
+          "coordinate": [
+            58,
+            14
+          ]
+        },
+        {
+          "block": "Ground",
+          "coordinate": [
+            58,
+            15
+          ]
+        },
+        {
+          "block": "Ground",
+          "coordinate": [
+            58,
+            16
+          ]
+        },
+        {
+          "block": "Ground",
+          "coordinate": [
+            59,
+            13
+          ]
+        },
+        {
+          "block": "Ground",
+          "coordinate": [
+            59,
+            14
+          ]
+        },
+        {
+          "block": "Ground",
+          "coordinate": [
+            59,
+            15
+          ]
+        },
+        {
+          "block": "Ground",
+          "coordinate": [
+            59,
+            16
+          ]
+        },
+        {
+          "block": "Ground",
+          "coordinate": [
+            60,
+            13
+          ]
+        },
+        {
+          "block": "Ground",
+          "coordinate": [
+            60,
+            14
+          ]
+        },
+        {
+          "block": "Ground",
+          "coordinate": [
+            60,
+            15
+          ]
+        },
+        {
+          "block": "Ground",
+          "coordinate": [
+            60,
+            16
+          ]
+        },
+        {
+          "block": "Ground",
+          "coordinate": [
+            61,
+            13
+          ]
+        },
+        {
+          "block": "Ground",
+          "coordinate": [
+            61,
+            14
+          ]
+        },
+        {
+          "block": "Ground",
+          "coordinate": [
+            61,
+            15
+          ]
+        },
+        {
+          "block": "Ground",
+          "coordinate": [
+            61,
+            16
+          ]
+        },
+        {
+          "block": "Ground",
+          "coordinate": [
+            62,
+            13
+          ]
+        },
+        {
+          "block": "Ground",
+          "coordinate": [
+            62,
+            14
+          ]
+        },
+        {
+          "block": "Ground",
+          "coordinate": [
+            62,
+            15
+          ]
+        },
+        {
+          "block": "Ground",
+          "coordinate": [
+            62,
+            16
+          ]
+        },
+        {
+          "block": "Ground",
+          "coordinate": [
+            63,
+            13
+          ]
+        },
+        {
+          "block": "Ground",
+          "coordinate": [
+            63,
+            14
+          ]
+        },
+        {
+          "block": "Ground",
+          "coordinate": [
+            63,
+            15
+          ]
+        },
+        {
+          "block": "Ground",
+          "coordinate": [
+            63,
+            16
+          ]
+        },
+        {
+          "block": "Ground",
+          "coordinate": [
+            64,
+            13
+          ]
+        },
+        {
+          "block": "Ground",
+          "coordinate": [
+            64,
+            14
+          ]
+        },
+        {
+          "block": "Ground",
+          "coordinate": [
+            64,
+            15
+          ]
+        },
+        {
+          "block": "Ground",
+          "coordinate": [
+            64,
+            16
+          ]
+        },
+        {
+          "block": "Ground",
+          "coordinate": [
+            65,
+            13
+          ]
+        },
+        {
+          "block": "Ground",
+          "coordinate": [
+            65,
+            14
+          ]
+        },
+        {
+          "block": "Ground",
+          "coordinate": [
+            65,
+            15
+          ]
+        },
+        {
+          "block": "Ground",
+          "coordinate": [
+            65,
+            16
+          ]
+        },
+        {
+          "block": "Ground",
+          "coordinate": [
+            66,
+            13
+          ]
+        },
+        {
+          "block": "Ground",
+          "coordinate": [
+            66,
+            14
+          ]
+        },
+        {
+          "block": "Ground",
+          "coordinate": [
+            66,
+            15
+          ]
+        },
+        {
+          "block": "Ground",
+          "coordinate": [
+            66,
+            16
+          ]
+        },
+        {
+          "block": "Ground",
+          "coordinate": [
+            67,
+            13
+          ]
+        },
+        {
+          "block": "Ground",
+          "coordinate": [
+            67,
+            14
+          ]
+        },
+        {
+          "block": "Ground",
+          "coordinate": [
+            67,
+            15
+          ]
+        },
+        {
+          "block": "Ground",
+          "coordinate": [
+            67,
+            16
+          ]
+        },
+        {
+          "block": "Ground",
+          "coordinate": [
+            68,
+            13
+          ]
+        },
+        {
+          "block": "Ground",
+          "coordinate": [
+            68,
+            14
+          ]
+        },
+        {
+          "block": "Ground",
+          "coordinate": [
+            68,
+            15
+          ]
+        },
+        {
+          "block": "Ground",
+          "coordinate": [
+            68,
+            16
+          ]
+        },
+        {
+          "block": "Ground",
+          "coordinate": [
+            69,
+            13
+          ]
+        },
+        {
+          "block": "Ground",
+          "coordinate": [
+            69,
+            14
+          ]
+        },
+        {
+          "block": "Ground",
+          "coordinate": [
+            69,
+            15
+          ]
+        },
+        {
+          "block": "Ground",
+          "coordinate": [
+            69,
+            16
+          ]
+        }
+      ],
       "background": [
-        255,
-        255,
-        255
+        0,
+        0,
+        0
       ]
     }
   ]
