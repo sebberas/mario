@@ -16,6 +16,8 @@ use crate::renderer::Renderer;
 use crate::scene;
 use crate::scene::*;
 
+const GRAVITY: f32 = 9.82 * 0.001;
+
 pub struct GameSystems {
     pub audio: AudioManager,
 }
@@ -276,7 +278,7 @@ impl Game {
             .cloned()
             .collect();
 
-        let updated_goombas = Self::update_goombas(goombas, player);
+        let updated_goombas = Self::update_goombas(goombas, scene);
 
         let koopas: Vec<_> = enemies
             .iter()
@@ -293,7 +295,7 @@ impl Game {
         // Animation State
     }
 
-    pub fn update_goombas(mut goombas: Vec<Enemy>, player: &mut Player) -> Vec<Enemy> {
+    pub fn update_goombas(mut goombas: Vec<Enemy>, scene: &mut Scene) -> Vec<Enemy> {
         const GOOMBA_SPEED: f32 = 0.2;
 
         // Update movement
@@ -315,6 +317,15 @@ impl Game {
                 x if x > to.x => *direction = Direction::Backward,
                 x if x < from.x => *direction = Direction::Forward,
                 _ => {}
+            }
+
+            // Handle gravity
+            if let Some(tile_collider) = closest_ground(scene, &scene.tiles.clone()) {
+                match goomba.collider().collides_with(&tile_collider) {
+                    Some(Hit::Bottom) => break,
+
+                    _ => {}
+                }
             }
         }
 
