@@ -287,7 +287,7 @@ impl Game {
                 Some(Hit::Right) => scene.player.move_velocity = 0.0,
                 Some(Hit::Bottom) => scene.player.jump_velocity = 0.0,
                 Some(Hit::Top) => scene.player.jump_velocity = 0.0,
-                _ => {},
+                _ => {}
             }
             if keyboard.is_scancode_pressed(Scancode::D) {
                 if scene.player.move_velocity < max_movespeed {
@@ -384,7 +384,7 @@ pub fn closest_side(scene: &mut Scene, nearby_tiles: &Vec<MapTile>) -> Option<Bo
 
         if (tile.coordinate.y == (position_to_coordinate(scene.player.position.y)) * 16
             && (tile.coordinate.x == (position_to_coordinate(scene.player.position.x) + 1) * 16)
-            || tile.coordinate.x == (position_to_coordinate(scene.player.position.x))* 16)
+            || tile.coordinate.x == (position_to_coordinate(scene.player.position.x)) * 16)
         {
             closest_tile = Some(BoundingBox::new(
                 tile_position.0,
