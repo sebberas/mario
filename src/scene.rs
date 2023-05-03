@@ -81,6 +81,23 @@ impl Enemy {
     pub fn is_koopa(&self) -> bool {
         matches!(self.kind, EnemyKind::Koopa { .. })
     }
+
+    pub fn collider(&self) -> BoundingBox {
+        let Self { position, kind } = self;
+        let [x, y] = position.as_ref();
+        let (width, height) = match kind {
+            EnemyKind::Goomba { .. } => (16.0, 16.0),
+            EnemyKind::Koopa { .. } => (16.0, 24.0),
+            _ => todo!(),
+        };
+
+        BoundingBox {
+            x: *x,
+            y: *y,
+            width,
+            height,
+        }
+    }
 }
 
 #[derive(Debug, Clone, PartialEq, Deserialize, Serialize)]
@@ -93,7 +110,9 @@ pub enum EnemyKind {
         frame: RefCell<u32>,
     },
     Piranha {},
-    Koopa {},
+    Koopa {
+        frame: RefCell<u32>,
+    },
 }
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Deserialize, Serialize)]
@@ -118,7 +137,7 @@ pub enum EntityKind {
 #[derive(Debug, Deserialize, Serialize)]
 pub struct Text {}
 
-#[derive(Debug, Deserialize, Serialize)]
+#[derive(Debug, Clone, Deserialize, Serialize)]
 pub struct Player {
     pub position: Vec2,
     pub direction: Direction,
@@ -286,7 +305,7 @@ impl ToSprite for Enemy {
                 false,
             ),
             EnemyKind::Koopa { .. } => Sprite::new(
-                (uvec2(0, 10), uvec2(16, 16)),
+                (uvec2(0, 112), uvec2(16, 24)),
                 "./assets/sprites/enemies.png",
                 false,
             ),
