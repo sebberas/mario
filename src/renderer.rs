@@ -1,5 +1,5 @@
-use std::collections::HashMap;
-use std::path::Path;
+use std::collections::{HashMap, HashSet};
+use std::path::{Path, PathBuf};
 
 use ::glam::*;
 use ::image::*;
@@ -14,14 +14,14 @@ use crate::scene::*;
 
 pub struct Renderer {
     pub canvas: WindowCanvas,
-    texture_creator: TextureCreator<WindowContext>,
-    cache: HashMap<&'static str, Texture>,
+    creator: TextureCreator<WindowContext>,
+    cache: HashMap<&'static str, (Texture, usize)>,
 }
 
 impl Renderer {
-    const TILES_X: u32 = 25;
-    const TILES_Y: u32 = 18;
-    const TILE_SIZE: u32 = 16;
+    pub const TILES_X: u32 = 25;
+    pub const TILES_Y: u32 = 18;
+    pub const TILE_SIZE: u32 = 16;
 
     pub fn new(mut canvas: WindowCanvas) -> Renderer {
         canvas.set_blend_mode(BlendMode::Blend);
@@ -33,11 +33,11 @@ impl Renderer {
             )
             .unwrap();
 
-        let texture_creator = canvas.texture_creator();
+        let creator = canvas.texture_creator();
 
         Renderer {
             canvas,
-            texture_creator,
+            creator,
             cache: HashMap::with_capacity(128),
         }
     }
@@ -73,68 +73,61 @@ impl Renderer {
         }
     }
 
-    // TODO: Figure out how to sub-sample textures.
     pub fn draw_image(&mut self, camera: &Camera, sprite: &Sprite, mut position: UVec2, size: u32) {
-        let Self { cache, canvas, .. } = self;
+        let Self {
+            cache,
+            canvas,
+            creator,
+        } = self;
 
         let Sprite {
-            bounding_box,
             asset_path,
+            bounding_box,
         } = sprite;
 
-        let texture = if let Some(texture) = cache.get(asset_path) {
+        let texture = if let Some((texture, _)) = cache.get(sprite.asset_path) {
             texture
         } else {
-            let UVec2 { x, y } = bounding_box.0;
-            let [width, height] = bounding_box.1.to_array();
+            let image = image::open(sprite.asset_path).unwrap();
+            let image = image.to_rgba8();
 
-            // If we are unable find the texture in the cache we have to
-            // load it in from disk.
-            let mut image = image::open(asset_path).unwrap().to_rgba8();
-
-            // #00298C  or #9290FF is used as background color on the tilesheets. This
-            // should just be made transparent. Since we cache the texture, we
-            // only pay the price of clearing these pixels once.
-            for x in 0..image.width() {
-                for y in 0..image.height() {
-                    let pixel = image.get_pixel(x, y);
-                    if pixel == &Rgba([0, 41, 140, 255]) || pixel == &Rgba([146, 144, 255, 255]) {
-                        // image.put_pixel(x, y, Rgba([0, 0, 0, 0]));
-                    }
-                }
-            }
-
-            let image_view = image.view(x, y, width, height);
-            let pixels: Vec<_> = image_view
+            let pixels: Vec<_> = image
                 .pixels()
-                .flat_map(|(_, _, color)| color.0)
+                .flat_map(|color| {
+                    // Both #00298C and #9290FF are used as background color on the tilesheets. This
+                    // should just be made transparent. Since we cache the texture, we
+                    // only pay the price of clearing these pixels once.
+                    if color != &Rgba([0, 41, 140, 255]) && color != &Rgba([146, 144, 255, 255]) {
+                        color.0
+                    } else {
+                        [0, 0, 0, 0]
+                    }
+                })
                 .collect();
 
-            let mut texture = self
-                .texture_creator
-                .create_texture_streaming(PixelFormatEnum::ABGR8888, width, height)
+            let mut texture = creator
+                .create_texture_static(PixelFormatEnum::ABGR8888, image.width(), image.height())
                 .unwrap();
 
+            let pitch = image.width() as usize * std::mem::size_of::<[u8; 4]>();
+            texture.update(None, &pixels, pitch).unwrap();
             texture.set_blend_mode(BlendMode::Blend);
 
-            texture.update(None, &pixels, (width * 4) as _).unwrap();
-
-            cache.insert(asset_path, texture);
-            cache.get(asset_path).unwrap()
+            cache.insert(sprite.asset_path, (texture, 1));
+            cache
+                .get(sprite.asset_path)
+                .map(|(texture, _)| texture)
+                .unwrap()
         };
 
-        position += camera.position.as_uvec2();
+        let [x, y] = bounding_box.0.as_ref();
+        let [width, height] = bounding_box.1.as_ref();
 
         canvas
             .copy(
                 texture,
-                None,
-                Rect::new(
-                    position.x as _,
-                    position.y as _,
-                    bounding_box.1.x,
-                    bounding_box.1.y,
-                ),
+                Rect::new(*x as _, *y as _, *width, *height),
+                Rect::new(position.x as _, position.y as _, *width, *height),
             )
             .unwrap();
     }

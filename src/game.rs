@@ -11,6 +11,7 @@ use ::serde_json as json;
 use crate::audio::*;
 use crate::level::*;
 use crate::map::*;
+use crate::renderer::Renderer;
 use crate::scene;
 use crate::scene::*;
 
@@ -110,15 +111,7 @@ impl Game {
     pub fn new(scene: &mut Scene, systems: &GameSystems) -> Self {
         let level_manager = LevelManager::new(&Self::LEVEL_PATH);
 
-        let mut maptiles = vec![];
-        for i in 0..10 {
-            maptiles.push(MapTile {
-                block: Block::Ground,
-                coordinate: uvec2(i, 10),
-            });
-        }
-
-        let level = Level {
+        let mut level = Level {
             name: "test".to_string(),
             difficulty: Difficulty::Easy,
             start: Some(0),
@@ -133,11 +126,27 @@ impl Game {
                             direction: Direction::Forward,
                         },
                     }],
-                    tiles: maptiles,
                     entities: vec![Entity {
                         kind: EntityKind::Pipe { id: 1 },
                         position: uvec2(120, 192),
                     }],
+                    tiles: {
+                        let mut tiles = Vec::with_capacity((Renderer::TILES_X * 4) as _);
+                        for i in 0..Renderer::TILES_X {
+                            for j in 0..4 {
+                                let x = i * Renderer::TILE_SIZE;
+                                let y = (Renderer::TILES_Y - 4) * Renderer::TILE_SIZE
+                                    + j * Renderer::TILE_SIZE;
+
+                                tiles.push(MapTile {
+                                    block: Block::Ground,
+                                    coordinate: uvec2(x, y),
+                                })
+                            }
+                        }
+
+                        tiles
+                    },
                     background: uvec3(146, 144, 255),
                 },
                 Segment {
@@ -155,9 +164,9 @@ impl Game {
         let file = File::open("./assets/save.json").ok();
         let state = file.map(|file| json::from_reader(file).unwrap());
 
-        // systems
-        //     .audio
-        //     .start(&"./assets/audio/tracks/running_about.wav");
+        systems
+            .audio
+            .start(&"./assets/audio/tracks/running_about.wav");
 
         let mut game = Self {
             level_manager,
