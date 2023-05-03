@@ -16,7 +16,7 @@ use crate::renderer::Renderer;
 use crate::scene;
 use crate::scene::*;
 
-const GRAVITY: f32 = 9.82 * 0.001;
+const GRAVITY: f32 = 9.82 * 0.01;
 
 pub struct GameSystems {
     pub audio: AudioManager,
@@ -123,7 +123,7 @@ impl Game {
                     spawn: Some(uvec2(20, 2)),
                     enemies: vec![
                         Enemy {
-                            position: vec2(64.0, 210.0 as f32),
+                            position: vec2(64.0, 210.0),
                             kind: EnemyKind::Goomba {
                                 from: vec2(20.0, 210.0),
                                 to: vec2(100.0, 210.0),
@@ -132,7 +132,7 @@ impl Game {
                             },
                         },
                         Enemy {
-                            position: vec2(128.0, 20.0 as f32),
+                            position: vec2(128.0, 20.0),
                             kind: EnemyKind::Koopa {
                                 frame: RefCell::new(0),
                             },
@@ -323,11 +323,8 @@ impl Game {
 
             // Handle gravity
             if let Some(tile_collider) = closest_ground(scene, &scene.tiles.clone()) {
-                match goomba.collider().collides_with(&tile_collider) {
-                    Some(Hit::Bottom) => break,
-
-                    _ => {}
-                }
+            } else {
+                goomba.position.y += GRAVITY;
             }
         }
 
