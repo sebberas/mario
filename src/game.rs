@@ -345,22 +345,28 @@ pub fn nearby_tiles(scene: &mut Scene) -> Vec<MapTile> {
 
 pub fn closest_ground(scene: &mut Scene, nearby_tiles: &Vec<MapTile>) -> Option<BoundingBox> {
     let mut closest_tile = None;
+
+    println!("{}", scene.player.position);
+
     for tile in nearby_tiles.iter() {
         if tile.coordinate.y == (position_to_coordinate(scene.player.position.y) + 1) * 16
-            && tile.coordinate.x == position_to_coordinate(scene.player.position.y) * 16
+            && (tile.coordinate.x == position_to_coordinate(scene.player.position.x) * 16
+                || tile.coordinate.x == (position_to_coordinate(scene.player.position.x) + 1) * 16)
         {
             let tile_position = (
                 coordinate_to_position(tile.coordinate.x),
                 coordinate_to_position(tile.coordinate.y),
             );
-            closest_tile = Some(BoundingBox::new(
+            return Some(BoundingBox::new(
                 tile_position.0,
                 tile_position.1,
                 16.0,
                 16.0,
-            ))
+            ));
         }
     }
+
+    println!("{:?}", closest_tile);
     return closest_tile;
 }
 
