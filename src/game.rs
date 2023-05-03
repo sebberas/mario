@@ -271,9 +271,9 @@ impl Game {
     }
 
     pub fn move_player(&mut self, scene: &mut Scene, keyboard: &KeyboardState) {
-        let move_acceleration = 0.1;
+        let move_acceleration = 0.02;
         let max_movespeed = 2.0;
-        let max_fallspeed = 5.0;
+        let max_fallspeed = 2.0;
         let max_jumpspeed = 5.0;
         let gravity_acceleration = 0.03;
 
@@ -347,7 +347,7 @@ pub fn closest_ground(scene: &mut Scene, nearby_tiles: &Vec<MapTile>) -> Option<
     let mut closest_tile = None;
     for tile in nearby_tiles.iter() {
         if tile.coordinate.y == (position_to_coordinate(scene.player.position.y) + 1) * 16
-            && tile.coordinate.x == position_to_coordinate(scene.player.position.y) * 16
+            && tile.coordinate.x == position_to_coordinate(scene.player.position.x) * 16
         {
             let tile_position = (
                 coordinate_to_position(tile.coordinate.x),
