@@ -42,7 +42,78 @@
           }
         }
       ],
-      "tiles": [],
+      "tiles": [
+        {
+          "block": "Ground",
+          "coordinate": [
+            0,
+            10
+          ]
+        },
+        {
+          "block": "Ground",
+          "coordinate": [
+            1,
+            10
+          ]
+        },
+        {
+          "block": "Ground",
+          "coordinate": [
+            2,
+            10
+          ]
+        },
+        {
+          "block": "Ground",
+          "coordinate": [
+            3,
+            10
+          ]
+        },
+        {
+          "block": "Ground",
+          "coordinate": [
+            4,
+            10
+          ]
+        },
+        {
+          "block": "Ground",
+          "coordinate": [
+            5,
+            10
+          ]
+        },
+        {
+          "block": "Ground",
+          "coordinate": [
+            6,
+            10
+          ]
+        },
+        {
+          "block": "Ground",
+          "coordinate": [
+            7,
+            10
+          ]
+        },
+        {
+          "block": "Ground",
+          "coordinate": [
+            8,
+            10
+          ]
+        },
+        {
+          "block": "Ground",
+          "coordinate": [
+            9,
+            10
+          ]
+        }
+      ],
       "background": [
         146,
         144,

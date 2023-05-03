@@ -51,6 +51,7 @@ impl Runtime {
                 position: vec2(10.0, 10.0),
                 move_velocity: 0.0,
                 jump_velocity: 0.0,
+                fall_velocity: 0.0,
                 can_jump: true,
                 is_shown: true,
             },
