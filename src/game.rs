@@ -278,26 +278,34 @@ impl Game {
         let gravity_acceleration = 0.03;
 
         // handle collision
-        let nearby_tiles = &scene.tiles;
+        let nearby_tiles = &scene.tiles.clone();
 
         // move left and right
-        if keyboard.is_scancode_pressed(Scancode::D) {
-            if scene.player.move_velocity < max_movespeed {
-                scene.player.move_velocity += move_acceleration;
+        if let Some(collider) = closest_side(scene, &nearby_tiles.clone()) {
+            match scene.player.collider().collides_with(&collider) {
+                Some(Hit::Left) => scene.player.move_velocity = 0.0,
+                Some(Hit::Right) => scene.player.move_velocity = 0.0,
+                Some(Hit::Bottom) => scene.player.jump_velocity = 0.0,
+                Some(Hit::Top) => scene.player.jump_velocity = 0.0,
+                _ => {},
             }
-            scene.player.position.x += scene.player.move_velocity;
-        } else if keyboard.is_scancode_pressed(Scancode::A) {
-            if scene.player.move_velocity < max_movespeed {
-                scene.player.move_velocity += move_acceleration;
+            if keyboard.is_scancode_pressed(Scancode::D) {
+                if scene.player.move_velocity < max_movespeed {
+                    scene.player.move_velocity += move_acceleration;
+                }
+                scene.player.position.x += scene.player.move_velocity;
+            } else if keyboard.is_scancode_pressed(Scancode::A) {
+                if scene.player.move_velocity < max_movespeed {
+                    scene.player.move_velocity += move_acceleration;
+                }
+                scene.player.position.x -= scene.player.move_velocity;
+            } else {
+                scene.player.move_velocity = 0.0;
             }
-            scene.player.position.x -= scene.player.move_velocity;
-        } else {
-            scene.player.move_velocity = 0.0;
         }
 
         if keyboard.is_scancode_pressed(Scancode::Space) && scene.player.can_jump == true {
             scene.player.jump_velocity = max_jumpspeed;
-            println!("jump");
         }
         if scene.player.jump_velocity >= 0.0 {
             scene.player.position.y -= scene.player.jump_velocity;
@@ -364,6 +372,32 @@ pub fn closest_ground(scene: &mut Scene, nearby_tiles: &Vec<MapTile>) -> Option<
     }
     return closest_tile;
 }
+
+pub fn closest_side(scene: &mut Scene, nearby_tiles: &Vec<MapTile>) -> Option<BoundingBox> {
+    let mut closest_tile = None;
+
+    for tile in nearby_tiles.iter() {
+        let tile_position = (
+            coordinate_to_position(tile.coordinate.x),
+            coordinate_to_position(tile.coordinate.y),
+        );
+
+        if (tile.coordinate.y == (position_to_coordinate(scene.player.position.y)) * 16
+            && (tile.coordinate.x == (position_to_coordinate(scene.player.position.x) + 1) * 16)
+            || tile.coordinate.x == (position_to_coordinate(scene.player.position.x))* 16)
+        {
+            closest_tile = Some(BoundingBox::new(
+                tile_position.0,
+                tile_position.1,
+                16.0,
+                16.0,
+            ))
+        }
+    }
+    return closest_tile;
+}
+
+pub fn closest_upper() {}
 
 pub fn coordinate_to_position(coordinate: u32) -> f32 {
     coordinate as f32 * 16.0
