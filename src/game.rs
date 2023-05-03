@@ -250,44 +250,53 @@ impl Game {
     }
 
     pub fn move_player(&mut self, scene: &mut Scene, keyboard: &KeyboardState) {
-        let acceleration = 0.01;
-        let max_movespeed = 1.0;
-        let max_fallspeed = 3.0;
-        let max_jumpspeed = 4.0;
-        let gravity = 0.02;
+        let move_acceleration = 0.1;
+        let max_movespeed = 2.0;
+        let max_fallspeed = 5.0;
+        let max_jumpspeed = 5.0;
+        let gravity_acceleration = 0.03;
 
         if keyboard.is_scancode_pressed(Scancode::D) {
             if scene.player.move_velocity < max_movespeed {
-                scene.player.move_velocity += acceleration;
-                // println!("{:?}", scene.player.speed);
+                scene.player.move_velocity += move_acceleration;
             }
             scene.player.position.x += scene.player.move_velocity;
-        }
-
-        if keyboard.is_scancode_pressed(Scancode::A) {
+        } else if keyboard.is_scancode_pressed(Scancode::A) {
             if scene.player.move_velocity < max_movespeed {
-                scene.player.move_velocity += acceleration;
+                scene.player.move_velocity += move_acceleration;
             }
             scene.player.position.x -= scene.player.move_velocity;
+        } else {
+            scene.player.move_velocity = 0.0;
         }
 
         if keyboard.is_scancode_pressed(Scancode::Space) && scene.player.can_jump == true {
+            scene.player.jump_velocity = max_jumpspeed;
+        }
+        if scene.player.jump_velocity >= 0.0 {
             scene.player.position.y -= scene.player.jump_velocity;
         }
-
-        let nearby_tiles = Self::nearby_tiles(scene);
 
         // gravity
         if Self::position_to_coordinate(scene.player.position.y) <= 10 {
             if scene.player.fall_velocity <= max_fallspeed {
-                scene.player.fall_velocity += gravity;
+                scene.player.fall_velocity += gravity_acceleration;
+                scene.player.jump_velocity -= scene.player.fall_velocity;
             }
+            // player is in air
             scene.player.position.y += scene.player.fall_velocity;
+            scene.player.can_jump = false;
         } else {
+            // if not falling...
             scene.player.fall_velocity = 0.0;
+            scene.player.jump_velocity = 0.0;
+            scene.player.can_jump = true;
         }
 
-        println!("fall_velocity {:?}", scene.player.fall_velocity);
+        println!(
+            "fall_velocity {:?} jump_vel {:?}",
+            scene.player.fall_velocity, scene.player.jump_velocity
+        );
     }
 
     pub fn nearby_tiles(scene: &mut Scene) -> Vec<MapTile> {
