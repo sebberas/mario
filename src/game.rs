@@ -137,7 +137,7 @@ impl Game {
                         for i in 0..Renderer::TILES_X {
                             for j in 0..4 {
                                 let x = i * Renderer::TILE_SIZE;
-                                let y = (Renderer::TILES_Y - 4) * Renderer::TILE_SIZE
+                                let y = (Renderer::TILES_Y - 5) * Renderer::TILE_SIZE
                                     + j * Renderer::TILE_SIZE;
 
                                 tiles.push(MapTile {
@@ -271,8 +271,8 @@ impl Game {
     }
 
     pub fn move_player(&mut self, scene: &mut Scene, keyboard: &KeyboardState) {
-        let move_acceleration = 0.02;
-        let max_movespeed = 2.0;
+        let move_acceleration = 0.3;
+        let max_movespeed = 1.0;
         let max_fallspeed = 2.0;
         let max_jumpspeed = 5.0;
         let gravity_acceleration = 0.03;
@@ -289,20 +289,22 @@ impl Game {
                 Some(Hit::Top) => scene.player.jump_velocity = 0.0,
                 _ => {}
             }
+        } else {
             if keyboard.is_scancode_pressed(Scancode::D) {
+                scene.player.direction = Direction::Forward;
                 if scene.player.move_velocity < max_movespeed {
                     scene.player.move_velocity += move_acceleration;
                 }
-                scene.player.position.x += scene.player.move_velocity;
             } else if keyboard.is_scancode_pressed(Scancode::A) {
+                scene.player.direction = Direction::Backward;
                 if scene.player.move_velocity < max_movespeed {
-                    scene.player.move_velocity += move_acceleration;
+                    scene.player.move_velocity -= move_acceleration;
                 }
-                scene.player.position.x -= scene.player.move_velocity;
             } else {
                 scene.player.move_velocity = 0.0;
             }
         }
+        scene.player.position.x += scene.player.move_velocity;
 
         if keyboard.is_scancode_pressed(Scancode::Space) && scene.player.can_jump == true {
             scene.player.jump_velocity = max_jumpspeed;
@@ -382,9 +384,9 @@ pub fn closest_side(scene: &mut Scene, nearby_tiles: &Vec<MapTile>) -> Option<Bo
             coordinate_to_position(tile.coordinate.y),
         );
 
-        if (tile.coordinate.y == (position_to_coordinate(scene.player.position.y)) * 16
-            && (tile.coordinate.x == (position_to_coordinate(scene.player.position.x) + 1) * 16)
-            || tile.coordinate.x == (position_to_coordinate(scene.player.position.x)) * 16)
+        if tile.coordinate.y == (position_to_coordinate(scene.player.position.y)) * 16
+            && (tile.coordinate.x == (position_to_coordinate(scene.player.position.x)) * 16
+                || tile.coordinate.x == (position_to_coordinate(scene.player.position.x) + 1) * 16)
         {
             closest_tile = Some(BoundingBox::new(
                 tile_position.0,
