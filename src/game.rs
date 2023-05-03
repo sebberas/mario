@@ -171,9 +171,25 @@ impl Game {
                 Segment {
                     spawn: Some(uvec2(30, 20)),
                     enemies: Vec::default(),
-                    tiles: Vec::default(),
+                    tiles: {
+                        let mut tiles = Vec::with_capacity((Renderer::TILES_X * 4) as _);
+                        for i in 0..Renderer::TILES_X {
+                            for j in 0..4 {
+                                let x = i * Renderer::TILE_SIZE;
+                                let y = (Renderer::TILES_Y - 5) * Renderer::TILE_SIZE
+                                    + j * Renderer::TILE_SIZE;
+
+                                tiles.push(MapTile {
+                                    block: Block::Ground,
+                                    coordinate: uvec2(x, y),
+                                })
+                            }
+                        }
+
+                        tiles
+                    },
                     entities: Vec::default(),
-                    background: uvec3(255, 255, 255),
+                    background: uvec3(0, 0, 0),
                 },
             ],
         };
