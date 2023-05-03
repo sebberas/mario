@@ -53,7 +53,6 @@ impl AudioManager {
     pub fn update(&mut self) {
         let mut device = self.0.device.lock().unwrap();
         if let Some(device) = device.as_mut() {
-            println!("yeet");
             device.resume();
         }
     }
