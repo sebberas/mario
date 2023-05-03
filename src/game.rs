@@ -156,7 +156,7 @@ impl Game {
                         }
                         for i in 0..4 {
                             tiles.push(MapTile {
-                                block: Block::Ground,
+                                block: Block::Wall,
                                 coordinate: uvec2(
                                     64 + i * Renderer::TILE_SIZE,
                                     12 * Renderer::TILE_SIZE,
@@ -199,9 +199,9 @@ impl Game {
         let file = File::open("./assets/save.json").ok();
         let state = file.map(|file| json::from_reader(file).unwrap());
 
-        // systems
-        //     .audio
-        //     .start(&"./assets/audio/tracks/running_about.wav");
+        systems
+            .audio
+            .start(&"./assets/audio/tracks/running_about.wav");
 
         let mut game = Self {
             level_manager,
@@ -223,7 +223,7 @@ impl Game {
                     && keyboard.is_scancode_pressed(Scancode::S)
                 {
                     self.load_segment(id, scene);
-                    break;
+                    return;
                 }
             }
         }
@@ -246,6 +246,20 @@ impl Game {
 
         // Koopas or Goombas are killed if the head of that enemy is jumped on by the
         // player.
+
+        for enemy in enemies.iter() {
+            match player.collider().collides_with(&enemy.collider()) {
+                Some(Hit::Left) | Some(Hit::Right) | Some(Hit::Bottom) => {
+                    show_simple_message_box(
+                        MessageBoxFlag::empty(),
+                        "Game Over",
+                        "You have died dumb fuck",
+                        None,
+                    );
+                }
+                _ => {}
+            }
+        }
 
         let enemies: Vec<_> = enemies.clone().into_iter().filter(|enemy| {
             if let Some(hit) = player.collider().collides_with(&enemy.collider()) && hit == Hit::Top {
