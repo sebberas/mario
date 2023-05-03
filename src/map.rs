@@ -1,6 +1,8 @@
 use ::glam::*;
 use ::serde::{Deserialize, Serialize};
 
+use crate::game::BoundingBox;
+use crate::renderer::Renderer;
 use crate::scene::*;
 
 #[derive(Debug, Deserialize, Serialize, Clone, Copy, PartialEq, Eq)]
@@ -13,6 +15,19 @@ pub enum Block {
 pub struct MapTile {
     pub block: Block,
     pub coordinate: UVec2,
+}
+
+impl MapTile {
+    pub fn collider(&self) -> BoundingBox {
+        let coordinate = self.coordinate.as_vec2();
+        let [x, y] = coordinate.as_ref();
+        BoundingBox {
+            x: *x,
+            y: *y,
+            width: 16.0,
+            height: 16.0,
+        }
+    }
 }
 
 impl ToSprite for Block {
