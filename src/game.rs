@@ -282,11 +282,13 @@ impl Game {
 
         // move left and right
         if keyboard.is_scancode_pressed(Scancode::D) {
+            scene.player.direction = Direction::Forward;
             if scene.player.move_velocity < max_movespeed {
                 scene.player.move_velocity += move_acceleration;
             }
             scene.player.position.x += scene.player.move_velocity;
         } else if keyboard.is_scancode_pressed(Scancode::A) {
+            scene.player.direction = Direction::Backward;
             if scene.player.move_velocity < max_movespeed {
                 scene.player.move_velocity += move_acceleration;
             }

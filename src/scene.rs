@@ -121,23 +121,23 @@ pub struct Text {}
 #[derive(Debug, Deserialize, Serialize)]
 pub struct Player {
     pub position: Vec2,
+    pub direction: Direction,
     pub move_velocity: f32,
     pub jump_velocity: f32,
     pub fall_velocity: f32,
     pub can_jump: bool,
-    pub is_shown: bool,
     frame: RefCell<u32>,
 }
 
 impl Player {
     pub fn new(position: Vec2) -> Self {
         Self {
-            position: vec2(10.0, 10.0),
+            position,
+            direction: Direction::Forward,
             move_velocity: 0.0,
             jump_velocity: 0.0,
             fall_velocity: 0.0,
             can_jump: true,
-            is_shown: true,
             frame: RefCell::new(0),
         }
     }
@@ -147,7 +147,7 @@ impl ToSprite for Player {
     fn to_sprite(&self) -> Sprite {
         let mut frame = self.frame.borrow_mut();
 
-        if self.fall_velocity != 0.0 {
+        let mut sprite = if self.fall_velocity != 0.0 {
             *frame = 0;
             Sprite::new(
                 (uvec2(96, 8), uvec2(16, 16)),
@@ -193,7 +193,10 @@ impl ToSprite for Player {
                 "assets/sprites/characters.png",
                 false,
             )
-        }
+        };
+
+        sprite.mirror = self.direction == Direction::Backward;
+        sprite
     }
 }
 

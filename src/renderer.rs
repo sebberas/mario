@@ -83,7 +83,7 @@ impl Renderer {
         let Sprite {
             asset_path,
             bounding_box,
-            ..
+            mirror,
         } = sprite;
 
         let texture = if let Some((texture, _)) = cache.get(sprite.asset_path) {
@@ -125,10 +125,14 @@ impl Renderer {
         let [width, height] = bounding_box.1.as_ref();
 
         canvas
-            .copy(
+            .copy_ex(
                 texture,
                 Rect::new(*x as _, *y as _, *width, *height),
                 Rect::new(position.x as _, position.y as _, *width, *height),
+                0.0,
+                None,
+                *mirror,
+                false,
             )
             .unwrap();
     }
