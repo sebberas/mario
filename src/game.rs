@@ -119,15 +119,23 @@ impl Game {
             segments: vec![
                 Segment {
                     spawn: Some(uvec2(20, 20)),
-                    enemies: vec![Enemy {
-                        position: vec2(64.0, 64.0),
-                        kind: EnemyKind::Goomba {
-                            from: vec2(20.0, 20.0),
-                            to: vec2(100.0, 20.0),
-                            direction: Direction::Forward,
-                            frame: RefCell::new(0),
+                    enemies: vec![
+                        Enemy {
+                            position: vec2(64.0, 13.0 * Renderer::TILE_SIZE as f32),
+                            kind: EnemyKind::Goomba {
+                                from: vec2(20.0, 20.0),
+                                to: vec2(100.0, 20.0),
+                                direction: Direction::Forward,
+                                frame: RefCell::new(0),
+                            },
                         },
-                    }],
+                        Enemy {
+                            position: vec2(128.0, 10.0 * Renderer::TILE_SIZE as f32),
+                            kind: EnemyKind::Koopa {
+                                frame: RefCell::new(0),
+                            },
+                        },
+                    ],
                     entities: vec![Entity {
                         kind: EntityKind::Pipe { id: 1 },
                         position: uvec2(120, 192),
@@ -208,7 +216,10 @@ impl Game {
     }
 
     pub fn update_enemies(scene: &mut Scene) {
-        let Scene { enemies, .. } = scene;
+        let Scene {
+            enemies, player, ..
+        } = scene;
+
         // TODO: Multhreaaaaaaaading goooooooo brrrrrrrrrrrrrrrrr
         // Spawn three tasks that take ownership of the different types of enemies.
         // These three tasks handle all logic that is required for that type of enemy
@@ -217,6 +228,17 @@ impl Game {
         // heap-allocations, but the branch predictor is very happy. Maybe slower, but
         // Steen likey like.
 
+        // Koopas or Goombas are killed if the head of that enemy is jumped on by the
+        // player.
+
+        let enemies: Vec<_> = enemies.clone().into_iter().filter(|enemy| {
+            if let Some(hit) = player.collider().collides_with(&enemy.collider()) && hit == Hit::Top {
+                false
+            } else {
+                true
+            }
+        }).collect();
+
         // Movement
         let goombas: Vec<_> = enemies
             .iter()
@@ -224,21 +246,29 @@ impl Game {
             .cloned()
             .collect();
 
-        let goombas = Self::update_goombas(goombas);
+        let updated_goombas = Self::update_goombas(goombas, player);
 
-        enemies.clear();
-        enemies.extend(goombas);
+        let koopas: Vec<_> = enemies
+            .iter()
+            .filter(|enemy| enemy.is_koopa())
+            .cloned()
+            .collect();
+
+        scene.enemies.clear();
+        scene.enemies.extend(updated_goombas);
+        scene.enemies.extend(koopas);
 
         // Collision
 
         // Animation State
     }
 
-    pub fn update_goombas(mut goombas: Vec<Enemy>) -> Vec<Enemy> {
-        const SPEED: f32 = 0.5;
+    pub fn update_goombas(mut goombas: Vec<Enemy>, player: &mut Player) -> Vec<Enemy> {
+        const GOOMBA_SPEED: f32 = 0.2;
 
+        // Update movement
         for goomba in goombas.iter_mut() {
-            let Enemy { position, kind, .. } = goomba;
+            let Enemy { position, kind } = goomba;
             let EnemyKind::Goomba {
                 from,
                 to,
@@ -247,8 +277,8 @@ impl Game {
             } = kind else { unreachable!() };
 
             match direction {
-                Direction::Forward => position.x += SPEED,
-                Direction::Backward => position.x -= SPEED,
+                Direction::Forward => *position += vec2(GOOMBA_SPEED, 0.0),
+                Direction::Backward => *position -= vec2(GOOMBA_SPEED, 0.0),
             }
 
             match position.x {
@@ -411,10 +441,10 @@ pub fn position_to_coordinate(position: f32) -> u32 {
 
 #[derive(Debug, Clone, Copy)]
 pub struct BoundingBox {
-    x: f32,
-    y: f32,
-    width: f32,
-    height: f32,
+    pub x: f32,
+    pub y: f32,
+    pub width: f32,
+    pub height: f32,
 }
 impl BoundingBox {
     pub fn new(x: f32, y: f32, width: f32, height: f32) -> BoundingBox {
@@ -453,7 +483,7 @@ impl BoundingBox {
     }
 }
 
-#[derive(Debug, Clone, Copy)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum Hit {
     Top,
     Right,
