@@ -347,7 +347,8 @@ pub fn closest_ground(scene: &mut Scene, nearby_tiles: &Vec<MapTile>) -> Option<
     let mut closest_tile = None;
     for tile in nearby_tiles.iter() {
         if tile.coordinate.y == (position_to_coordinate(scene.player.position.y) + 1) * 16
-            && tile.coordinate.x == position_to_coordinate(scene.player.position.x) * 16
+            && (tile.coordinate.x == position_to_coordinate(scene.player.position.x) * 16
+                || tile.coordinate.x == (position_to_coordinate(scene.player.position.x) + 1) * 16)
         {
             let tile_position = (
                 coordinate_to_position(tile.coordinate.x),
