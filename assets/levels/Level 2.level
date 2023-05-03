@@ -21,7 +21,7 @@
                 20.0
               ],
               "to": [
-                40.0,
+                100.0,
                 20.0
               ],
               "direction": "Forward"
@@ -741,6 +741,34 @@
           "coordinate": [
             384,
             272
+          ]
+        },
+        {
+          "block": "Ground",
+          "coordinate": [
+            64,
+            192
+          ]
+        },
+        {
+          "block": "Ground",
+          "coordinate": [
+            80,
+            192
+          ]
+        },
+        {
+          "block": "Ground",
+          "coordinate": [
+            96,
+            192
+          ]
+        },
+        {
+          "block": "Ground",
+          "coordinate": [
+            112,
+            192
           ]
         }
       ],

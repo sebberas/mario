@@ -146,6 +146,15 @@ impl Game {
                                 })
                             }
                         }
+                        for i in 0..4 {
+                            tiles.push(MapTile {
+                                block: Block::Ground,
+                                coordinate: uvec2(
+                                    64 + i * Renderer::TILE_SIZE,
+                                    12 * Renderer::TILE_SIZE,
+                                ),
+                            });
+                        }
 
                         tiles
                     },
