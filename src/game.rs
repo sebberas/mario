@@ -184,7 +184,7 @@ impl Game {
             if let EntityKind::Pipe { id } = kind {
                 if scene.player.position.x >= position.x as f32
                     && scene.player.position.x < (position.x + 32) as f32
-                    && scene.player.position.y + 16.0 == position.y as f32
+                    && (scene.player.position.y + 16.0) as u32 == position.y
                     && keyboard.is_scancode_pressed(Scancode::S)
                 {
                     self.load_segment(id, scene);
@@ -307,10 +307,10 @@ impl Game {
             scene.player.can_jump = true;
         }
 
-        println!(
-            "fall_velocity {:?} jump_vel {:?}",
-            scene.player.fall_velocity, scene.player.jump_velocity
-        );
+        // println!(
+        //     "fall_velocity {:?} jump_vel {:?}",
+        //     scene.player.fall_velocity, scene.player.jump_velocity
+        // );
     }
 
     pub fn nearby_tiles(scene: &mut Scene) -> Vec<MapTile> {
