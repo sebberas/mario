@@ -83,6 +83,7 @@ impl Renderer {
         let Sprite {
             asset_path,
             bounding_box,
+            ..
         } = sprite;
 
         let texture = if let Some((texture, _)) = cache.get(sprite.asset_path) {

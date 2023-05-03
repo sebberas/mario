@@ -21,6 +21,7 @@ impl ToSprite for Block {
             Block::Ground => Sprite::new(
                 (uvec2(0, 16), uvec2(16, 16)),
                 "./assets/sprites/tilesheet.png",
+                false,
             ),
             Block::Question { .. } => todo!(),
         }

@@ -1,3 +1,4 @@
+use std::cell::RefCell;
 use std::fs::*;
 use std::path::{Path, PathBuf};
 use std::str::SplitInclusive;
@@ -122,8 +123,9 @@ impl Game {
                         position: vec2(64.0, 64.0),
                         kind: EnemyKind::Goomba {
                             from: vec2(20.0, 20.0),
-                            to: vec2(40.0, 20.0),
+                            to: vec2(100.0, 20.0),
                             direction: Direction::Forward,
+                            frame: RefCell::new(0),
                         },
                     }],
                     entities: vec![Entity {
@@ -164,9 +166,9 @@ impl Game {
         let file = File::open("./assets/save.json").ok();
         let state = file.map(|file| json::from_reader(file).unwrap());
 
-        systems
-            .audio
-            .start(&"./assets/audio/tracks/running_about.wav");
+        // systems
+        //     .audio
+        //     .start(&"./assets/audio/tracks/running_about.wav");
 
         let mut game = Self {
             level_manager,
@@ -232,6 +234,7 @@ impl Game {
                 from,
                 to,
                 direction,
+                ..
             } = kind else { unreachable!() };
 
             match direction {

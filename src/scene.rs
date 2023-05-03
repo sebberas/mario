@@ -1,3 +1,5 @@
+use std::cell::RefCell;
+
 use glam::*;
 use sdl2::pixels::*;
 use serde::{Deserialize, Serialize};
@@ -60,7 +62,7 @@ pub enum Direction {
     Backward,
 }
 
-#[derive(Debug, Clone, Copy, PartialEq, Deserialize, Serialize)]
+#[derive(Debug, Clone, PartialEq, Deserialize, Serialize)]
 pub struct Enemy {
     pub position: Vec2,
     pub kind: EnemyKind,
@@ -80,12 +82,14 @@ impl Enemy {
     }
 }
 
-#[derive(Debug, Clone, Copy, PartialEq, Deserialize, Serialize)]
+#[derive(Debug, Clone, PartialEq, Deserialize, Serialize)]
 pub enum EnemyKind {
     Goomba {
         from: Vec2,
         to: Vec2,
         direction: Direction,
+        #[serde(skip)]
+        frame: RefCell<u32>,
     },
     Piranha {},
     Koopa {},
@@ -121,14 +125,75 @@ pub struct Player {
     pub fall_velocity: f32,
     pub can_jump: bool,
     pub is_shown: bool,
+    frame: RefCell<u32>,
+}
+
+impl Player {
+    pub fn new(position: Vec2) -> Self {
+        Self {
+            position: vec2(10.0, 10.0),
+            move_velocity: 0.0,
+            jump_velocity: 0.0,
+            fall_velocity: 0.0,
+            can_jump: true,
+            is_shown: true,
+            frame: RefCell::new(0),
+        }
+    }
 }
 
 impl ToSprite for Player {
     fn to_sprite(&self) -> Sprite {
-        Sprite::new(
-            (uvec2(0, 8), uvec2(16, 16)),
-            "assets/sprites/characters.png",
-        )
+        let mut frame = self.frame.borrow_mut();
+
+        if self.fall_velocity != 0.0 {
+            *frame = 0;
+            Sprite::new(
+                (uvec2(96, 8), uvec2(16, 16)),
+                "assets/sprites/characters.png",
+                false,
+            )
+        } else if self.move_velocity != 0.0 {
+            println!("{frame:?}");
+            match *frame {
+                0 | 1 | 2 => {
+                    *frame += 1;
+                    Sprite::new(
+                        (uvec2(56, 8), uvec2(16, 16)),
+                        "assets/sprites/characters.png",
+                        false,
+                    )
+                }
+                3 | 4 | 5 | 6 | 7 | 8 => {
+                    *frame += 1;
+                    Sprite::new(
+                        (uvec2(20, 8), uvec2(16, 16)),
+                        "assets/sprites/characters.png",
+                        false,
+                    )
+                }
+                9 | 10 | 11 | 12 | 13 | 14 => {
+                    *frame += 1;
+                    if *frame == 15 {
+                        *frame = 0
+                    };
+
+                    Sprite::new(
+                        (uvec2(38, 8), uvec2(16, 16)),
+                        "assets/sprites/characters.png",
+                        false,
+                    )
+                }
+                _ => unreachable!(),
+            }
+        } else {
+            *frame = 0;
+            Sprite::new(
+                (uvec2(0, 8), uvec2(16, 16)),
+                "assets/sprites/characters.png",
+                false,
+            )
+        }
     }
 }
 
@@ -158,6 +223,7 @@ pub struct SpriteId(usize);
 pub struct Sprite {
     pub bounding_box: (UVec2, UVec2),
     pub asset_path: &'static str,
+    pub mirror: bool,
 }
 
 impl Sprite {
@@ -165,28 +231,55 @@ impl Sprite {
     ///
     /// The coordinates in the second UVec2 is relative to the top-left of the
     /// bounding box.
-    pub fn new(bounding_box: (UVec2, UVec2), asset_path: &'static str) -> Sprite {
+    pub fn new(bounding_box: (UVec2, UVec2), asset_path: &'static str, mirror: bool) -> Sprite {
         Sprite {
             bounding_box,
             asset_path,
+            mirror,
         }
     }
 }
 
 impl ToSprite for Enemy {
     fn to_sprite(&self) -> Sprite {
-        match self.kind {
-            EnemyKind::Goomba { .. } => Sprite::new(
-                (uvec2(0, 16), uvec2(16, 16)),
-                "./assets/sprites/enemies.png",
-            ),
+        match &self.kind {
+            EnemyKind::Goomba {
+                frame, direction, ..
+            } => {
+                let mut frame = frame.borrow_mut();
+                match *frame {
+                    0..=15 => {
+                        *frame += 1;
+                        Sprite::new(
+                            (uvec2(0, 16), uvec2(16, 16)),
+                            "./assets/sprites/enemies.png",
+                            direction == &Direction::Forward,
+                        )
+                    }
+                    16..=32 => {
+                        *frame += 1;
+                        if *frame == 25 {
+                            *frame = 0
+                        }
+
+                        Sprite::new(
+                            (uvec2(18, 16), uvec2(16, 16)),
+                            "./assets/sprites/enemies.png",
+                            direction == &Direction::Forward,
+                        )
+                    }
+                    _ => unreachable!(),
+                }
+            }
             EnemyKind::Piranha { .. } => Sprite::new(
                 (uvec2(0, 10), uvec2(16, 16)),
                 "./assets/sprites/enemies.png",
+                false,
             ),
             EnemyKind::Koopa { .. } => Sprite::new(
                 (uvec2(0, 10), uvec2(16, 16)),
                 "./assets/sprites/enemies.png",
+                false,
             ),
             _ => unreachable!(),
         }
@@ -196,12 +289,13 @@ impl ToSprite for Enemy {
 impl ToSprite for Entity {
     fn to_sprite(&self) -> Sprite {
         match self.kind {
-            EntityKind::Coin => Sprite::new((uvec2(0, 10), uvec2(0, 10)), ""),
+            EntityKind::Coin => Sprite::new((uvec2(0, 10), uvec2(0, 10)), "", false),
             EntityKind::Pipe { .. } => Sprite::new(
                 (uvec2(119, 196), uvec2(33, 34)),
                 "./assets/sprites/tilesheet.png",
+                false,
             ),
-            EntityKind::Item(..) => Sprite::new((uvec2(0, 10), uvec2(0, 10)), ""),
+            EntityKind::Item(..) => Sprite::new((uvec2(0, 10), uvec2(0, 10)), "", false),
         }
     }
 }
