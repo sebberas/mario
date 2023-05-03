@@ -157,7 +157,6 @@ impl Game {
                         }
                         for i in 0..4 {
                             tiles.push(MapTile {
-<<<<<<< HEAD
                                 block: Block::Ground,
                                 coordinate: uvec2(10 + i, 12),
                             });
@@ -167,13 +166,6 @@ impl Game {
                             tiles.push(MapTile {
                                 block: Block::Ground,
                                 coordinate: uvec2(21 + i, 12),
-=======
-                                block: Block::Wall,
-                                coordinate: uvec2(
-                                    64 + i * Renderer::TILE_SIZE,
-                                    12 * Renderer::TILE_SIZE,
-                                ),
->>>>>>> 1fe3cd5edb6f046d7fe5a0265eacf0fa355c2ac4
                             });
                         }
 
