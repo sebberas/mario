@@ -653,6 +653,8 @@ impl BoundingBox {
             height,
         }
     }
+
+    // en smule overkompliceret når alle colliders er samme størrelse
     pub fn collides_with(&self, other: &Self) -> Option<(Hit, f32)> {
         let dx = (self.x + self.width / 2.0) - (other.x + other.width / 2.0);
         let dy = (self.y + self.height / 2.0) - (other.y + other.height / 2.0);
