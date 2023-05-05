@@ -242,7 +242,6 @@ pub struct Scene {
     pub enemies: Vec<Enemy>,
     pub player: Player,
 
-    pub sprites: Vec<Sprite>,
     pub text: Vec<Text>,
 
     pub tiles: Vec<MapTile>,

@@ -155,12 +155,4 @@ impl Renderer {
     pub fn draw_text(&mut self) {
         todo!()
     }
-
-    pub fn move_camera(&mut self, scene: &mut Scene, camera_movement: Vec2) -> Vec2 {
-        scene.camera.position + camera_movement
-    }
-}
-
-fn map_range(from_range: (f32, f32), to_range: (f32, f32), s: f32) -> f32 {
-    to_range.0 + (s - from_range.0) * (to_range.1 - to_range.0) / (from_range.1 - from_range.0)
 }

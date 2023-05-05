@@ -49,7 +49,6 @@ impl Runtime {
             enemies: Vec::default(),
             entities: Vec::default(),
             player: Player::new(vec2(10.0, 10.0)),
-            sprites: Vec::default(),
             text: Vec::default(),
             tiles: Vec::default(),
             background: uvec3(146, 144, 255),
