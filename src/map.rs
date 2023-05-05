@@ -23,12 +23,12 @@ pub struct MapTile {
 impl MapTile {
     pub fn collider(&self) -> BoundingBox {
         let coordinate = self.coordinate.as_vec2();
-        let [x, y] = coordinate.as_ref();
+        let [x, y] = coordinate.as_ref().map(|e| e * Renderer::TILE_SIZE as f32);
         BoundingBox {
-            x: *x,
-            y: *y,
-            width: 16.0,
-            height: 16.0,
+            x,
+            y,
+            width: Renderer::TILE_SIZE as f32,
+            height: Renderer::TILE_SIZE as f32,
         }
     }
 }

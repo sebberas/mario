@@ -1,4 +1,5 @@
 use std::cell::RefCell;
+use std::time::Instant;
 
 use glam::*;
 use sdl2::pixels::*;
@@ -88,7 +89,7 @@ impl Enemy {
         let (width, height) = match kind {
             EnemyKind::Goomba { .. } => (16.0, 16.0),
             EnemyKind::Koopa { .. } => (16.0, 24.0),
-            _ => todo!(),
+            EnemyKind::Piranha { .. } => (16.0, 16.0),
         };
 
         BoundingBox {
@@ -109,8 +110,15 @@ pub enum EnemyKind {
         #[serde(skip)]
         frame: RefCell<u32>,
     },
-    Piranha {},
+    Piranha {
+        #[serde(skip)]
+        frame: RefCell<u32>,
+    },
     Koopa {
+        direction: Direction,
+        #[serde(skip)]
+        shell: Option<Instant>,
+        #[serde(skip)]
         frame: RefCell<u32>,
     },
 }
@@ -299,16 +307,73 @@ impl ToSprite for Enemy {
                     _ => unreachable!(),
                 }
             }
-            EnemyKind::Piranha { .. } => Sprite::new(
-                (uvec2(0, 10), uvec2(16, 16)),
-                "./assets/sprites/enemies.png",
-                false,
-            ),
-            EnemyKind::Koopa { .. } => Sprite::new(
-                (uvec2(0, 112), uvec2(16, 24)),
-                "./assets/sprites/enemies.png",
-                false,
-            ),
+            EnemyKind::Piranha { frame } => {
+                let mut frame = frame.borrow_mut();
+                match *frame {
+                    0..=35 => {
+                        *frame += 1;
+                        Sprite::new(
+                            (uvec2(0, 138), uvec2(16, 24)),
+                            "./assets/sprites/enemies.png",
+                            false,
+                        )
+                    }
+                    36..=72 => {
+                        *frame += 1;
+                        if *frame == 72 {
+                            *frame = 0;
+                        }
+
+                        Sprite::new(
+                            (uvec2(18, 138), uvec2(16, 24)),
+                            "./assets/sprites/enemies.png",
+                            false,
+                        )
+                    }
+                    _ => unreachable!(),
+                }
+            }
+            EnemyKind::Koopa {
+                frame,
+                direction,
+                shell,
+            } => {
+                let mut frame = frame.borrow_mut();
+                if shell.is_some() {
+                    *frame = 0;
+                    return Sprite::new(
+                        (uvec2(72, 120), uvec2(16, 16)),
+                        "./assets/sprites/enemies.png",
+                        false,
+                    );
+                }
+
+                let mut sprite = match *frame {
+                    0..=35 => {
+                        *frame += 1;
+                        Sprite::new(
+                            (uvec2(0, 112), uvec2(16, 24)),
+                            "./assets/sprites/enemies.png",
+                            false,
+                        )
+                    }
+                    36..=72 => {
+                        *frame += 1;
+                        if *frame == 73 {
+                            *frame = 0;
+                        }
+                        Sprite::new(
+                            (uvec2(18, 112), uvec2(16, 24)),
+                            "./assets/sprites/enemies.png",
+                            false,
+                        )
+                    }
+                    _ => unreachable!(),
+                };
+
+                sprite.mirror = direction == &Direction::Backward;
+                sprite
+            }
             _ => unreachable!(),
         }
     }

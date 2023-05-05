@@ -1,10 +1,11 @@
 #![feature(let_chains)]
+#![feature(future_join)]
 
-use glam::*;
-use sdl2::event::*;
-use sdl2::keyboard::*;
-use sdl2::mouse::*;
-use sdl2::video::*;
+use ::glam::*;
+use ::sdl2::event::*;
+use ::sdl2::keyboard::*;
+use ::sdl2::mouse::*;
+use ::sdl2::video::*;
 
 use self::editor::*;
 use self::runtime::*;
@@ -19,7 +20,6 @@ mod map;
 mod renderer;
 mod runtime;
 mod scene;
-mod task;
 
 mod os;
 

@@ -1,6 +1,4 @@
-use std::borrow::Borrow;
 use std::cell::RefCell;
-use std::path::PathBuf;
 use std::rc::Rc;
 
 use ::glam::*;
@@ -13,7 +11,6 @@ use ::sdl2::rect::{Point, Rect};
 use ::sdl2::render::*;
 use ::sdl2::video::*;
 use ::sdl2::{AudioSubsystem, VideoSubsystem};
-use ::windows::core::ComInterface;
 use ::windows::Win32::Foundation::*;
 use ::windows::Win32::System::Com::*;
 use ::windows::Win32::UI::Shell::*;
@@ -21,8 +18,8 @@ use ::windows::Win32::UI::Shell::*;
 use crate::level::read_level;
 use crate::os::{windows, MenuItem};
 
-const SDL_WINDOW_INPUT_FOCUS: u32 = 0x00000200;
-const SDL_WINDOW_MOUSE_FOCUS: u32 = 0x00000400;
+const _SDL_WINDOW_INPUT_FOCUS: u32 = 0x00000200;
+const _SDL_WINDOW_MOUSE_FOCUS: u32 = 0x00000400;
 
 use crate::Layer;
 
@@ -42,8 +39,10 @@ struct EditorState {
 }
 
 pub struct Editor {
-    video: VideoSubsystem,
+    _video: VideoSubsystem,
+    _audio: AudioSubsystem,
     canvas: WindowCanvas,
+
     should_close: Rc<RefCell<bool>>,
 
     // Command stuff
@@ -58,8 +57,8 @@ pub struct Editor {
 }
 
 trait Command: std::fmt::Debug {
-    fn apply(&mut self, state: &mut EditorState) {}
-    fn undo(&mut self, state: &mut EditorState) {}
+    fn apply(&mut self, _state: &mut EditorState) {}
+    fn undo(&mut self, _state: &mut EditorState) {}
 
     fn is_complete(&mut self) -> bool {
         true
@@ -169,7 +168,8 @@ impl Editor {
         canvas.window_mut().set_size(1600, 800).unwrap();
 
         Self {
-            video,
+            _video: video,
+            _audio: audio,
             canvas,
             should_close: Rc::new(RefCell::new(false)),
 

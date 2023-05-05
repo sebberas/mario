@@ -6,6 +6,7 @@ use ::sdl2::keyboard::*;
 use ::sdl2::mouse::*;
 use ::sdl2::video::*;
 use ::sdl2::{AudioSubsystem, VideoSubsystem};
+use futures::executor::ThreadPool;
 
 use crate::audio::AudioManager;
 use crate::game::*;
@@ -54,12 +55,13 @@ impl Runtime {
             background: uvec3(146, 144, 255),
         };
 
-        let mut systems = {
-            let mut audio_manager = AudioManager::new(audio.clone());
+        let systems = {
+            let audio_manager = AudioManager::new(audio.clone());
             audio_manager.register_dir(&"./assets/audio", true);
 
             GameSystems {
                 audio: audio_manager,
+                thread_pool: ThreadPool::new().unwrap(),
             }
         };
 

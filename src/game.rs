@@ -1,13 +1,18 @@
 use std::cell::RefCell;
 use std::fs::*;
+use std::future::join;
 use std::path::{Path, PathBuf};
 use std::str::SplitInclusive;
+use std::time::{Instant, Duration};
 
 use ::glam::*;
 use ::sdl2::keyboard::*;
 use ::sdl2::messagebox::*;
 use ::serde::{Deserialize, Serialize};
 use ::serde_json as json;
+use futures::executor::ThreadPool;
+use futures::future::join3;
+use futures::task::{Spawn, SpawnExt};
 
 use crate::audio::*;
 use crate::level::*;
@@ -16,10 +21,11 @@ use crate::renderer::Renderer;
 use crate::scene;
 use crate::scene::*;
 
-const GRAVITY: f32 = 9.82 * 0.01;
+const GRAVITY: f32 = 9.82 * 0.1;
 
 pub struct GameSystems {
     pub audio: AudioManager,
+    pub thread_pool: ThreadPool,
 }
 
 #[derive(Debug, Clone)]
@@ -81,6 +87,8 @@ pub struct GameState {}
 pub struct Game {
     level_manager: LevelManager,
     state: GameState,
+
+    died: Option<Instant>,
 }
 
 impl Game {
@@ -132,8 +140,19 @@ impl Game {
                             },
                         },
                         Enemy {
-                            position: vec2(128.0, 20.0),
+                            position: vec2(
+                                200.0,
+                                ((Renderer::TILES_Y - 12) * Renderer::TILE_SIZE) as f32 - 8.0,
+                            ),
                             kind: EnemyKind::Koopa {
+                                direction: Direction::Forward,
+                                shell: None,
+                                frame: RefCell::new(0),
+                            },
+                        },
+                        Enemy {
+                            position: vec2(120.0 + 8.0, 192.0 - 24.0),
+                            kind: EnemyKind::Piranha {
                                 frame: RefCell::new(0),
                             },
                         },
@@ -155,18 +174,23 @@ impl Game {
                                 })
                             }
                         }
-                        for i in 0..4 {
-                            tiles.push(MapTile {
-                                block: Block::Ground,
-                                coordinate: uvec2(10 + i, 12),
-                            });
+                        // // Stair thingy
+                        for i in 0..6 {
+                            for j in i..6 {
+                                tiles.push(MapTile {
+                                    block: Block::Stone,
+                                    coordinate: uvec2(j + 10, Renderer::TILES_Y - i - 3),
+                                })
+                            }
                         }
 
-                        for i in 0..4 {
-                            tiles.push(MapTile {
-                                block: Block::Ground,
-                                coordinate: uvec2(21 + i, 12),
-                            });
+                        for i in 0..1 {
+                            for j in 0..6 {
+                                tiles.push(MapTile {
+                                    block: Block::Stone,
+                                    coordinate: uvec2(i + 16, Renderer::TILES_Y - j - 3),
+                                })
+                            }
                         }
 
                         tiles
@@ -203,13 +227,10 @@ impl Game {
         let file = File::open("./assets/save.json").ok();
         let state = file.map(|file| json::from_reader(file).unwrap());
 
-        systems
-            .audio
-            .start(&"./assets/audio/tracks/running_about.wav");
-
         let mut game = Self {
             level_manager,
             state: state.unwrap_or_default(),
+            died: None,
         };
 
         game.load_level("Level 2", scene);
@@ -217,118 +238,220 @@ impl Game {
     }
 
     pub fn update(&mut self, scene: &mut Scene, systems: &GameSystems, keyboard: KeyboardState) {
-        self.move_player(scene, &keyboard);
+        if let Some(died) = self.died {
+            let duration = Duration::from_secs(2);
+            if died.elapsed() >= duration {
+                let buttons = [
+                    ButtonData {
+                        flags: MessageBoxButtonFlag::NOTHING,
+                        button_id: 1,
+                        text: "Ohh noo",
+                    }
+            
+                ];
+    
+               let btn = show_message_box(MessageBoxFlag::empty(), &buttons, "Game Over", "You died, poor loser", None, None).unwrap();
+               if let ClickedButton::CustomButton(btn) = btn {
+                    if btn.button_id == 1 {
+                        panic!("Get good");
+                    }
+               }
+            }
 
-        for Entity { position, kind } in scene.entities.clone() {
-            if let EntityKind::Pipe { id } = kind {
-                if scene.player.position.x >= position.x as f32
-                    && scene.player.position.x < (position.x + 32) as f32
-                    && (scene.player.position.y + 16.0) as u32 == position.y
-                    && keyboard.is_scancode_pressed(Scancode::S)
-                {
-                    self.load_segment(id, scene);
-                    return;
+
+        } else {
+            self.move_player(scene, &keyboard);
+    
+            for Entity { position, kind } in scene.entities.clone() {
+                if let EntityKind::Pipe { id } = kind {
+                    if scene.player.position.x >= position.x as f32
+                        && scene.player.position.x < (position.x + 32) as f32
+                        && (scene.player.position.y + 16.0) as u32 == position.y
+                        && keyboard.is_scancode_pressed(Scancode::S)
+                    {
+                        self.load_segment(id, scene);
+                        return;
+                    }
                 }
             }
+    
+            Self::update_enemies(self, scene, systems);
+
+            scene.camera.position.x = scene.player.position.x;
         }
 
-        Self::update_enemies(scene);
     }
 
-    pub fn update_enemies(scene: &mut Scene) {
-        let Scene {
-            enemies, player, ..
-        } = scene;
+    pub fn update_enemies(game: &mut Game, scene: &mut Scene, systems: &GameSystems) {
+        let GameSystems { thread_pool, .. } = systems;
 
-        // TODO: Multhreaaaaaaaading goooooooo brrrrrrrrrrrrrrrrr
-        // Spawn three tasks that take ownership of the different types of enemies.
-        // These three tasks handle all logic that is required for that type of enemy
-        // except player to enemy collision. Then
-        // await those tasks and combine all the new enemies again. Essentially three
-        // heap-allocations, but the branch predictor is very happy. Maybe slower, but
-        // Steen likey like.
+        let updated_goombas = {
+            let goombas: Vec<_> = scene
+                .enemies
+                .iter()
+                .filter(|el| el.is_goomba())
+                .cloned()
+                .collect();
 
-        // Koopas or Goombas are killed if the head of that enemy is jumped on by the
-        // player.
+            let player = scene.player.clone();
+            let tiles = scene.tiles.clone();
+            async move { Self::update_goombas(goombas, &player, &tiles) }
+        };
 
-        for enemy in enemies.iter() {
-            match player.collider().collides_with(&enemy.collider()) {
-                Some(Hit::Left) | Some(Hit::Right) | Some(Hit::Bottom) => {
-                    show_simple_message_box(
-                        MessageBoxFlag::empty(),
-                        "Game Over",
-                        "You have died dumb fuck",
-                        None,
-                    );
-                }
-                _ => {}
-            }
-        }
+        let updated_koopas = {
+            let koopas: Vec<_> = scene
+                .enemies
+                .iter()
+                .filter(|enemy| enemy.is_koopa())
+                .cloned()
+                .collect();
 
-        let enemies: Vec<_> = enemies.clone().into_iter().filter(|enemy| {
-            if let Some(hit) = player.collider().collides_with(&enemy.collider()) && hit == Hit::Top {
-                false
-            } else {
-                true
-            }
-        }).collect();
+            let player = scene.player.clone();
+            let tiles = scene.tiles.clone();
+            async move { Self::update_koopas(koopas, &player, &tiles) }
+        };
 
-        // Movement
-        let goombas: Vec<_> = enemies
-            .iter()
-            .filter(|enemy| enemy.is_goomba())
-            .cloned()
-            .collect();
+        let updated_piranhas = {
+            let piranhas: Vec<_> = scene
+                .enemies
+                .iter()
+                .filter(|enemy| enemy.is_piranha())
+                .cloned()
+                .collect();
 
-        let updated_goombas = Self::update_goombas(goombas, scene);
+            let player = scene.player.clone();
+            let tiles = scene.tiles.clone();
+            async move { Self::update_piranhas(piranhas, &player, &tiles) }
+        };
 
-        let koopas: Vec<_> = enemies
-            .iter()
-            .filter(|enemy| enemy.is_koopa())
-            .cloned()
-            .collect();
+        let (goombas, koopas, piranhas) = futures::executor::block_on(join!(
+            thread_pool.spawn_with_handle(updated_goombas).unwrap(),
+            thread_pool.spawn_with_handle(updated_koopas).unwrap(),
+            thread_pool.spawn_with_handle(updated_piranhas).unwrap()
+        ));
 
         scene.enemies.clear();
-        scene.enemies.extend(updated_goombas);
-        scene.enemies.extend(koopas);
+        scene.enemies.extend(goombas.0);
+        scene.enemies.extend(koopas.0);
+        scene.enemies.extend(piranhas.0);
 
-        // Collision
-
-        // Animation State
+        let hits = goombas.1 + koopas.1 + piranhas.1;
+        if hits >= 1 {
+            systems.audio.start(&"./assets/audio/clips/mariodie.wav");
+            game.died = Some(Instant::now());
+        }
     }
 
-    pub fn update_goombas(mut goombas: Vec<Enemy>, scene: &mut Scene) -> Vec<Enemy> {
+    pub fn update_goombas(
+        goombas: Vec<Enemy>,
+        player: &Player,
+        tiles: &[MapTile],
+    ) -> (Vec<Enemy>, usize) {
         const GOOMBA_SPEED: f32 = 0.2;
 
+        // Handle Dead
+        let mut goombas: Vec<_> = goombas
+            .into_iter()
+            .filter(|goomba| {
+                !matches!(
+                    goomba.collider().collides_with(&player.collider()),
+                    Some((Hit::Bottom, _))
+                )
+            })
+            .collect();
+
+        let mut hits = 0;
         // Update movement
         for goomba in goombas.iter_mut() {
-            let Enemy { position, kind } = goomba;
             let EnemyKind::Goomba {
                 from,
                 to,
                 direction,
                 ..
-            } = kind else { unreachable!() };
+            } = &mut goomba.kind else { unreachable!() };
 
+            // Handle Movement
             match direction {
-                Direction::Forward => *position += vec2(GOOMBA_SPEED, 0.0),
-                Direction::Backward => *position -= vec2(GOOMBA_SPEED, 0.0),
+                Direction::Forward => goomba.position += vec2(GOOMBA_SPEED, 0.0),
+                Direction::Backward => goomba.position -= vec2(GOOMBA_SPEED, 0.0),
             }
 
-            match position.x {
+            match goomba.position.x {
                 x if x > to.x => *direction = Direction::Backward,
                 x if x < from.x => *direction = Direction::Forward,
                 _ => {}
             }
 
-            // Handle gravity
-            if let Some(tile_collider) = closest_ground(scene, &scene.tiles.clone()) {
+            if let Some((hit, _)) = goomba.collider().collides_with(&player.collider()) && hit != Hit::Bottom {
+                hits += 1;
+            }
+
+            // Handle Gravity
+            if let Some(collider) = below_of(goomba.position, uvec2(16, 16), tiles) && let Some((Hit::Top, overlap)) = goomba.collider().collides_with(&collider) {
+                goomba.position.y -= overlap;
             } else {
                 goomba.position.y += GRAVITY;
             }
         }
 
-        goombas
+        (goombas, hits)
+    }
+
+    pub fn update_koopas(
+        mut koopas: Vec<Enemy>,
+        player: &Player,
+        tiles: &[MapTile],
+    ) -> (Vec<Enemy>, usize) {
+        const KOOPA_SPEED: f32 = 0.15;
+
+        // Handle Dead
+        let mut hits = 0;
+        for koopa in koopas.iter_mut() {
+            // Hide in Shell
+            if let Some((Hit::Bottom, _)) = koopa.collider().collides_with(&player.collider()) {
+                if let EnemyKind::Koopa { shell, .. } = &mut koopa.kind {
+                     *shell = Some(Instant::now()) 
+                }
+            }
+
+            
+            let collider = koopa.collider();
+            let EnemyKind::Koopa { direction, shell, .. } = &mut koopa.kind else {unreachable!()};
+            
+            if shell.is_none() {
+                if let Some((hit, _)) = collider.collides_with(&player.collider()) && hit != Hit::Bottom {
+                    hits += 1;
+                }
+            }
+
+
+            // Gravity
+            let size = if shell.is_some() {uvec2(16, 16)} else {uvec2(16, 24)};
+            if let Some(collider) = below_of(koopa.position, size, tiles) && let Some((Hit::Top, overlap)) = collider.collides_with(&collider) {
+                if overlap != 16.0 {
+                        koopa.position.y -= overlap;
+                }  
+            } else {
+                koopa.position.y += GRAVITY;
+            }
+
+            if shell.is_none() {
+                koopa.position -= vec2(KOOPA_SPEED, 0.0);
+            }
+        }
+
+        (koopas, hits)
+    }
+
+    pub fn update_piranhas(piranhas: Vec<Enemy>, player: &Player, tiles: &[MapTile]) -> (Vec<Enemy>, usize) {
+        let mut hits = 0;
+        for piranha in &piranhas {
+            if let Some((_, _)) = piranha.collider().collides_with(&player.collider()) {
+                hits += 1;
+            }
+        }
+
+        (piranhas, hits)
     }
 
     pub fn on_destroy(&mut self, scene: &mut Scene) {
@@ -371,7 +494,12 @@ impl Game {
         }
 
         if let Some(collider) = closest_side(scene, &nearby_tiles.clone()) {
-            match scene.player.collider().collides_with(&collider) {
+            match scene
+                .player
+                .collider()
+                .collides_with(&collider)
+                .map(|e| e.0)
+            {
                 Some(Hit::Left) => {
                     scene.player.move_velocity = -scene.player.move_velocity;
                 }
@@ -411,26 +539,47 @@ impl Game {
     }
 }
 
-pub fn nearby_tiles(scene: &mut Scene) -> Vec<MapTile> {
-    let mut nearby_tiles = vec![];
-    let search_distance = 2000.0;
-    for block in scene.tiles.iter() {
-        // check x distance
-        if (block.coordinate.x as f32 - scene.player.position.x).abs() < search_distance
-            || (scene.player.position.x - block.coordinate.x as f32).abs() < search_distance
+/// Returns if there is a tile directly below of `position` in `tiles`.
+///
+/// If `position` is between two tiles one large bounding box is returned. The
+/// bounding box is in world-space.
+///
+/// # Arguments
+///
+/// - `position` - The position of the player/entity in world-space.
+/// - `tiles` - A slice containing all the tiles that should be checked against
+///   (in tile-space).
+pub fn below_of(position: Vec2, size: UVec2, tiles: &[MapTile]) -> Option<BoundingBox> {
+    let mut left: Option<MapTile> = None;
+    let mut right: Option<MapTile> = None;
+    for tile in tiles {
+        if tile.coordinate == (position + (size.as_vec2())).as_uvec2() / Renderer::TILE_SIZE {
+            left = Some(*tile)
+        } else if tile.coordinate
+            == (position + (size.as_vec2())).as_uvec2() / Renderer::TILE_SIZE - 1
         {
-            nearby_tiles.push(*block);
+            right = Some(*tile);
         }
 
-        // check y distance
-        if (block.coordinate.y as f32 - scene.player.position.y).abs() < search_distance
-            || (scene.player.position.y - block.coordinate.y as f32).abs() < search_distance
-        {
-            nearby_tiles.push(*block);
+        if left.is_some() && right.is_some() {
+            break;
         }
     }
 
-    return nearby_tiles;
+    match (left, right) {
+        (Some(left), None) => Some(left.collider()),
+        (None, Some(right)) => Some(right.collider()),
+        (Some(left), Some(right)) => {
+            let mut left_collider = left.collider();
+            let right_collider = right.collider();
+
+            left_collider.width += right_collider.width;
+            left_collider.height = left_collider.height.max(right_collider.height);
+            Some(left_collider)
+        }
+
+        _ => None,
+    }
 }
 
 pub fn closest_ground(scene: &mut Scene, nearby_tiles: &Vec<MapTile>) -> Option<BoundingBox> {
@@ -499,7 +648,7 @@ impl BoundingBox {
             height,
         }
     }
-    pub fn collides_with(&self, other: &Self) -> Option<Hit> {
+    pub fn collides_with(&self, other: &Self) -> Option<(Hit, f32)> {
         let dx = (self.x + self.width / 2.0) - (other.x + other.width / 2.0);
         let dy = (self.y + self.height / 2.0) - (other.y + other.height / 2.0);
         let combined_half_widths = self.width / 2.0 + other.width / 2.0;
@@ -510,15 +659,15 @@ impl BoundingBox {
             let overlap_y = combined_half_heights - dy.abs();
             if overlap_x < overlap_y {
                 if dx > 0.0 {
-                    Some(Hit::Right) // Collision on right side
+                    Some((Hit::Right, overlap_x)) // Collision on right side
                 } else {
-                    Some(Hit::Left) // Collision on left side
+                    Some((Hit::Left, overlap_x)) // Collision on left side
                 }
             } else {
                 if dy > 0.0 {
-                    Some(Hit::Bottom) // Collision on bottom side
+                    Some((Hit::Bottom, overlap_y)) // Collision on bottom side
                 } else {
-                    Some(Hit::Top) // Collision on top side
+                    Some((Hit::Top, overlap_y)) // Collision on top side
                 }
             }
         } else {

@@ -19,7 +19,7 @@ pub struct Renderer {
 }
 
 impl Renderer {
-    pub const TILES_X: u32 = 70;
+    pub const TILES_X: u32 = 25;
     pub const TILES_Y: u32 = 18;
     pub const TILE_SIZE: u32 = 16;
 
@@ -86,10 +86,10 @@ impl Renderer {
             mirror,
         } = sprite;
 
-        let texture = if let Some((texture, _)) = cache.get(sprite.asset_path) {
+        let texture = if let Some((texture, _)) = cache.get(asset_path) {
             texture
         } else {
-            let image = image::open(sprite.asset_path).unwrap();
+            let image = image::open(asset_path).unwrap();
             let image = image.to_rgba8();
 
             let pixels: Vec<_> = image
@@ -114,15 +114,14 @@ impl Renderer {
             texture.update(None, &pixels, pitch).unwrap();
             texture.set_blend_mode(BlendMode::Blend);
 
-            cache.insert(sprite.asset_path, (texture, 1));
-            cache
-                .get(sprite.asset_path)
-                .map(|(texture, _)| texture)
-                .unwrap()
+            cache.insert(asset_path, (texture, 1));
+            cache.get(asset_path).map(|(texture, _)| texture).unwrap()
         };
 
         let [x, y] = bounding_box.0.as_ref();
         let [width, height] = bounding_box.1.as_ref();
+
+        position += camera.position.as_uvec2();
 
         canvas
             .copy_ex(
@@ -140,10 +139,6 @@ impl Renderer {
     pub fn draw_background(&mut self, color: scene::Rgba) {
         self.canvas.set_draw_color(Color::from(color));
         self.canvas.fill_rect(None).unwrap();
-    }
-
-    pub fn draw_sprites(&mut self, scene: &mut Scene) {
-        let sprite = scene.player.to_sprite();
     }
 
     pub fn draw_player(&mut self, scene: &mut Scene) {
