@@ -151,7 +151,7 @@ impl Game {
                             },
                         },
                         Enemy {
-                            position: vec2(120.0 + 8.0, 192.0 - 24.0),
+                            position: vec2(104.0 + 8.0, 224.0 - 24.0),
                             kind: EnemyKind::Piranha {
                                 frame: RefCell::new(0),
                             },
@@ -159,7 +159,7 @@ impl Game {
                     ],
                     entities: vec![Entity {
                         kind: EntityKind::Pipe { id: 1 },
-                        position: uvec2(120, 192),
+                        position: uvec2(104, 224),
                     }],
                     tiles: {
                         let mut tiles = Vec::with_capacity((Renderer::TILES_X * 4) as _);
@@ -191,6 +191,10 @@ impl Game {
                                     coordinate: uvec2(i + 16, Renderer::TILES_Y - j - 3),
                                 })
                             }
+                        }
+
+                        for i in 0..4 {
+                            tiles.push(MapTile { block: Block::Ground, coordinate: uvec2(i + 2, 13) });
                         }
 
                         tiles

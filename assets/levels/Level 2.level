@@ -41,8 +41,8 @@
         },
         {
           "position": [
-            128.0,
-            168.0
+            112.0,
+            200.0
           ],
           "kind": {
             "Piranha": {}
@@ -52,8 +52,8 @@
       "entities": [
         {
           "position": [
-            120,
-            192
+            104,
+            224
           ],
           "kind": {
             "Pipe": {
@@ -600,6 +600,34 @@
           "coordinate": [
             16,
             10
+          ]
+        },
+        {
+          "block": "Ground",
+          "coordinate": [
+            2,
+            13
+          ]
+        },
+        {
+          "block": "Ground",
+          "coordinate": [
+            3,
+            13
+          ]
+        },
+        {
+          "block": "Ground",
+          "coordinate": [
+            4,
+            13
+          ]
+        },
+        {
+          "block": "Ground",
+          "coordinate": [
+            5,
+            13
           ]
         }
       ],
