@@ -121,13 +121,15 @@ impl Renderer {
         let [x, y] = bounding_box.0.as_ref();
         let [width, height] = bounding_box.1.as_ref();
 
-        position += camera.position.as_uvec2();
+        // konverter til i32
+        let mut pos_x = position.x as i32;
+        pos_x -= camera.position.x as i32;
 
         canvas
             .copy_ex(
                 texture,
                 Rect::new(*x as _, *y as _, *width, *height),
-                Rect::new(position.x as _, position.y as _, *width, *height),
+                Rect::new(pos_x as _, position.y as _, *width, *height),
                 0.0,
                 None,
                 *mirror,

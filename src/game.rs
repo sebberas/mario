@@ -276,8 +276,9 @@ impl Game {
             }
     
             Self::update_enemies(self, scene, systems);
-
-            scene.camera.position.x = scene.player.position.x;
+            if scene.player.position.x > (Renderer::TILES_X * Renderer::TILE_SIZE) as f32 * 0.5 {
+                scene.camera.position.x = scene.player.position.x - (Renderer::TILES_X * Renderer::TILE_SIZE) as f32 * 0.5;
+            }
         }
 
     }
