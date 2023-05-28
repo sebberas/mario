@@ -35,7 +35,7 @@ impl Runtime {
             .build()
             .unwrap();
 
-        let mut canvas = window
+        let canvas = window
             .into_canvas()
             .accelerated()
             .present_vsync()
@@ -81,18 +81,16 @@ impl Runtime {
 
 impl Layer for Runtime {
     fn update(&mut self, keyboard: KeyboardState, mouse: MouseState) {
-        let Self { game, systems, .. } = self;
+        let Self {
+            game,
+            systems,
+            renderer,
+            ..
+        } = self;
 
         game.update(&mut self.scene, systems, keyboard);
-
         systems.audio.update();
-
-        let start = std::time::Instant::now();
-        self.renderer.update(&mut self.scene);
-        let end = std::time::Instant::now();
-
-        let elapsed = end - start;
-        // println!("{elapsed:?}");
+        renderer.update(&mut self.scene);
     }
 
     fn handle_events(&mut self, events: &mut dyn Iterator<Item = &sdl2::event::Event>) {

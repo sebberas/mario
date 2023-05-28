@@ -67,7 +67,10 @@ fn main() {
             if let Some(layer) = layer {
                 let window_id = layer.window().id();
 
-                let mut iter = events.iter().filter(|event| matches!(event.get_window_id(), Some(id) if id == window_id && !matches!(event, Event::Quit { .. })));
+                let mut iter = events.iter().filter(|event| {
+                    matches!(event.get_window_id(), Some(id) if id == window_id
+                        && !matches!(event, Event::Quit { .. }))
+                });
 
                 layer.handle_events(&mut iter);
                 layer.update(event_pump.keyboard_state(), event_pump.mouse_state());

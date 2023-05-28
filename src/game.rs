@@ -122,7 +122,7 @@ impl Game {
     pub fn new(scene: &mut Scene, systems: &GameSystems) -> Self {
         let level_manager = LevelManager::new(&Self::LEVEL_PATH);
 
-        let mut level = Level {
+        let level = Level {
             name: "test".to_string(),
             difficulty: Difficulty::Easy,
             start: Some(0),
@@ -158,12 +158,16 @@ impl Game {
                         },
                     ],
                     entities: vec![Entity {
-                        kind: EntityKind::Pipe { id: 1 },
+                        kind: EntityKind::Pipe { id: 0 },
                         position: uvec2(104, 224),
+                    },
+                    Entity {
+                        kind: EntityKind::Pipe { id: 1 },
+                        position: uvec2(300, 224),
                     }],
                     tiles: {
                         let mut tiles = Vec::with_capacity((Renderer::TILES_X * 4) as _);
-                        for i in 0..Renderer::TILES_X {
+                        for i in 0..(2 * Renderer::TILES_X) {
                             for j in 0..2 {
                                 let x = i;
                                 let y = (Renderer::TILES_Y - 2) + j;
@@ -174,7 +178,8 @@ impl Game {
                                 })
                             }
                         }
-                        // // Stair thingy
+                        
+                        // Stair thingy
                         for i in 0..6 {
                             for j in i..6 {
                                 tiles.push(MapTile {
@@ -207,9 +212,9 @@ impl Game {
                     tiles: {
                         let mut tiles = Vec::with_capacity((Renderer::TILES_X * 4) as _);
                         for i in 0..Renderer::TILES_X {
-                            for j in 0..4 {
+                            for j in 0..2 {
                                 let x = i;
-                                let y = (Renderer::TILES_Y - 5) + j;
+                                let y = (Renderer::TILES_Y - 2) + j;
 
                                 tiles.push(MapTile {
                                     block: Block::Ground,
@@ -221,7 +226,7 @@ impl Game {
                         tiles
                     },
                     entities: Vec::default(),
-                    background: uvec3(0, 0, 0),
+                    background: uvec3(146, 144, 255),
                 },
             ],
         };
@@ -254,7 +259,14 @@ impl Game {
             
                 ];
     
-               let btn = show_message_box(MessageBoxFlag::empty(), &buttons, "Game Over", "You died, poor loser", None, None).unwrap();
+               let btn = show_message_box(
+                            MessageBoxFlag::empty(),
+                            &buttons,
+                            "Game Over",
+                            "You died, poor loser",
+                            None,
+                            None).unwrap();
+
                if let ClickedButton::CustomButton(btn) = btn {
                     if btn.button_id == 1 {
                         panic!("Get good");
@@ -264,22 +276,30 @@ impl Game {
 
 
         } else {
-            self.move_player(scene, &keyboard);
-    
-            for Entity { position, kind } in scene.entities.clone() {
-                if let EntityKind::Pipe { id } = kind {
-                    if scene.player.position.x >= position.x as f32
-                        && scene.player.position.x < (position.x + 32) as f32
-                        && (scene.player.position.y + 16.0) as u32 == position.y
-                        && keyboard.is_scancode_pressed(Scancode::S)
-                    {
-                        self.load_segment(id, scene);
-                        return;
+            // Check if the current segment of the level has changed.
+            for entity in scene.entities.clone() {
+                if let EntityKind::Pipe { id } = entity.kind {
+                    if matches!(scene.player.collider().collides_with(&entity.collider()), Some((Hit::Top, _))) && keyboard.is_scancode_pressed(Scancode::S) {
+                       self.load_segment(id, scene);
+                       return;
                     }
                 }
             }
+
+
+            
+            self.move_player(scene, &keyboard);
+            
+            // Check if the player has fallen to their death
+            if scene.player.position.y > (Renderer::TILES_Y * Renderer::TILES_Y) as f32 - 16.0 {
+                self.died = Some(Instant::now());
+                systems.audio.start(&"./assets/audio/clips/mariodie.wav");
+                return;
+            }
     
             Self::update_enemies(self, scene, systems);
+
+            // Move camera with the player
             if scene.player.position.x > (Renderer::TILES_X * Renderer::TILE_SIZE) as f32 * 0.5 {
                 scene.camera.position.x = scene.player.position.x - (Renderer::TILES_X * Renderer::TILE_SIZE) as f32 * 0.5;
             }
@@ -517,6 +537,22 @@ impl Game {
             }
         }
 
+        for entity in &scene.entities {
+            if matches!(entity.kind, EntityKind::Pipe { id: _}) {
+                if let Some((side, overlap)) = scene.player.collider().collides_with(&entity.collider()) {
+                    match side {
+                        Hit::Left => { scene.player.position -= vec2(overlap, 0.0)}
+                        Hit::Right => { scene.player.position += vec2(overlap, 0.0)}
+                        Hit::Top => {
+                            scene.player.position -= vec2(0.0, overlap);
+                        }
+                        _ => {}
+                    }
+                }
+
+            }
+        }
+
         if keyboard.is_scancode_pressed(Scancode::Space) && scene.player.can_jump == true {
             scene.player.jump_velocity = max_jumpspeed;
         }
@@ -609,7 +645,7 @@ pub fn closest_ground(scene: &mut Scene, nearby_tiles: &Vec<MapTile>) -> Option<
     return closest_tile;
 }
 
-pub fn closest_side(scene: &mut Scene, tiles: &Vec<MapTile>) -> Option<BoundingBox> {
+pub fn closest_side(scene: &mut Scene, tiles: &[MapTile]) -> Option<BoundingBox> {
     let Scene { player, .. } = scene;
 
     for tile in tiles.iter() {
@@ -654,7 +690,6 @@ impl BoundingBox {
         }
     }
 
-    // en smule overkompliceret når alle colliders er samme størrelse
     pub fn collides_with(&self, other: &Self) -> Option<(Hit, f32)> {
         let dx = (self.x + self.width / 2.0) - (other.x + other.width / 2.0);
         let dy = (self.y + self.height / 2.0) - (other.y + other.height / 2.0);

@@ -135,6 +135,24 @@ pub struct Entity {
     pub kind: EntityKind,
 }
 
+impl Entity {
+    pub fn collider(&self) -> BoundingBox {
+        let Self { position, kind } = self;
+
+        let (width, height) = match kind {
+            EntityKind::Pipe { id: _ } => (33.0, 34.0),
+            _ => unimplemented!(),
+        };
+
+        BoundingBox {
+            x: position.x as _,
+            y: position.y as _,
+            width,
+            height,
+        }
+    }
+}
+
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Deserialize, Serialize)]
 pub enum EntityKind {
     Coin,
