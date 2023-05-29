@@ -274,15 +274,16 @@ impl Game {
             for entity in scene.entities.clone() {
                 if let EntityKind::Pipe { id } = entity.kind {
                     if matches!(scene.player.collider().collides_with(&entity.collider()), Some((Hit::Top, _))) && keyboard.is_scancode_pressed(Scancode::S) {
-                       self.load_segment(id, scene);
-                       return;
+                        systems.audio.start(&"./assets/audio/sfx/pipe.wav");
+                        self.load_segment(id, scene);
+                        return;
                     }
                 }
             }
 
 
             
-            self.move_player(scene, &keyboard);
+            self.move_player(scene, &keyboard, systems);
             
             // Check if the player has fallen to their death
             if scene.player.position.y > (Renderer::TILES_Y * Renderer::TILES_Y) as f32 - 16.0 {
@@ -380,6 +381,10 @@ impl Game {
             thread_pool.spawn_with_handle(updated_piranhas).unwrap()
         ));
 
+        if scene.enemies.len() > goombas.0.len() + koopas.0.len() + piranhas.0.len() {
+            systems.audio.start(&"./assets/audio/sfx/bump.wav");
+        }
+
         scene.enemies.clear();
         scene.enemies.extend(goombas.0);
         scene.enemies.extend(koopas.0);
@@ -403,7 +408,7 @@ impl Game {
         let mut goombas: Vec<_> = goombas
             .into_iter()
             .filter(|goomba| {
-                !matches!(
+                 !matches!(
                     goomba.collider().collides_with(&player.collider()),
                     Some((Hit::Bottom, _))
                 )
@@ -513,7 +518,7 @@ impl Game {
         }
     }
 
-    pub fn move_player(&mut self, scene: &mut Scene, keyboard: &KeyboardState) {
+    pub fn move_player(&mut self, scene: &mut Scene, keyboard: &KeyboardState, systems: &GameSystems) {
         let move_acceleration = 0.3;
         let max_movespeed = 1.0;
         let max_fallspeed = 2.0;
@@ -579,6 +584,7 @@ impl Game {
         }
 
         if keyboard.is_scancode_pressed(Scancode::Space) && scene.player.can_jump == true {
+            systems.audio.start(&"./assets/audio/sfx/jump_small.wav");
             scene.player.jump_velocity = max_jumpspeed;
         }
         if scene.player.jump_velocity >= 0.0 {
