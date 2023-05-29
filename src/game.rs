@@ -2,7 +2,6 @@ use std::cell::RefCell;
 use std::fs::*;
 use std::future::join;
 use std::path::{Path, PathBuf};
-use std::str::SplitInclusive;
 use std::time::{Instant, Duration};
 
 use ::glam::*;
@@ -11,14 +10,12 @@ use ::sdl2::messagebox::*;
 use ::serde::{Deserialize, Serialize};
 use ::serde_json as json;
 use futures::executor::ThreadPool;
-use futures::future::join3;
 use futures::task::{Spawn, SpawnExt};
 
 use crate::audio::*;
 use crate::level::*;
 use crate::map::*;
 use crate::renderer::Renderer;
-use crate::scene;
 use crate::scene::*;
 
 const GRAVITY: f32 = 9.82 * 0.1;
@@ -107,6 +104,16 @@ impl Game {
             .expect("No level is loaded");
 
         let segment = &level.segments[segment_id];
+
+        if let Some(spawn) = segment.spawn {
+            scene.player.position = spawn.as_vec2();
+            scene.camera.position = vec2(0.0, 0.0);
+
+            if spawn.x as f32 > (Renderer::TILES_X * Renderer::TILE_SIZE) as f32 * 0.5 {
+                scene.camera.position.x = spawn.x as f32 - (Renderer::TILES_X * Renderer::TILE_SIZE) as f32 * 0.5;
+            }
+            
+        }
 
         scene.enemies = segment.enemies.clone();
         scene.entities = segment.entities.clone();
@@ -208,7 +215,20 @@ impl Game {
                 },
                 Segment {
                     spawn: Some(uvec2(30, 20)),
-                    enemies: Vec::default(),
+                    enemies: vec![
+                        Enemy {
+                            kind: EnemyKind::Koopa { direction: Direction::Forward, shell: None, frame: RefCell::new(0) },
+                            position: vec2(16.0 * 10.0, ((Renderer::TILES_Y - 4) * Renderer::TILE_SIZE) as f32)
+                        },
+                        Enemy {
+                            kind: EnemyKind::Koopa { direction: Direction::Forward, shell: None, frame: RefCell::new(0) },
+                            position: vec2(16.0 * 12.0, ((Renderer::TILES_Y - 4) * Renderer::TILE_SIZE) as f32)
+                        },
+                        Enemy {
+                            kind: EnemyKind::Koopa { direction: Direction::Forward, shell: None, frame: RefCell::new(0) },
+                            position: vec2(16.0 * 14.0, ((Renderer::TILES_Y - 4) * Renderer::TILE_SIZE) as f32)
+                        }
+                    ],
                     tiles: {
                         let mut tiles = Vec::with_capacity((Renderer::TILES_X * 4) as _);
                         for i in 0..Renderer::TILES_X {
@@ -247,34 +267,8 @@ impl Game {
     }
 
     pub fn update(&mut self, scene: &mut Scene, systems: &GameSystems, keyboard: KeyboardState) {
-        if let Some(died) = self.died {
-            let duration = Duration::from_secs(2);
-            if died.elapsed() >= duration {
-                let buttons = [
-                    ButtonData {
-                        flags: MessageBoxButtonFlag::NOTHING,
-                        button_id: 1,
-                        text: "Ohh noo",
-                    }
-            
-                ];
-    
-               let btn = show_message_box(
-                            MessageBoxFlag::empty(),
-                            &buttons,
-                            "Game Over",
-                            "You died, poor loser",
-                            None,
-                            None).unwrap();
-
-               if let ClickedButton::CustomButton(btn) = btn {
-                    if btn.button_id == 1 {
-                        panic!("Get good");
-                    }
-               }
-            }
-
-
+        if self.died.is_some() {
+            self.handle_died();
         } else {
             // Check if the current segment of the level has changed.
             for entity in scene.entities.clone() {
@@ -305,6 +299,37 @@ impl Game {
             }
         }
 
+    }
+
+    fn handle_died(&mut self) {
+        const DURATION: Duration = Duration::from_secs(2);
+        let died = self.died.unwrap();
+
+        if died.elapsed() >= DURATION {
+            let buttons = [
+                ButtonData {
+                    flags: MessageBoxButtonFlag::NOTHING,
+                    button_id: 1,
+                    text: "Ohh noo",
+                }
+            ];
+    
+            let btn = show_message_box(
+                        MessageBoxFlag::empty(),
+                        &buttons,
+                        "Game Over",
+                        "You died, poor loser",
+                        None,
+                        None
+                    )
+                    .unwrap();
+
+            if let ClickedButton::CustomButton(btn) = btn {
+                if btn.button_id == 1 {
+                        panic!("Get good");
+                }
+            }
+        }
     }
 
     pub fn update_enemies(game: &mut Game, scene: &mut Scene, systems: &GameSystems) {
