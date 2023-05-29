@@ -96,7 +96,7 @@ impl Command for Remove {
         if let Some(tile) = state
             .tiles
             .iter_mut()
-            .find(|tile| tile.map_or(false, |_| true))
+            .find(|tile| tile.map_or(false, |tile| tile.0 == self.0))
         {
             *tile = None;
         }
