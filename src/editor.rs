@@ -89,7 +89,7 @@ impl Command for Insert {
 }
 
 #[derive(Debug)]
-struct Remove(UVec2);
+struct Remove(UVec2, Color);
 
 impl Command for Remove {
     fn apply(&mut self, state: &mut EditorState) {
@@ -98,17 +98,17 @@ impl Command for Remove {
             .iter_mut()
             .find(|tile| tile.map_or(false, |tile| tile.0 == self.0))
         {
-            *tile = None;
+            if let Some(tile) = tile.take() {
+                self.1 = tile.1;
+            }
         }
     }
 
     fn undo(&mut self, state: &mut EditorState) {
         if let Some(tile) = state.tiles.iter_mut().find(|tile| tile.is_none()) {
-            *tile = Some((self.0, *RefCell::borrow(&state.brush)))
+            *tile = Some((self.0, self.1))
         } else {
-            state
-                .tiles
-                .push(Some((self.0, *RefCell::borrow(&state.brush))))
+            state.tiles.push(Some((self.0, self.1)))
         };
     }
 }
@@ -315,7 +315,9 @@ impl Layer for Editor {
                         .iter()
                         .any(|tile| matches!(tile, Some((tile, ..)) if tile == &position))
                     {
-                        self.commands.borrow_mut().push(Box::new(Remove(position)));
+                        self.commands
+                            .borrow_mut()
+                            .push(Box::new(Remove(position, Color::BLACK)));
                     }
                 }
                 _ => {}
